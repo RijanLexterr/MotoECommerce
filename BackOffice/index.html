@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Main Dashboard</title>
+    <meta
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+      name="viewport"
+    />
+    <link
+      rel="icon"
+      href="assets/img/kaiadmin/favicon.ico"
+      type="image/x-icon"
+    />
+
+    <!-- Fonts and icons -->
+    <script src="assets/js/plugin/webfont/webfont.min.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+
+
+    <script>
+      WebFont.load({
+        google: { families: ["Public Sans:300,400,500,600,700"] },
+        custom: {
+          families: [
+            "Font Awesome 5 Solid",
+            "Font Awesome 5 Regular",
+            "Font Awesome 5 Brands",
+            "simple-line-icons",
+          ],
+          urls: ["assets/css/fonts.min.css"],
+        },
+        active: function () {
+          sessionStorage.fonts = true;
+        },
+      });
+    </script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="assets/css/plugins.min.css" />
+    <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
+
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="assets/css/demo.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+    .accordion-button {
+      font-size: 1.3rem; /* Bigger text */
+      font-weight: 600;
+    }
+    .accordion-button .icon-toggle {
+      font-size: 1.3rem; /* Match icon size with text */
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-body{
+      height: 30vh;
+    }
+
+    body { font-family: Arial; padding: 20px; }
+    .login-box { max-width: 300px; margin: auto; }
+    input { display: block; width: 100%; margin-bottom: 10px; padding: 8px; }
+    button { padding: 8px 16px; }
+    .error { color: red; }
+    </style>    
+  </head>
+  <body>
+    <div ng-controller="MainController">    
+      <div class="wrapper">
+      <!-- Sidebar -->
+        <div ng-show="isLoggedIn" ng-include="'view/sidebarmenu.html'"></div>
+        <!-- End Sidebar -->
+
+                    <!-- Navbar Header -->
+            
+            <div ng-show="isLoggedIn" ng-include="'view/nav.html'"></div>
+            <!-- End Navbar -->
+
+        <div class="main-panel">
+          <div class="main-header">
+            <div class="main-header-logo">
+              <!-- Logo Header -->
+              <div class="logo-header" data-background-color="dark">
+                <a href="index.html" class="logo">
+                  <img
+                    src="assets/img/kaiadmin/logo_light.svg"
+                    alt="navbar brand"
+                    class="navbar-brand"
+                    height="20"
+                  />
+                </a>
+                <div class="nav-toggle">
+                  <button class="btn btn-toggle toggle-sidebar">
+                    <i class="gg-menu-right"></i>
+                  </button>
+                  <button class="btn btn-toggle sidenav-toggler">
+                    <i class="gg-menu-left"></i>
+                  </button>
+                </div>
+                <button class="topbar-toggler more">
+                  <i class="gg-more-vertical-alt"></i>
+                </button>
+              </div>
+              <!-- End Logo Header -->
+            </div>
+
+          </div>
+                    <div class="container">
+            <div class="page-inner">
+              <!--TO DO: Load specific View based on selected menu -->
+              <div ng-view></div>
+            </div>
+          </div>
+          <footer class="footer" ng-show="isLoggedIn">
+            <div class="container-fluid d-flex justify-content-between">
+              <nav class="pull-left">              
+              </nav>
+              <div class="copyright">
+                2025, Ester Supermarket Inc.
+              </div>
+              <div>
+                Distributed by
+                <a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
+              </div>
+            </div>
+          </footer>
+        </div>      
+      </div>
+    </div>
+
+    <!--   Core JS Files   -->
+    <script src="assets/js/core/jquery-3.7.1.min.js"></script>
+    <script src="assets/js/core/popper.min.js"></script>
+    <script src="assets/js/core/bootstrap.min.js"></script>
+
+    <!-- jQuery Scrollbar -->
+    <script src="assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+
+    <!-- Chart JS -->
+    <script src="assets/js/plugin/chart.js/chart.min.js"></script>
+
+    <!-- jQuery Sparkline -->
+    <script src="assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+
+    <!-- Chart Circle -->
+    <script src="assets/js/plugin/chart-circle/circles.min.js"></script>
+
+    <!-- Datatables -->
+    <script src="assets/js/plugin/datatables/datatables.min.js"></script>
+
+    <!-- Bootstrap Notify -->
+    <script src="assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+
+    <!-- jQuery Vector Maps -->
+    <script src="assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
+    <script src="assets/js/plugin/jsvectormap/world.js"></script>
+
+    <!-- Sweet Alert -->
+    <script src="assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+
+
+    <script src="app.js"></script>
+    <script src="controllers/userController.js"></script>
+    <script src="controllers/product.controller.js"></script>
+    <script src="controllers/inventoryController.js"></script>
+	  <script src="controllers/categoryController.js"></script>
+	  <script src="controllers/dashboardController.js"></script>
+	  <script src="controllers/orderController.js"></script>
+    <script src="controllers/inventoryTransByPrdoductsController.js"></script>
+    <script src="controllers/navController.js"></script>
+    <script src="controllers/loginController.js"></script>
+    <script src="controllers/mainController.js"></script>
+  </body>
+</html>

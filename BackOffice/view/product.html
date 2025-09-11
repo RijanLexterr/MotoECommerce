@@ -1,0 +1,12 @@
+<input type="text" ng-model="searchQuery" placeholder="Search..." />
+  <table>
+    <tr ng-repeat="item in products | filter:searchQuery">
+      <td>{{$index + 1}}</td>
+      <td>{{item.name}}</td>
+      <td>{{item.description}}</td>
+      <td>{{item.price}}</td>
+      <td>{{item.stock}}</td>
+      <td>{{item.expiration_date}}</td>
+    </tr>
+  </table>
+

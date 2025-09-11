@@ -1,0 +1,39 @@
+.action-btn-container {
+    display: flex;
+}
+
+.action-update-btn {
+    padding: 6.5px 8px 6.5px 8px;
+    border: 1px solid green;
+    border-radius: 16px;
+    margin-right: 5px;
+    color:green
+}
+
+.action-delete-btn {
+    padding: 6.5px 8px 6.5px 8px;
+    border: 1px solid red;
+    border-radius: 16px;
+    color:red
+}
+
+.add-user-btn-container {
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+.pagination .page-link {
+  border-radius: 50px;
+  transition: background-color 0.3s ease;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+}
+
+.pagination .page-link:hover {
+  background-color: #e9ecef;
+}
+
