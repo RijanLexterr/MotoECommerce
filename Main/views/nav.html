@@ -1,0 +1,251 @@
+<!-- Topbar Start -->
+<div ng-controller="NavController">
+    <!-- HEADER -->
+    <header>
+        <!-- TOP HEADER -->
+        <div id="top-header">
+            <div class="container">
+                <ul class="header-links pull-left">
+                    <li><a href="#"><i class="fa fa-phone"></i> +021-95-51-84</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o"></i> email@email.com</a></li>
+                    <li><a href="#"><i class="fa fa-map-marker"></i> 1734 Stonecoal Road</a></li>
+                </ul>
+                <ul class="header-links pull-right">
+                    <li><a href="#"><i class="fa fa-dollar"></i> USD</a></li>
+                    <li><a href="#"><i class="fa fa-user-o"></i> My Account</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- /TOP HEADER -->
+
+        <!-- MAIN HEADER -->
+        <div id="header">
+            <!-- container -->
+            <div class="container">
+                <!-- row -->
+                <div class="row">
+                    <!-- LOGO -->
+                    <div class="col-md-3">
+                        <div class="header-logo">
+                            <a href="#" class="logo">
+                                <img src="./assets/img/logo.png" alt="">
+                            </a>
+                        </div>
+                    </div>
+                    <!-- /LOGO -->
+
+                    <!-- SEARCH BAR -->
+                    <div class="col-md-6">
+                        <div class="header-search">
+                            <form>
+                                <select class="input-select">
+                                    <option value="0">All Categories</option>
+                                    <option value="1">Category 01</option>
+                                    <option value="1">Category 02</option>
+                                </select>
+                                <input class="input" placeholder="Search here">
+                                <button class="search-btn">Search</button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- /SEARCH BAR -->
+
+                    <!-- ACCOUNT -->
+                    <div class="col-md-3 clearfix">
+                        <div class="header-ctn">
+                            <!-- Wishlist -->
+                            <div>
+                                <a href="#">
+                                    <i class="fa fa-heart-o"></i>
+                                    <span>Your Wishlist</span>
+                                    <div class="qty">2</div>
+                                </a>
+                            </div>
+                            <!-- /Wishlist -->
+
+                            <!-- Cart -->
+                            <div class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span>Your Cart</span>
+                                    <div class="qty"> {{cartCount}}
+                                    </div>
+                                </a>
+                                <div class="cart-dropdown">
+                                    <div class="cart-list">
+                                        <div class="product-widget" ng-repeat="item in productsOnCart">
+                                            <div class="product-img">
+                                                <img class="img-fluid w-100" ng-if="item.image_location"
+                                                    ng-src="../BackOffice/uploads/{{item.image_location}}"
+                                                    alt="{{ item.name }}">
+
+                                                <img class="img-fluid w-100" ng-if="!item.image_location"
+                                                    ng-src="assets/img/default.jpg" alt="No image available">
+                                            </div>
+                                            <div class="product-body">
+                                                <h3 class="product-name"><a href="#">{{item.details.name}}</a></h3>
+                                                <h4 class="product-price"><span
+                                                        class="qty">{{item.count}} x</span>{{item.details.price}}</h4>
+                                            </div>
+                                            <button class="delete"><i class="fa fa-close"></i></button>
+                                        </div>
+
+                                    </div>
+                                    <div class="cart-summary">
+                                        <small>{{cartCount}} Item(s) selected</small>
+                                        <h5>SUBTOTAL: {{ getTotal() | currency:"₱":2 }}</h5>
+                                    </div>
+                                    <div class="cart-btns">
+                                        <a href="#">View Cart</a>
+                                        <a href="#">Checkout <i class="fa fa-arrow-circle-right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /Cart -->
+
+                            <!-- Menu Toogle -->
+                            <div class="menu-toggle">
+                                <a href="#">
+                                    <i class="fa fa-bars"></i>
+                                    <span>Menu</span>
+                                </a>
+                            </div>
+                            <!-- /Menu Toogle -->
+                        </div>
+                    </div>
+                    <!-- /ACCOUNT -->
+                </div>
+                <!-- row -->
+            </div>
+            <!-- container -->
+        </div>
+        <!-- /MAIN HEADER -->
+    </header>
+    <!-- /HEADER -->
+
+    <!-- NAVIGATION -->
+    <nav id="navigation">
+        <!-- container -->
+        <div class="container">
+            <!-- responsive-nav -->
+            <div id="responsive-nav">
+                <!-- NAV -->
+                <ul class="main-nav nav navbar-nav">
+                    <li class="active"><a href="#!/">Home</a></li>
+                    <li><a href="#">Hot Deals</a></li>
+                    <li><a href="#!/shop/0">Shop</a></li>
+                    <li><a href="#">Categories</a></li>
+                    <li><a href="#">Laptops</a></li>
+                    <li><a href="#">Smartphones</a></li>
+                    <li><a href="#">Cameras</a></li>
+                    <li><a href="#">Accessories</a></li>
+                </ul>
+                <!-- /NAV -->
+            </div>
+            <!-- /responsive-nav -->
+        </div>
+        <!-- /container -->
+    </nav>
+    <!-- /NAVIGATION -->
+
+
+
+    <!-- Register User Modal -->
+    <div class="modal fade" id="userCreateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userCreateModalLabel">Add User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" ng-click="updateUserFields()"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" ng-model="name" ng-blur="validateName()">
+                        <span ng-show="nameHasError" style="color: red; font-size: 0.9em;">
+                            Name is required.
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="text" class="form-control" id="email" ng-disabled="userId" ng-model="email"
+                            ng-blur="validateEmail()">
+                        <span ng-show="emailHasError" style="color: red; font-size: 0.9em;">
+                            {{emailError}}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" ng-model="password"
+                            ng-blur="validatePassword()">
+                        <span ng-show="passwordHasError" style="color: red; font-size: 0.9em;">
+                            Password is required.
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="text" class="form-control" id="confirmPassword" ng-model="confirmPassword"
+                            ng-blur="validateConfirmPassword()">
+                        <span ng-show="confirmPasswordHasError" style="color: red; font-size: 0.9em;">
+                            {{confirmPasswordError}}
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        ng-click="updateUserFields()">Cancel</button>
+                    <button ng-show="!userId" type="button" class="btn btn-primary"
+                        ng-click="submit(userId)">Cofirm</button>
+                    <button ng-show="userId" type="button" class="btn btn-primary"
+                        ng-click="submit(userId)">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-body p-4">
+                        <form>
+                            <!-- Email input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="email" id="email" ng-model="username" class="form-control" />
+                                <label class="form-label" for="email1">Email address</label>
+                            </div>
+
+                            <!-- password input -->
+                            <div data-mdb-input-init class="form-outline mb-4">
+                                <input type="password" id="password" ng-model="password" class="form-control" />
+                                <label class="form-label" for="password1">Password</label>
+                            </div>
+
+                            <!-- Submit button -->
+                            <button type="submit" data-mdb-button-init data-mdb-ripple-init
+                                class="btn btn-primary btn-block" ng-click="login()">Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+</div>

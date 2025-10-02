@@ -40,15 +40,12 @@ app.controller("ProductController", function($scope, $http) {
 		$http.get(`../Core/Controller/ProductController.php?action=readAll&page=${page}&limit=${limit}`)
 		.then(function(response) {
 		  $scope.products = response.data.data;
-		  console.log($scope.products);
 		  $scope.pagination.page = response.data.page;
 		  $scope.pagination.limit = response.data.limit;
 		  $scope.pagination.totalPages = Math.ceil(response.data.total / response.data.limit);
 		}, function(error) {
 		  console.error("Error fetching data:", error);
 		});
-		  
-
 	};
 
 	function getAllCategoriesAndBrands() {
