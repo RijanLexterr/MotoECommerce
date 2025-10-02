@@ -160,7 +160,7 @@ INSERT INTO roles (name) VALUES
 
 -- Order Status
 INSERT INTO order_status (name) VALUES
-('Paid'),('To Ship'),('For Delivery'),('Delivered');
+('Paid'),('To Ship'),('For Delivery'),('Delivered'),('Completed');
 
 -- Transaction Types
 INSERT INTO transaction_types (name) VALUES

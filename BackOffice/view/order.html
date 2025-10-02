@@ -1,75 +1,79 @@
-<div class="container mt-5">
-    <h2 class="mb-4">Pending Orders</h2>
+<div class="add-user-btn-container d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <input class="form-control" type="text" placeholder="search" ng-model="searchQuery">
+    </div>
+</div>
 
-    <!-- Parent and Child Table -->
-    <table class="table table-bordered">
+<div>
+    <table class="table">
         <thead>
             <tr>
-                <th>Order No</th>
-                <th>Order By</th>
-                <th>Status</th>
-                <th>Order Created At</th>
+                <th scope="col">Order No</th>
+                <th scope="col">Order By</th>
+                <th scope="col">Status</th>
+                <th scope="col">Order Created At</th>
+                <th scope="col">Action</th>
             </tr>
         </thead>
+        </thead>
         <tbody>
-            <tr ng-repeat="order in OrdersWithItems | filter:{order_status_name: 'Pending'}">
+            <tr ng-repeat="order in OrdersWithItems | filter:searchQuery">
                 <td>{{ order.order_id }}</td>
                 <td>{{ order.order_by_name }}</td>
                 <td>{{ order.order_status_name }}</td>
-                <td>{{ order.order_created_at }}</td>                
+                <td>{{ order.order_created_at }}</td>  
                 <td>
-                    <!-- Toggle Button for Child Items -->
-                    <button class="btn btn-secondary mb-2" ng-click="showOrderItems(order)">
-                      Show Items
-                    </button>
+                    <div class="action-btn-container">
+                        <div>
+                            <button type="button" class="btn btn-link btn-primary" ng-click="showOrderItems(order)" data-bs-toggle="modal" data-bs-target="#showItemsModal">
+                                <i class="far fa-folder-open" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Order Items"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order.order_id)" data-bs-toggle="modal" data-bs-target="#shippedOrderConfirmationModal" ng-show="order.order_status_name == 'Pending'">
+                                <i class="fas fa-shipping-fast" data-bs-toggle="tooltip" data-bs-placement="top" title="Ship Order"></i>
+                            </button>
+                        </div>
+                    </div>
                 </td>
-                <td>
-                    <!-- Toggle Button for Child Items -->
-                    <button class="btn btn-secondary mb-2" ng-click="shippedOrder(order.order_id)">
-                      Ready for Shipping
-                    </button>
-                </td>
-            </tr>
+            </tr>            
         </tbody>
     </table>
-</div>
-<div class="container mt-5">
-    <h2 class="mb-4">Shipped Orders</h2>
+    <div>
+        <!-- Pagination controls -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                <label>Show 
+                <select ng-model="pageSize" ng-change="changePageSize()" 
+                            ng-options="s for s in [5,10,25,50]"></select> 
+                entries
+                </label>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-primary"
+                            ng-disabled="pagination.page === 1"
+                            ng-click="loadTransactions(pagination.page - 1)">Prev</button>
 
-    <!-- Parent and Child Table -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Order No</th>
-                <th>Order By</th>
-                <th>Status</th>
-                <th>Order Created At</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="order in OrdersWithItems | filter:{order_status_name: 'Shipped'}">
-                <td>{{ order.order_id }}</td>
-                <td>{{ order.order_by_name }}</td>
-                <td>{{ order.order_status_name }}</td>
-                <td>{{ order.order_created_at }}</td>                
-                <td>
-                    <!-- Toggle Button for Child Items -->
-                    <button class="btn btn-secondary mb-2" ng-click="showOrderItems(order)">
-                      Show Items
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+                Page {{pagination.page}} of {{pagination.totalPages}}
 
-<!-- Bootstrap Modal for showing child items -->
-<div class="modal fade" id="childModal" tabindex="-1" aria-labelledby="childModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" style="max-width: 75%;">
+                <button class="btn btn-sm btn-outline-primary"
+                            ng-disabled="pagination.page === pagination.totalPages"
+                            ng-click="loadTransactions(pagination.page + 1)">Next</button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+    
+
+<!-- Show Items Modal -->
+<div class="modal fade" id="showItemsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="max-width:65%;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="childModalLabel">Order Items</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="showItemsModalLabel">Order Items</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
             </div>
             <div class="modal-body">
                 <!-- Table wrapped in a div with `table-responsive` class -->
@@ -77,22 +81,22 @@
                     <table class="table table-sm table-bordered">
                         <thead>
                             <tr>
-                              <th>Child Item ID</th>
-                              <th>Brand Name</th>
-                              <th>Category Name</th>
-                              <th>Quantity</th>
-                              <th>Price</th>
-                              <th>Item Total Amount</th>
+                                <th>Child Item ID</th>
+                                <th>Brand Name</th>
+                                <th>Category Name</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Item Total Amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="item in selectedParent.items">
-                              <td>{{ item.item_id}}</td>
-                              <td>{{ item.item_brand_name }}</td>
-                              <td>{{ item.item_category_name }}</td>
-                              <td>{{ item.item_qty }}</td>
-                              <td>{{ item.item_price }}</td>
-                              <td>{{ item.item_total_amt }}</td>
+                                <td>{{ item.item_id}}</td>
+                                <td>{{ item.item_brand_name }}</td>
+                                <td>{{ item.item_category_name }}</td>
+                                <td>{{ item.item_qty }}</td>
+                                <td>{{ item.item_price }}</td>
+                                <td>{{ item.item_total_amt }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -101,42 +105,20 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap Modal for showing child items -->
-<div class="modal fade" id="childModal" tabindex="-1" aria-labelledby="childModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" style="max-width: 75%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="childModalLabel">Order Items</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Table wrapped in a div with `table-responsive` class -->
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead>
-                            <tr>
-                              <th>Child Item ID</th>
-                              <th>Brand Name</th>
-                              <th>Category Name</th>
-                              <th>Quantity</th>
-                              <th>Price</th>
-                              <th>Item Total Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="item in selectedParent.items">
-                              <td>{{ item.item_id}}</td>
-                              <td>{{ item.item_brand_name }}</td>
-                              <td>{{ item.item_category_name }}</td>
-                              <td>{{ item.item_qty }}</td>
-                              <td>{{ item.item_price }}</td>
-                              <td>{{ item.item_total_amt }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<div class="modal fade" id="shippedOrderConfirmationModal" tabindex="-1" aria-labelledby="shippedOrderConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="shippedOrderConfirmationModalLabel">Ready to Ship Order</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to ship this order now?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" ng-click="shippedOrder()">Yes</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+      </div>
     </div>
+  </div>
 </div>
