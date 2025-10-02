@@ -1,0 +1,75 @@
+<div class="container mt-5" ng-controller="PaymentTypeController">
+    <h2 class="mb-4">Payment Types</h2>
+
+    <!-- Add New Payment Type Form -->
+    <form ng-submit="addPaymentType(newType)" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" class="form-control" ng-model="newType.payment_type_name" placeholder="Payment Type Name" required>
+            </div>
+            <div class="col-md-2">
+                <select class="form-control" ng-model="newType.is_active" required>
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Add Payment Type</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Payment Types Table -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Payment Type ID</th>
+                <th>Name</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="type in PaymentTypes">
+                <td>{{ type.payment_type_id }}</td>
+                <td>{{ type.name }}</td>
+                <td>
+                    <span ng-if="type.is_active == 1" class="badge bg-success">Active</span>
+                    <span ng-if="type.is_active == 0" class="badge bg-danger">Inactive</span>
+                </td>
+                <td>
+                    <button class="btn btn-secondary btn-sm" ng-click="showPaymentTypeModal(type)">Edit</button>
+                    <button class="btn btn-danger btn-sm" ng-click="deletePaymentType(type.payment_type_id)">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Editing Payment Type -->
+<div class="modal fade" id="paymentTypeModal" tabindex="-1" aria-labelledby="paymentTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentTypeModalLabel">Edit Payment Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form ng-submit="updatePaymentType(selectedPaymentType)">
+                    <div class="mb-3">
+                        <label class="form-label">Payment Type Name</label>
+                        <input type="text" class="form-control" ng-model="selectedPaymentType.payment_type_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Is Active</label>
+                        <select class="form-control" ng-model="selectedPaymentType.is_active" required>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

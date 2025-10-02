@@ -1,6 +1,6 @@
 -- CREATE DATABASE
 CREATE DATABASE MotoECommerce;
-USE eCommerce;
+USE MotoECommerce;
 
 -- ======================
 -- LOOKUP TABLES
@@ -22,6 +22,13 @@ CREATE TABLE order_status (
 CREATE TABLE transaction_types (
     type_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- PAYMENT TYPES
+CREATE TABLE payment_types (
+    payment_type_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    is_active TINYINT(1) DEFAULT 1
 );
 
 -- ======================
@@ -85,7 +92,7 @@ CREATE TABLE products (
     expiration_date DATE NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     image_location VARCHAR(200) NULL,
-    filePath VARCHAR(255) NULL, -- ✅ new column
+    filePath VARCHAR(255) NULL,
     FOREIGN KEY (brand_id) REFERENCES brands(brand_id) ON DELETE SET NULL,
     FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL
 );
@@ -115,7 +122,7 @@ CREATE TABLE cart (
     FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
--- ORDERS (✅ updated with user_shipping_id directly)
+-- ORDERS (✅ now includes payment_type_id)
 CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -124,9 +131,12 @@ CREATE TABLE orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     shipped_at DATETIME NULL,
     user_shipping_id INT NULL,
+    payment_type_id INT NULL,
+    payment_img VARCHAR(255) NULL, -- Path to payment image
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (status_id) REFERENCES order_status(status_id),
-    FOREIGN KEY (user_shipping_id) REFERENCES user_shipping_details(user_shipping_id)
+    FOREIGN KEY (user_shipping_id) REFERENCES user_shipping_details(user_shipping_id),
+    FOREIGN KEY (payment_type_id) REFERENCES payment_types(payment_type_id)
 );
 
 -- ORDER ITEMS
@@ -150,11 +160,17 @@ INSERT INTO roles (name) VALUES
 
 -- Order Status
 INSERT INTO order_status (name) VALUES
-('Pending'), ('Paid'), ('Shipped'), ('Delivered');
+('Paid'),('To Ship'),('For Delivery'),('Delivered');
 
 -- Transaction Types
 INSERT INTO transaction_types (name) VALUES
 ('In'), ('Out'), ('Adjustment');
+
+-- Payment Types
+INSERT INTO payment_types (name, is_active) VALUES
+('Cash on Delivery', 1),
+('GCash', 1)
+
 
 -- Users
 INSERT INTO users (name, email, password) VALUES
@@ -186,9 +202,9 @@ INSERT INTO products (brand_id, category_id, name, description, price, stock, ex
 (3, 4, 'Vitamin C Tablets', 'Immune Booster 500mg', 250.00, 200, '2027-01-15');
 
 -- Orders
-INSERT INTO orders (user_id, status_id, total) VALUES
-(3, 1, 4725.00),  -- Pending
-(3, 2, 35000.00); -- Paid
+INSERT INTO orders (user_id, status_id, total, payment_type_id) VALUES
+(3, 1, 4725.00, 1),  -- Pending, Cash
+(3, 2, 35000.00, 2); -- Paid, Credit Card
 
 -- Order Items
 INSERT INTO order_items (order_id, product_id, qty, price) VALUES

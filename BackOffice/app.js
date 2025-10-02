@@ -48,6 +48,13 @@ app.config(function($routeProvider) {
         auth: checkAuth
       }
     })
+    .when("/paymentType", {
+      templateUrl: "view/paymentType.html",
+      controller: "PaymentTypeController",
+      resolve: {
+        auth: checkAuth
+      }
+    })
     .when("/orders", {
       templateUrl: "view/order.html",
       controller: "OrderController",
