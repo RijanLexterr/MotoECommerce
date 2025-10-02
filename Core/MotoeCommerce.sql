@@ -1,6 +1,8 @@
--- CREATE DATABASE
+-- DROP & CREATE DATABASE
+DROP DATABASE IF EXISTS MotoECommerce;
 CREATE DATABASE MotoECommerce;
 USE MotoECommerce;
+
 
 -- ======================
 -- LOOKUP TABLES
@@ -160,7 +162,7 @@ INSERT INTO roles (name) VALUES
 
 -- Order Status
 INSERT INTO order_status (name) VALUES
-('Paid'),('To Ship'),('For Delivery'),('Delivered'),('Completed');
+('Pending'),('Paid'),('To Ship'),('Delivered'),('Completed');
 
 -- Transaction Types
 INSERT INTO transaction_types (name) VALUES
@@ -169,7 +171,7 @@ INSERT INTO transaction_types (name) VALUES
 -- Payment Types
 INSERT INTO payment_types (name, is_active) VALUES
 ('Cash on Delivery', 1),
-('GCash', 1)
+('GCash', 1);
 
 
 -- Users
@@ -184,27 +186,53 @@ INSERT INTO user_roles (user_id, role_id) VALUES
 (2, 2),  -- Staff
 (3, 3);  -- Customer
 
--- Brands
-INSERT INTO brands (name) VALUES
-('Nike'), ('Samsung'), ('Nestle'), ('Sony');
-
--- Categories
-INSERT INTO categories (name) VALUES
-('Clothing'), ('Electronics'), ('Food & Beverage'), ('Health & Beauty');
-
--- Products
-INSERT INTO products (brand_id, category_id, name, description, price, stock, expiration_date) VALUES
-(1, 1, 'Nike Air Max', 'Running Shoes', 4500.00, 20, NULL),
-(2, 2, 'Samsung Galaxy S22', 'Latest Smartphone', 35000.00, 10, NULL),
-(3, 3, 'Nescafe Coffee', 'Instant Coffee 100g', 150.00, 50, '2026-12-31'),
-(3, 3, 'Nestle Milk 1L', 'Fresh Milk', 75.00, 100, '2025-10-01'),
-(4, 2, 'Sony Headphones', 'Wireless Noise Cancelling', 8000.00, 15, NULL),
-(3, 4, 'Vitamin C Tablets', 'Immune Booster 500mg', 250.00, 200, '2027-01-15');
-
 -- Orders
 INSERT INTO orders (user_id, status_id, total, payment_type_id) VALUES
 (3, 1, 4725.00, 1),  -- Pending, Cash
+(3, 3, 471225.00, 1),  -- Pending, Cash
 (3, 2, 35000.00, 2); -- Paid, Credit Card
+
+-- Brands (Motorcycle related)
+INSERT INTO brands (name) VALUES
+('Yamaha'),
+('Honda'),
+('Kawasaki'),
+('Suzuki');
+
+-- Categories (Motorcycle Parts & Accessories)
+INSERT INTO categories (name) VALUES
+('Engines & Performance'),
+('Tires & Wheels'),
+('Brakes & Suspension'),
+('Riding Gear & Accessories');
+
+-- More Motorcycle Products
+INSERT INTO products (brand_id, category_id, name, description, price, stock, expiration_date) VALUES
+-- Engines & Performance
+(1, 1, 'Yamaha Spark Plug Set', 'High-performance spark plugs for 150cc-200cc engines', 450.00, 100, NULL),
+(2, 1, 'Honda Chain & Sprocket Kit', 'Durable chain with front & rear sprockets', 3200.00, 25, NULL),
+(3, 1, 'Kawasaki Air Filter', 'Washable performance air filter', 1600.00, 30, NULL),
+
+-- Tires & Wheels
+(4, 2, 'Suzuki Alloy Wheel 17"', 'Lightweight alloy rear wheel for street bikes', 9500.00, 8, NULL),
+(2, 2, 'Honda Front Tire 90/80-17', 'All-season tubeless front tire', 2800.00, 15, NULL),
+
+-- Brakes & Suspension
+(1, 3, 'Yamaha Brake Pads', 'Ceramic front brake pads', 750.00, 60, NULL),
+(3, 3, 'Kawasaki Front Fork Oil Seal Kit', 'Fork seal replacement kit', 1200.00, 40, NULL),
+
+-- Riding Gear & Accessories
+(4, 4, 'Suzuki Riding Jacket', 'Mesh jacket with CE protection', 7200.00, 10, NULL),
+(1, 4, 'Yamaha Motorcycle Boots', 'Racing boots with ankle protection', 5600.00, 15, NULL),
+(2, 4, 'Honda Tank Bag', 'Magnetic tank bag with rain cover', 2200.00, 20, NULL),
+
+-- Oils & Consumables (still under Engines & Performance)
+(1, 1, 'Yamaha Engine Oil 1L', 'Fully synthetic 10W-40 motorcycle oil', 600.00, 200, '2027-06-01'),
+(2, 1, 'Honda Brake Fluid 500ml', 'DOT 4 high-performance brake fluid', 350.00, 150, '2026-12-01'),
+(3, 1, 'Kawasaki Coolant 1L', 'Long-life premixed coolant', 450.00, 100, '2028-01-01');
+
+
+
 
 -- Order Items
 INSERT INTO order_items (order_id, product_id, qty, price) VALUES

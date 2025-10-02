@@ -21,59 +21,72 @@
                 <td>{{ order.order_id }}</td>
                 <td>{{ order.order_by_name }}</td>
                 <td>{{ order.order_status_name }}</td>
-                <td>{{ order.order_created_at }}</td>  
+                <td>{{ order.order_created_at }}</td>
                 <td>
                     <div class="action-btn-container">
                         <div>
-                            <button type="button" class="btn btn-link btn-primary" ng-click="showOrderItems(order)" data-bs-toggle="modal" data-bs-target="#showItemsModal">
-                                <i class="far fa-folder-open" data-bs-toggle="tooltip" data-bs-placement="top" title="Show Order Items"></i>
+                            <button type="button" class="btn btn-link btn-primary" ng-click="showOrderItems(order)"
+                                data-bs-toggle="modal" data-bs-target="#showItemsModal">
+                                <i class="far fa-folder-open" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Show Order Items"></i>
                             </button>
                         </div>
                         <div>
-                            <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order.order_id)" data-bs-toggle="modal" data-bs-target="#shippedOrderConfirmationModal" ng-show="order.order_status_name == 'Pending'">
-                                <i class="fas fa-shipping-fast" data-bs-toggle="tooltip" data-bs-placement="top" title="Ship Order"></i>
+                            <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order.order_id)"
+                                data-bs-toggle="modal" data-bs-target="#shippedOrderConfirmationModal"
+                                ng-show="order.order_status_name == 'Paid'||order.order_status_name == 'Pending'">
+                                <i class="fas fa-shipping-fast" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Tag as Ship Order"></i>
+                            </button>
+                        </div>
+
+                        <div>
+                            <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order.order_id)"
+                                data-bs-toggle="modal" data-bs-target="#shippedOrderConfirmationModal"
+                                ng-show="order.order_status_name == 'To Ship'">
+                                <i class="fas fa fa-check-circle" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Tag as Delivered"></i>
                             </button>
                         </div>
                     </div>
                 </td>
-            </tr>            
+            </tr>
         </tbody>
     </table>
     <div>
         <!-- Pagination controls -->
         <div class="d-flex justify-content-between align-items-center mt-3">
             <div>
-                <label>Show 
-                <select ng-model="pageSize" ng-change="changePageSize()" 
-                            ng-options="s for s in [5,10,25,50]"></select> 
-                entries
+                <label>Show
+                    <select ng-model="pageSize" ng-change="changePageSize()"
+                        ng-options="s for s in [5,10,25,50]"></select>
+                    entries
                 </label>
             </div>
             <div>
-                <button class="btn btn-sm btn-outline-primary"
-                            ng-disabled="pagination.page === 1"
-                            ng-click="loadTransactions(pagination.page - 1)">Prev</button>
+                <button class="btn btn-sm btn-outline-primary" ng-disabled="pagination.page === 1"
+                    ng-click="loadTransactions(pagination.page - 1)">Prev</button>
 
                 Page {{pagination.page}} of {{pagination.totalPages}}
 
-                <button class="btn btn-sm btn-outline-primary"
-                            ng-disabled="pagination.page === pagination.totalPages"
-                            ng-click="loadTransactions(pagination.page + 1)">Next</button>
+                <button class="btn btn-sm btn-outline-primary" ng-disabled="pagination.page === pagination.totalPages"
+                    ng-click="loadTransactions(pagination.page + 1)">Next</button>
 
             </div>
         </div>
 
     </div>
 </div>
-    
+
 
 <!-- Show Items Modal -->
-<div class="modal fade" id="showItemsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="showItemsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" style="max-width:65%;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="showItemsModalLabel">Order Items</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Table wrapped in a div with `table-responsive` class -->
@@ -105,20 +118,21 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="shippedOrderConfirmationModal" tabindex="-1" aria-labelledby="shippedOrderConfirmationModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="shippedOrderConfirmationModalLabel">Ready to Ship Order</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to ship this order now?</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" ng-click="shippedOrder()">Yes</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-      </div>
+<div class="modal fade" id="shippedOrderConfirmationModal" tabindex="-1"
+    aria-labelledby="shippedOrderConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shippedOrderConfirmationModalLabel">Ready to Ship Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to ship this order now?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" ng-click="shippedOrder()">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
