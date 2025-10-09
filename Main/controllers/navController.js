@@ -189,8 +189,15 @@ app.controller("NavController", function ($scope, $http, $location, $rootScope) 
     }
   };
 
-  $scope.getTotal = () =>
-    $scope.productsOnCart.reduce((sum, item) => sum + item.details.price * item.count, 0);
+  $scope.getTotal = function () {
+    return ($scope.productsOnCart || []).reduce((sum, item) => {
+      let price =
+        item.details?.price || item.id?.price || 0;
+      let count = item.count || 0;
+      return sum + (parseFloat(price) * count);
+    }, 0);
+  };
+
 
   // Pagination helpers
   $scope.paginatedItems = () => {

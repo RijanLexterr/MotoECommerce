@@ -1,6 +1,6 @@
 var app = angular.module("main", ["ngRoute"]);
 
-app.config(function($routeProvider, $locationProvider) {
+app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
     .when("/home", {
       templateUrl: "views/home.html"
@@ -12,7 +12,7 @@ app.config(function($routeProvider, $locationProvider) {
       templateUrl: "views/nav.html",
       controller: "NavController"
     })
-     .when("/home", {
+    .when("/home", {
       templateUrl: "views/home.html",
       controller: "HomeController"
     })
@@ -25,6 +25,10 @@ app.config(function($routeProvider, $locationProvider) {
       templateUrl: "views/productDetails.html",   // fixed here
       controller: "ProductDetailsController"
     })
+    .when("/cart", {
+      templateUrl: "views/cart.html",   // fixed here
+      controller: "CartOrderController"
+    })
     .otherwise({
       redirectTo: "/home"
     });
@@ -34,7 +38,7 @@ app.config(function($routeProvider, $locationProvider) {
 });
 
 
-var checkAuth = function($q, $location) {
+var checkAuth = function ($q, $location) {
   var deferred = $q.defer();
 
   if (sessionStorage.getItem('isLoggedIn') === 'true') {

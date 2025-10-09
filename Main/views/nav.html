@@ -54,16 +54,21 @@
                                             <div class="product-img">
                                                 <img class="img-fluid w-100" ng-if="item.image_location"
                                                     ng-src="../BackOffice/uploads/{{item.image_location}}"
-                                                    alt="{{ item.name }}">
+                                                    alt="{{ item.id.name }}">
 
                                                 <img class="img-fluid w-100" ng-if="!item.image_location"
                                                     ng-src="assets/img/default.jpg" alt="No image available">
                                             </div>
                                             <div class="product-body">
-                                                <h3 class="product-name"><a href="#">{{item.details.name}}</a></h3>
-                                                <h4 class="product-price"><span
-                                                        class="qty">{{item.count}} x</span>{{item.details.price}}</h4>
+                                                <h3 class="product-name">
+                                                    <a href="#">{{ item.details.name || item.id.name }}</a>
+                                                </h3>
+                                                <h4 class="product-price">
+                                                    <span class="qty">{{ item.count }} × </span>
+                                                    ₱{{ (item.details.price || item.id.price || 0) | number:2 }}
+                                                </h4>
                                             </div>
+
                                             <button class="delete"><i class="fa fa-close"></i></button>
                                         </div>
 
@@ -74,12 +79,12 @@
                                     </div>
                                     <div class="cart-btns">
                                         <a href="#">View Cart</a>
-                                        <a href="#">Checkout <i class="fa fa-arrow-circle-right"></i></a>
+                                        <a href="#!/cart">Checkout <i class="fa fa-arrow-circle-right"></i></a>
                                     </div>
                                 </div>
                             </div>
                             <div class="my-account">
-                                
+
                                 <a> <i class="fa fa-user"></i> My Account</a>
                             </div>
                             <!-- /Cart -->
