@@ -5,7 +5,7 @@ $email = $data->email;
 $password = $data->password;
 
 // Connect to your database
-$conn = new mysqli("localhost", "root", "", "ecommerce");
+$conn = new mysqli("localhost", "root", "", "motoecommerce");
 if ($conn->connect_error) {
   echo json_encode(['status' => 'error', 'message' => 'Database connection failed']);
   exit;

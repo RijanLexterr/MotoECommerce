@@ -10,6 +10,34 @@ app.controller("NavController", function ($scope, $http, $location, $rootScope) 
   $scope.productsOnCart = JSON.parse(sessionStorage.getItem("productsOnCart")) || [];
   $scope.cartCount = $scope.productsOnCart.length;
 
+  if (sessionStorage.getItem('isLoggedIn') === 'true') {
+  $rootScope.isLoggedIn = true;
+  $scope.isLoggedIn = true;
+} else {
+  $rootScope.isLoggedIn = false;
+  $scope.isLoggedIn = false;
+}
+
+if (sessionStorage.getItem('currentUser')) {
+  $rootScope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+  $scope.currentUser = $rootScope.currentUser;
+} else {
+  $rootScope.currentUser = null;
+  $scope.currentUser = null;
+}
+
+  $scope.$watch(function() {
+  return $rootScope.isLoggedIn;
+}, function(newVal) {
+  $scope.isLoggedIn = newVal;
+});
+
+$scope.$watch(function() {
+  return $rootScope.currentUser;
+}, function(newVal) {
+  $scope.currentUser = newVal;
+});
+
   // Pagination for cart modal
   $scope.currentPage = 1;
   $scope.itemsPerPage = 3;
@@ -59,12 +87,14 @@ app.controller("NavController", function ($scope, $http, $location, $rootScope) 
       });
   };
 
-  $scope.logout = function () {
-    $http.post("../Core/Controller/Login/logout.php").then(() => {
+$scope.logout = function () {
+    $http.post('../Core/Controller/Login/logout.php').then(function () {
       $scope.isLoggedIn = false;
-      $scope.currentUser = null;
+      $scope.currentUser = '';
+      $rootScope.isLoggedIn = false;
+      $rootScope.currentUser = '';
       sessionStorage.clear();
-      $location.path("/login");
+      // $location.path('/login');
     });
   };
 
@@ -210,4 +240,35 @@ app.controller("NavController", function ($scope, $http, $location, $rootScope) 
   $scope.changePage = (page) => {
     if (page >= 1 && page <= $scope.totalPages()) $scope.currentPage = page;
   };
+
+  $scope.signupOnClick = function() {
+    sessionStorage.setItem('redirectAfterLogin', $location.path());
+    $location.path('/signup');
+  }
+
+  $scope.openModal = function(modalId) {
+  $(modalId).modal('show');
+};
+
+$scope.isLoginPage = function() {
+   return $location.path() === '/login' || $location.path() === '/signup';
+};
+
+$scope.signupOnClick = function () {
+  // Close the modal with ID 'loginModal'
+  $('#loginModal').modal('hide');
+
+  // Redirect to the signup page
+  $location.path('/signup');
+
+};
+
+$scope.menuVisible = false;
+
+$scope.toggleMenu = function () {
+  $scope.menuVisible = !$scope.menuVisible;
+};
+
+
+
 });

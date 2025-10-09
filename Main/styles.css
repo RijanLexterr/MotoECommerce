@@ -1,3 +1,50 @@
 .my-account {
     color: #fff;
 }
+
+#responsive-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-left ul,
+.nav-right ul {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-right {
+    margin-left: auto;
+}
+
+/* Ensure nav pills stack vertically on small screens */
+.nav-stacked {
+  margin-top: 10px;
+}
+
+/* Optional: Add smooth slide-down animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Hide desktop nav on small screens */
+@media (max-width: 767px) {
+  #responsive-nav.hidden-xs {
+    display: none;
+  }
+}

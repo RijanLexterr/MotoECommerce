@@ -124,7 +124,7 @@ class UserController {
         
     }
 
-    public function getUserByEmail($email) {
+    public function validateUserByEmail($email) {
 
         
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
@@ -137,6 +137,22 @@ class UserController {
             echo json_encode(["isExisting" => true]);
         } else {
             echo json_encode(["isExisting" => false]);
+        }
+}
+
+public function getUserByEmail($email) {
+
+        
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
+
+        if ($user) {
+            echo json_encode(["status" => "success", "user" => $user]);
+        } else {
+            echo json_encode(["status" => "error", "user" => $user]);
         }
 }
 
@@ -198,6 +214,41 @@ class UserController {
     }
 }
 
+public function updateUserProfile($id) {
+    $rawData = file_get_contents("php://input");
+    $data = json_decode($rawData, true);
+
+    // Validate required fields
+    if (!isset($data['name'], $data['email'], $data['password'])) {
+        echo json_encode([
+            "status" => "error",
+            "message" => "Missing required fields: name, email, or password"
+        ]);
+        return;
+    }
+
+    // Update user info only
+    $stmt = $this->db->prepare("
+        UPDATE users
+        SET name = ?, email = ?, password = ?
+        WHERE user_id = ?
+    ");
+    $stmt->bind_param("sssi", $data['name'], $data['email'], $data['password'], $id);
+
+    if ($stmt->execute()) {
+        echo json_encode([
+            "status" => "success",
+            "message" => "User information updated successfully"
+        ]);
+    } else {
+        echo json_encode([
+            "status" => "error",
+            "message" => "Update failed: " . $stmt->error
+        ]);
+    }
+}
+
+
 
     public function delete($id) {
         $stmt = $this->db->prepare("DELETE FROM users WHERE user_id = ?");
@@ -238,8 +289,8 @@ if (isset($_GET['action'])) {
         case 'readAllRoles':
             $controller->readAllRoles();
             break;
-        case 'getUserByEmail':
-            $controller->getUserByEmail($_GET['email'] ?? "");
+        case 'validateUserByEmail':
+            $controller->validateUserByEmail($_GET['email'] ?? "");
             break;
         case 'readOne':
             $controller->readOne($_GET['id'] ?? 0);
@@ -249,6 +300,12 @@ if (isset($_GET['action'])) {
             break;
         case 'delete':
             $controller->delete($_GET['id'] ?? 0);
+            break;
+        case 'getUserByEmail':
+            $controller->getUserByEmail($_GET['email'] ?? "");
+            break;
+        case 'updateUserProfile':
+            $controller->updateUserProfile($_GET['id'] ?? 0);
             break;
         default:
             echo json_encode(["status" => "error", "message" => "Invalid action"]);

@@ -83,7 +83,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="my-account">
+                            <div class="my-account" ng-show="isLoggedIn">
 
                                 <a> <i class="fa fa-user"></i> My Account</a>
                             </div>
@@ -110,121 +110,92 @@
     <!-- /HEADER -->
 
     <!-- NAVIGATION -->
+    <!-- NAVIGATION -->
     <nav id="navigation">
-        <!-- container -->
         <div class="container">
-            <!-- responsive-nav -->
-            <div id="responsive-nav">
-                <!-- NAV -->
-                <ul class="main-nav nav navbar-nav">
-                    <li class="active"><a href="#!/">Home</a></li>
-                    <li><a href="#">Hot Deals</a></li>
-                    <li><a href="#!/shop/0">Shop</a></li>
-                </ul>
-                <!-- /NAV -->
+            <div id="responsive-nav" class="row">
+                <!-- Left Navigation -->
+                <div class="col-md-6">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#!/">Home</a></li>
+                        <li><a href="#">Hot Deals</a></li>
+                        <li><a href="#!/shop/0">Shop</a></li>
+                    </ul>
+                </div>
+                <!-- Right Navigation -->
+                <div class="col-md-6 text-right">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li ng-show="!isLoggedIn">
+                            <a href="" ng-click="openModal('#loginModal')">Login</a>
+                        </li>
+                        <li ng-show="!isLoggedIn">
+                            <a href="" ng-click="signupOnClick()">Sign Up</a>
+                        </li>
+                        <li ng-show="isLoggedIn">
+                            <a href="" type="button" ng-click="logout()">Logout</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <!-- /responsive-nav -->
         </div>
-        <!-- /container -->
     </nav>
+
     <!-- /NAVIGATION -->
 
 
 
-    <!-- Register User Modal -->
-    <div class="modal fade" id="userCreateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="userCreateModalLabel">Add User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" ng-click="updateUserFields()"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" ng-model="name" ng-blur="validateName()">
-                        <span ng-show="nameHasError" style="color: red; font-size: 0.9em;">
-                            Name is required.
-                        </span>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="text" class="form-control" id="email" ng-disabled="userId" ng-model="email"
-                            ng-blur="validateEmail()">
-                        <span ng-show="emailHasError" style="color: red; font-size: 0.9em;">
-                            {{emailError}}
-                        </span>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" ng-model="password"
-                            ng-blur="validatePassword()">
-                        <span ng-show="passwordHasError" style="color: red; font-size: 0.9em;">
-                            Password is required.
-                        </span>
-                    </div>
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Confirm Password</label>
-                        <input type="text" class="form-control" id="confirmPassword" ng-model="confirmPassword"
-                            ng-blur="validateConfirmPassword()">
-                        <span ng-show="confirmPasswordHasError" style="color: red; font-size: 0.9em;">
-                            {{confirmPasswordError}}
-                        </span>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        ng-click="updateUserFields()">Cancel</button>
-                    <button ng-show="!userId" type="button" class="btn btn-primary"
-                        ng-click="submit(userId)">Cofirm</button>
-                    <button ng-show="userId" type="button" class="btn btn-primary"
-                        ng-click="submit(userId)">Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <!-- Login Modal -->
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- Modal Header -->
+                <div class="modal-header clearfix">
+                    <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="loginModalLabel">
+                        <i class="fa fa-user"></i> Login to Your Account
+                    </h4>
                 </div>
+
+                <!-- Modal Body -->
                 <div class="modal-body">
-                    <div class="modal-body p-4">
-                        <form>
-                            <!-- Email input -->
-                            <div data-mdb-input-init class="form-outline mb-4">
-                                <input type="email" id="email" ng-model="username" class="form-control" />
-                                <label class="form-label" for="email1">Email address</label>
-                            </div>
+                    <form>
+                        <!-- Email input -->
+                        <div class="form-group">
+                            <label for="email">Email address</label>
+                            <input type="email" id="email" ng-model="username" class="form-control"
+                                placeholder="Enter your email" />
+                        </div>
 
-                            <!-- password input -->
-                            <div data-mdb-input-init class="form-outline mb-4">
-                                <input type="password" id="password" ng-model="password" class="form-control" />
-                                <label class="form-label" for="password1">Password</label>
-                            </div>
+                        <!-- Password input -->
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" ng-model="password" class="form-control"
+                                placeholder="Enter your password" />
+                        </div>
 
-                            <!-- Submit button -->
-                            <button type="submit" data-mdb-button-init data-mdb-ripple-init
-                                class="btn btn-primary btn-block" ng-click="login()">Login</button>
-                        </form>
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary btn-block" ng-click="login()">
+                            <i class="fa fa-sign-in"></i> Login
+                        </button>
+                    </form>
+
+                    <!-- Signup Message -->
+                    <hr>
+                    <p class="text-center">
+                        Don't have an account?
+                    </p>
+                    <div class="text-center">
+                        <a  class="btn btn-default" ng-click="signupOnClick()">
+                            <i class="fa fa-user-plus"></i> Sign Up
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-
-
-
-
-
 
 
 

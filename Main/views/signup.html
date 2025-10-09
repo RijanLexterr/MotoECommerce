@@ -1,0 +1,82 @@
+<div class="container" ng-show="status !== 'success' && status !== 'error'" style="max-width: 600px; margin-top: 50px;">
+  <h2 class="text-center">{{ userId ? 'Edit User' : 'Sign Up' }}</h2>
+  <hr>
+
+  <!-- Name -->
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" class="form-control" id="name" ng-model="name" ng-blur="validateName()">
+    <span ng-show="nameHasError" class="text-danger small">Name is required.</span>
+  </div>
+
+  <!-- Email -->
+  <div class="form-group">
+    <label for="email">Email address</label>
+    <input type="text" class="form-control" id="email" ng-model="email" ng-disabled="userId" ng-blur="validateEmail()">
+    <span ng-show="emailHasError" class="text-danger small">{{ emailError }}</span>
+  </div>
+
+  <!-- Password -->
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" class="form-control" id="password" ng-model="password" ng-blur="validatePassword()">
+    <span ng-show="passwordHasError" class="text-danger small">Password is required.</span>
+  </div>
+
+  <!-- Confirm Password -->
+  <div class="form-group">
+    <label for="confirmPassword">Confirm Password</label>
+    <input type="password" class="form-control" id="confirmPassword" ng-model="confirmPassword" ng-blur="validateConfirmPassword()">
+    <span ng-show="confirmPasswordHasError" class="text-danger small">{{ confirmPasswordError }}</span>
+  </div>
+
+  <!-- Hidden Role -->
+  <input type="hidden" ng-model="role.role_id">
+
+  <!-- Buttons -->
+  <div class="text-center" style="margin-top: 20px;">
+    <button type="button" class="btn btn-default" ng-click="updateUserFields()">Clear</button>
+    <button type="button" class="btn btn-primary" ng-click="submit(userId)">
+      {{ userId ? 'Save' : 'Register' }}
+    </button>
+  </div>
+
+  <!-- Login Prompt -->
+  <div class="text-center" style="margin-top: 20px;">
+    <p>Already have an account?
+      <a href="#!/login" class="text-primary">Click here to sign in</a>
+    </p>
+  </div>
+</div>
+
+
+<div class="container text-center" style="margin-top: 100px;">
+  <!-- Success Message -->
+  <div ng-if="status === 'success'" class="panel panel-success">
+    <div class="panel-heading">
+      <h2><span class="glyphicon glyphicon-ok-circle"></span> Welcome!</h2>
+    </div>
+    <div class="panel-body">
+      <p class="lead">Your account has been created successfully.</p>
+      <p>You can now log in and start using our services.</p>
+      <p>A confirmation email has been sent to <strong>{{email}}</strong>.</p>
+      <a href="#!/login" class="btn btn-success">
+        <span class="glyphicon glyphicon-log-in"></span> Go to Login
+      </a>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div ng-if="status === 'error'" class="panel panel-danger">
+    <div class="panel-heading">
+      <h2><span class="glyphicon glyphicon-remove-circle"></span> Sign-Up Failed</h2>
+    </div>
+    <div class="panel-body">
+      <p class="lead">We couldn’t create your account.</p>
+      <p>Please try again or contact support if the issue persists.</p>
+      <a href="#!/signup" class="btn btn-danger">
+        <span class="glyphicon glyphicon-repeat"></span> Try Again
+      </a>
+    </div>
+  </div>
+</div>
