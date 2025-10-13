@@ -219,14 +219,50 @@ $scope.logout = function () {
     }
   };
 
-  $scope.getTotal = function () {
-    return ($scope.productsOnCart || []).reduce((sum, item) => {
-      let price =
-        item.details?.price || item.id?.price || 0;
-      let count = item.count || 0;
-      return sum + (parseFloat(price) * count);
+  $scope.getTotal = function() {
+    return $scope.addedtoCart.reduce(function(sum, item) {
+      return sum + (item.price * item.quantity);
     }, 0);
+  }; 
+
+  $scope.cartVisible = false;
+
+  $scope.toggleCart = function() {
+    $scope.cartVisible = !$scope.cartVisible;
+    if ($scope.cartVisible) {
+      loadCart();
+    }
   };
+
+  function loadCart() {
+    $scope.addedtoCart = [];      
+    productsOnCart = JSON.parse(sessionStorage.getItem('productsOnCart')) || [];
+
+    //Questionnnnn...
+    //IF NULL SI SESSION, QUERY to DB
+
+    if (productsOnCart.length != 0){
+      productsOnCart.forEach(function(product) {
+          return $http.get("../Core/Controller/ProductController.php?action=readOne&id=" + parseInt(product.id))
+            .then(function(response) {
+              var exists = $scope.addedtoCart.find(function(item) {
+                  return item.id === product.id;
+              });
+
+              if (!exists) {
+                  $scope.addedtoCart.push({
+                  id: product.id,
+                  name: response.data.name,
+                  price: response.data.price,
+                  quantity: product.count,
+                  stock: response.data.stock,
+                  stockError: false
+                  });
+              }
+            });
+        });
+    }
+  }
 
 
   // Pagination helpers

@@ -42,15 +42,15 @@
                         <div class="header-ctn">
                             <!-- Cart -->
                             <div class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                                <a class="dropdown-toggle" ng-click="toggleCart()" data-toggle="dropdown" aria-expanded="true">
                                     <i class="fa fa-shopping-cart"></i>
                                     <span>Your Cart</span>
                                     <div class="qty"> {{cartCount}}
                                     </div>
                                 </a>
-                                <div class="cart-dropdown">
+                                <div class="cart-dropdown" ng-show="cartVisible">
                                     <div class="cart-list">
-                                        <div class="product-widget" ng-repeat="item in productsOnCart">
+                                        <div class="product-widget" ng-repeat="item in addedtoCart">
                                             <div class="product-img">
                                                 <img class="img-fluid w-100" ng-if="item.image_location"
                                                     ng-src="../BackOffice/uploads/{{item.image_location}}"
@@ -61,11 +61,11 @@
                                             </div>
                                             <div class="product-body">
                                                 <h3 class="product-name">
-                                                    <a href="#">{{ item.details.name || item.id.name }}</a>
+                                                    <a href="#">{{ item.name || item.id }}</a>
                                                 </h3>
                                                 <h4 class="product-price">
-                                                    <span class="qty">{{ item.count }} × </span>
-                                                    ₱{{ (item.details.price || item.id.price || 0) | number:2 }}
+                                                    <span class="qty">{{ item.quantity }} × </span>
+                                                    ₱{{ (item.price || item.price || 0) | number:2 }}
                                                 </h4>
                                             </div>
 

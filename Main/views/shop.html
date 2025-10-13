@@ -44,126 +44,46 @@
 
             <!-- STORE -->
             <div id="store" class="col-md-9">
-
-
-
                 <!-- store products -->
                 <div class="row">
                     <!-- product -->
-                   <div class="col-md-4 col-xs-6" ng-repeat="product in Products">
-    <div class="product" ng-if="product">
-        <div class="product-img">
-            <img class="img-fluid w-100"
-                 ng-if="product.image_location"
-                 ng-src="../BackOffice/uploads/{{product.image_location}}"
-                 alt="{{ product.name }}">
-            <img class="img-fluid w-100"
-                 ng-if="!product.image_location"
-                 ng-src="assets/img/default.jpg"
-                 alt="No image available">
-
-            <div class="product-label">
-                <span class="sale">-30%</span>
-                <span class="new">NEW</span>
-            </div>
-        </div>
-        <div class="product-body">
-            <h5 class="product-name">
-                <a href="#">{{ product.name | limitTo:20 }}</a>
-            </h5>
-            <h6 class="product-price" ng-if="product.price">
-                ₱{{ product.price | number:2 }}
-                <del class="product-old-price">₱{{ product.price | number:2 }}</del>
-            </h6>
-            <h6 class="product-price" ng-if="!product.price">
-                ₱0.00
-            </h6>
-
-            <div class="product-btns">
-                <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span class="tooltipp">add to wishlist</span></button>
-                <button class="add-to-compare"><i class="fa fa-exchange"></i><span class="tooltipp">add to compare</span></button>
-                <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick view</span></button>
-            </div>
-        </div>
-        <div class="add-to-cart">
-            <button class="add-to-cart-btn" ng-click="addToCart(product)">
-                <i class="fa fa-shopping-cart"></i> add to cart
-            </button>
-        </div>
-    </div>
-</div>
-
-                    <!-- /product -->
-
-                    <!-- product -->
-                    <div class="col-md-4 col-xs-6">
-                        <div class="product">
+                    <div class="col-md-4 col-xs-6" ng-repeat="product in Products">
+                        <div class="product" ng-if="product">
                             <div class="product-img">
-                                <img src="./assets/img/product02.png" alt="">
+                                <img class="img-fluid w-100"
+                                    ng-if="product.image_location"
+                                    ng-src="../BackOffice/uploads/{{product.image_location}}"
+                                    alt="{{ product.name }}">
+                                <img class="img-fluid w-100"
+                                    ng-if="!product.image_location"
+                                    ng-src="assets/img/default.jpg"
+                                    alt="No image available">
+
                                 <div class="product-label">
+                                    <span class="sale">-30%</span>
                                     <span class="new">NEW</span>
                                 </div>
                             </div>
                             <div class="product-body">
-                                <p class="product-category">Category</p>
-                                <h3 class="product-name"><a href="#">product name goes here</a></h3>
-                                <h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-                                <div class="product-rating">
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star"></i>
-                                    <i class="fa fa-star-o"></i>
-                                </div>
-                                <div class="product-btns">
-                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
-                                            class="tooltipp">add to wishlist</span></button>
-                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span
-                                            class="tooltipp">add to compare</span></button>
-                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick
-                                            view</span></button>
-                                </div>
+                                <h5 class="product-name">
+                                    <a href="#">{{ product.name | limitTo:20 }}</a>
+                                </h5>
+                                <h6 class="product-price" ng-if="product.price">
+                                    ₱{{ product.price | number:2 }}
+                                    <del class="product-old-price">₱{{ product.price | number:2 }}</del>
+                                </h6>
+                                <h6 class="product-price" ng-if="!product.price">
+                                    ₱0.00
+                                </h6>
                             </div>
                             <div class="add-to-cart">
-                                <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
+                                <button class="add-to-cart-btn" ng-click="addToCart(product.product_id)" data-toggle="modal" data-target="#addToCartModal">
+                                    <i class="fa fa-shopping-cart"></i> add to cart
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <!-- /product -->
-
-
-
-                    <!-- product -->
-                    <div class="col-md-4 col-xs-6">
-                        <div class="product">
-                            <div class="product-img">
-                                <img src="./assets/img/product03.png" alt="">
-                            </div>
-                            <div class="product-body">
-                                <p class="product-category">Category</p>
-                                <h3 class="product-name"><a href="#">product name goes here</a></h3>
-                                <h4 class="product-price">$980.00 <del class="product-old-price">$990.00</del></h4>
-                                <div class="product-rating">
-                                </div>
-                                <div class="product-btns">
-                                    <button class="add-to-wishlist"><i class="fa fa-heart-o"></i><span
-                                            class="tooltipp">add to wishlist</span></button>
-                                    <button class="add-to-compare"><i class="fa fa-exchange"></i><span
-                                            class="tooltipp">add to compare</span></button>
-                                    <button class="quick-view"><i class="fa fa-eye"></i><span class="tooltipp">quick
-                                            view</span></button>
-                                </div>
-                            </div>
-                            <div class="add-to-cart">
-                                <button class="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> add to cart</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /product -->
-
-
-
-                    <!-- /product -->
+                    <!-- /product -->    
                 </div>
                 <!-- /store products -->
 
@@ -180,6 +100,25 @@
                 </div>
                 <!-- /store bottom filter -->
             </div>
+
+            <!-- ✅ AngularJS-Controlled Bootstrap Modal -->
+            <div class="modal fade" id="addToCartModal" tabindex="-1" aria-labelledby="addToCartModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addToCartModalLabel">Cart Notification</h5>
+                        </div>
+                        <div class="modal-body">
+                            {{ alertMessage }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">OK</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- /STORE -->
         </div>
         <!-- /row -->

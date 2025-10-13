@@ -128,6 +128,5 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
     // ✅ Bootstrap Modal helper
     $scope.showModal = function (message) {
         $scope.alertMessage = message;
-        $('#addToCartModal').modal('show');
     };
 });
