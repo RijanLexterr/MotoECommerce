@@ -22,82 +22,77 @@
 			<div class="row">
 
 				<!-- BILLING DETAILS -->
-				<div class="col-md-7">
+				<div class="col-md-8" >
 					<div class="billing-details">
 						<div class="section-title">
 							<h3 class="title">Billing Address</h3>
 						</div>
 						<div class="form-group">
-							<input class="input" type="text" name="first-name" placeholder="First Name">
+							<input class="input" type="text" name="first-name" placeholder="Name" ng-model="userWithAddresses[currentUser.user_id].Name">
 						</div>
 						<div class="form-group">
-							<input class="input" type="text" name="last-name" placeholder="Last Name">
+							<input class="input" type="text" name="email" placeholder="Email Address" ng-model="userWithAddresses[currentUser.user_id].Email">
 						</div>
 						<div class="form-group">
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold">Registered Shipping Address</label>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Registered Shipping Address</label>
 
-                                    <div class="list-group" ng-if="userWithAddresses[currentUser.user_id].Addresses.length > 0">
-                                        <label 
-                                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-start"
-                                            ng-repeat="addr in userWithAddresses[currentUser.user_id].Addresses track by addr.ShippingId"
-                                            for="address{{$index}}">
+                                <div class="list-group" ng-if="userWithAddresses[currentUser.user_id].Addresses.length > 0">
+									<!-- Repeat each address -->
+									<div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+										ng-repeat="addr in userWithAddresses[currentUser.user_id].Addresses track by addr.ShippingId">
 
-                                            <!-- Radio Button -->
-                                            <div class="form-check me-2">
-                                                <input 
-                                                    class="form-check-input mt-1" 
-                                                    type="radio" 
-                                                    name="selectedAddress" 
-                                                    id="address{{$index}}" 
-                                                    ng-model="selectedAddressId"
-                                                    ng-value="addr.ShippingId"
-                                                    ng-change="onAddressChange(selectedAddressId)">
-                                            </div>
+										<!-- Radio Button -->
+										<div class="form-check me-3">
+											<input class="form-check-input" 
+												type="radio" 
+												name="selectedAddress" 
+												id="address{{$index}}" 
+												ng-model="selectedAddressId"
+												ng-value="addr.ShippingId"
+												ng-change="onAddressChange(selectedAddressId)">
+												<label class="form-check-label" for="address{{$index}}"></label>
+										</div>
 
-                                            <!-- Address Details -->
-                                            <div class="flex-grow-1">
-                                                <div class="text-muted small mt-1">
-                                                    <i class="fas fa-user-circle me-2"></i>
-                                                    {{ addr.FullName }}
-                                                </div>
-                                                <div class="text-muted small mt-1">
-                                                    <i class="fas fa-phone-square-alt me-2"></i>
-                                                    {{ addr.PhoneNumber }}
-                                                </div>
-                                                <div class="text-muted small mt-1">
-                                                    <i class="far fa-address-book me-2"></i>
-                                                    {{ addr.Address }} {{ addr.PostalCode }}
-                                                </div>
-                                            </div>
+										<!-- Address Details -->
+										<div class="flex-grow-1">
+											<div class="text-muted medium">
+												<i class="fas fa-user-circle me-3"></i>
+												{{ addr.FullName }}
 
-                                            <!-- Default Badge -->
-                                            <span class="badge bg-primary rounded-pill align-self-center ms-2"
-                                                ng-if="addr.IsDefault == 1">Default</span>
-                                        </label>
-                                    </div>
+												<!-- Default Badge -->
+												<span class="badge bg-primary rounded-pill ms-2"
+													ng-if="addr.IsDefault == 1">Default</span>
+											</div>
+											<div class="text-muted medium">
+												<i class="fas fa-phone-square-alt me-3"></i>
+												{{ addr.PhoneNumber }}
+											</div>
+											<div class="text-muted medium">
+												<i class="far fa-address-book me-3"></i>
+												{{ addr.Address }} {{ addr.PostalCode }}
+											</div>
+										</div>									
+									</div>
+								</div>
+							</div>                                       
 
-                                    <!-- Show message if no addresses -->
-                                    <div class="alert alert-warning mt-3" ng-if="!userWithAddresses[currentUser.user_id].Addresses || userWithAddresses[currentUser.user_id].Addresses.length === 0">
-                                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                                        No shipping address found. Please 
-                                        <a href="#!/profile" class="alert-link">update your profile</a> to add one.
-                                    </div>
-                                </div>
-                            </div>                            
-						
-
+							<!-- Show message if no addresses -->
+							<div class="alert alert-warning mt-3" ng-if="!userWithAddresses[currentUser.user_id].Addresses || userWithAddresses[currentUser.user_id].Addresses.length === 0">
+								<i class="fa-solid fa-triangle-exclamation me-2"></i>
+								No shipping address found. Please 
+								<a href="#!/profile" class="alert-link">update your profile</a> to add one.
+							</div>                            
+                        </div>
 						<div ng-if="!isLoggedIn">
 							<p>Please <a href="#/login">login</a> to use saved addresses.</p>
 						</div>
-
 					</div>
 				</div>
 				<!-- /BILLING DETAILS -->
 
-
 				<!-- ORDER DETAILS -->
-				<div class="col-md-5 order-details">
+				<div class="col-md-4 order-details">
 					<div class="section-title text-center">
 						<h3 class="title">Your Order</h3>
 					</div>
@@ -110,7 +105,7 @@
 
 						<div class="order-products">
 							<div class="order-col" ng-repeat="item in addedtoCart">
-								<div>{{item.quantity}}x {{item.name}}</div>
+								<div>{{item.quantity}} x {{item.name}}</div>
 								<div>₱{{ item.price * item.quantity | number:2 }}</div>
 							</div>
 						</div>
@@ -126,15 +121,7 @@
 						</div>
 					</div>
 
-					<div class="input-checkbox">
-						<input type="checkbox" id="terms">
-						<label for="terms">
-							<span></span>
-							I've read and accept the <a href="#">terms & conditions</a>
-						</label>
-					</div>
-
-					<button class="primary-btn order-submit" ng-click="proceedCheckOut()">Place order</button>
+					<button class="primary-btn order-submit" ng-click="proceedCheckOut()" ng-disabled="!userWithAddresses[currentUser.user_id].Addresses || userWithAddresses[currentUser.user_id].Addresses.length === 0">Place order</button>
 				</div>
 				<!-- /ORDER DETAILS -->
 

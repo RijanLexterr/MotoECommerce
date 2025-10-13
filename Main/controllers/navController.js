@@ -212,17 +212,24 @@ $scope.logout = function () {
   $scope.decreaseQty = (item) => (item.count > 1 ? item.count-- : null);
 
   $scope.removeItem = function (item) {
-    let index = $scope.productsOnCart.indexOf(item);
-    if (index !== -1) {
-      $scope.productsOnCart.splice(index, 1);
-      $scope.cartCount = $scope.productsOnCart.length;
-    }
+    $scope.productsOnCart = JSON.parse(sessionStorage.getItem('productsOnCart')) || [];
+        var index = productsOnCart.findIndex(p => p.id === item.id);
+        if (index !== -1) {
+          $scope.productsOnCart.splice(index, 1);
+          $scope.addedtoCart.splice(index, 1);
+          sessionStorage.setItem('productsOnCart', JSON.stringify($scope.productsOnCart));
+          $scope.$emit('productsOnCart', $scope.productsOnCart);
+          loadCart();
+          $scope.cartCount = $scope.productsOnCart.length;
+        } 
   };
 
   $scope.getTotal = function() {
-    return $scope.addedtoCart.reduce(function(sum, item) {
-      return sum + (item.price * item.quantity);
-    }, 0);
+    if ($scope.addedtoCart != null && $scope.addedtoCart.length != 0) {
+      return $scope.addedtoCart.reduce(function(sum, item) {
+        return sum + (item.price * item.quantity);
+      }, 0);
+    }
   }; 
 
   $scope.cartVisible = false;

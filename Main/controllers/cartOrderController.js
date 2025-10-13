@@ -28,7 +28,7 @@ app.controller("CartOrderController", function($scope, $http, $rootScope, $locat
 
     productsOnCart.forEach((product, index) => {
       console.log(product );
-      $http.get("../Core/Controller/ProductController.php?action=readOne&id=" + parseInt(product.id.product_id))
+      $http.get("../Core/Controller/ProductController.php?action=readOne&id=" + parseInt(product.id))
         .then((response) => {
           const data = response.data;
           if (!data || !data.name) {
@@ -58,14 +58,25 @@ app.controller("CartOrderController", function($scope, $http, $rootScope, $locat
 
   // 👤 Load addresses
   function loadUserInfo() {
+    
+    $scope.userWithAddresses = [];
     if (!$scope.isLoggedIn || !$scope.currentUser?.user_id) return;
 
     const userId = parseInt($scope.currentUser.user_id);
     $http.get("../Core/Controller/UserShippingDetailsController.php?action=getByUserId&user_id=" + userId)
       .then((response) => {
-        if (response.data.status === "success") {
+        if (response.data.status === "success") {          
           $scope.userWithAddresses = response.data.userAddress || [];
           console.log("User addresses:", $scope.userWithAddresses);
+                  
+          if ($scope.userWithAddresses[parseInt($scope.currentUser.user_id)].Addresses.length > 0) {
+                let user = $scope.userWithAddresses[parseInt($scope.currentUser.user_id)];
+                let defaultAddress = user.Addresses.find(a => a.IsDefault === 1);
+
+                if (defaultAddress) {
+                  $scope.selectedAddressId = defaultAddress.ShippingId;
+                }
+          }
         }
       })
       .catch((err) => console.error("Error loading user addresses:", err));
