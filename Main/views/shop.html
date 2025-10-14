@@ -89,14 +89,30 @@
 
                 <!-- store bottom filter -->
                 <div class="store-filter clearfix">
-                    <span class="store-qty">Showing 20-100 products</span>
-                    <ul class="store-pagination">
-                        <li class="active">1</li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#"><i class="fa fa-angle-right"></i></a></li>
-                    </ul>
+                   <nav aria-label="Page navigation" class="">
+                        <ul class="store-pagination">
+                            <!-- Previous -->
+                            <li class="page-item" ng-class="{disabled: pagination.page === 1}">
+                                <a class="page-link" href="" ng-click="goToPage(pagination.page - 1)">
+                                    &laquo;
+                                </a>
+                            </li>
+
+                            <li class="page-item" ng-repeat="n in getPageRange(pagination.pages) track by $index"
+                                ng-class="{active: ($index+1) === pagination.page}">
+                                <a class="page-link" href="javascript:void(0)" ng-click="goToPage($index+1)">
+                                    {{$index+1}}
+                                </a>
+                            </li>
+
+                            <!-- Next -->
+                            <li class="page-item" ng-class="{disabled: pagination.page === pagination.pages}">
+                                <a class="page-link" href="" ng-click="goToPage(pagination.page + 1)">
+                                    &raquo;
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
                 <!-- /store bottom filter -->
             </div>
