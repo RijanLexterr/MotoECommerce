@@ -1,0 +1,128 @@
+<div class="add-btn-container d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <input class="form-control" type="text" placeholder="search" ng-model="searchQuery">
+    </div>
+    <div>
+        <button type="button" class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#BrandCreateModal" ng-click="addBrandOnClick()">
+            <i class="fa fa-plus"></i>
+            Add Brand
+        </button>
+    </div>
+</div>
+
+    <div class="modal fade" id="BrandCreateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" ng-show="!brand.brand_id" id="BrandCreateModalLabel">Add Brand</h5>
+				<h5 class="modal-title" ng-show="brand.brand_id" id="BrandCreateModalLabel">Edit Brand</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" ng-click="updateBrandFields()" aria-label="Close" ></button>
+            </div>
+                <div class="modal-body">
+                    <div class="mb-3">	
+                        <label for="brand.name" class="form-label">Brand Name</label>
+                        <input type="text" class="form-control" id="brand.name" ng-model="brand.name" ng-blur="validateName()" placeholder="Enter Brand Name">
+                        <span ng-show="nameHasError" style="color: red; font-size: 0.9em;">
+                            {{nameError}}
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" ng-click="updateBrandFields()">Cancel</button>
+                    <button ng-show="!brand.brand_id" type="button" class="btn btn-primary"  ng-click="submit()">Create</button>
+                    <button ng-show="brand.brand_id" type="button" class="btn btn-primary"  ng-click="submit()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+
+<div class="modal fade" id="deleteBrandConfirmationModal" tabindex="-1" aria-labelledby="deleteBrandConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteBrandConfirmationModalLabel">Delete Brand</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the brand name : {{brandNameForDelete}}?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" ng-click="deleteBrandById()">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div>
+	<form ng-submit="save">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">#</th>
+            <th scope="col">Brand Name</th>
+            <th scope="col">Created Date</th>            
+            <th scope="col">Action</th>
+            </tr>
+        </thead>
+        </thead>
+        <tbody>
+            <tr ng-repeat="Brand in brandlist | filter:searchQuery">
+                <td>{{($index + 1) + ((pagination.page - 1) * pagination.limit)}}</td>
+				<td>{{Brand.name}}</td>
+				<td>{{Brand.created_at}}</td>
+                <td>
+                    <div class="action-btn-container">
+                        <div>
+                            <button type="button" class="btn btn-link btn-primary" ng-click="updateBrandOnClick(Brand)" data-bs-toggle="modal" data-bs-target="#BrandCreateModal">
+                                <i class="fa fa-edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Update"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <button class="btn btn-link btn-danger" ng-click="deleteBrandOnClick(Brand)" data-bs-toggle="modal" data-bs-target="#deleteBrandConfirmationModal">
+                                <i class="fa fa-times"  data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+	</form>
+    <div>
+        <!-- Pagination controls -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                <label>Show 
+                <select ng-model="pageSize" ng-change="changePageSize()" 
+                        ng-options="s for s in [5,10,25,50]"></select> 
+                entries
+                </label>
+            </div>
+
+            <div>
+                <button class="btn btn-sm btn-outline-primary"
+                        ng-disabled="pagination.page === 1"
+                        ng-click="loadTransactions(pagination.page - 1)">
+                Prev
+                </button>
+
+                Page {{pagination.page}} of {{pagination.totalPages}}
+
+            <button class="btn btn-sm btn-outline-primary"
+                        ng-disabled="pagination.page === pagination.totalPages"
+                        ng-click="loadTransactions(pagination.page + 1)">next</button>
+
+                </div>
+                </div>
+
+        </div>
+            </div>
+    </div>
+    
+</div>
+

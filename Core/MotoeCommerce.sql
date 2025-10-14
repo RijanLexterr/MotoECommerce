@@ -152,6 +152,22 @@ CREATE TABLE order_items (
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
+
+-- ALTER ORDERS TO ADD USER SHIPPING ID
+ALTER TABLE orders
+ADD user_shipping_id INT;
+
+ALTER TABLE orders
+ADD CONSTRAINT fk_orders_shipping
+FOREIGN KEY (user_shipping_id)
+REFERENCES user_shipping_details(user_shipping_id)
+
+
+-- ALTER ADD NEW PRICE 
+ALTER TABLE products 
+ADD new_price DECIMAL(10,2) NULL,
+ADD is_promoted INT;
+
 -- ======================
 -- SAMPLE DATA
 -- ======================

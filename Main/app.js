@@ -2,7 +2,7 @@ var app = angular.module("main", ["ngRoute"]);
 
 app.config(function ($routeProvider, $locationProvider) {
   $routeProvider
-   .when("/login", {
+    .when("/login", {
       templateUrl: "views/login.html",
       controller: "LoginController"
     })
@@ -36,6 +36,10 @@ app.config(function ($routeProvider, $locationProvider) {
     .when("/cart", {
       templateUrl: "views/cart.html",   // fixed here
       controller: "CartOrderController"
+    })
+    .when("/profile", {
+      templateUrl: "views/profile.html",   // fixed here
+      controller: "ProfileController"
     })
     .otherwise({
       redirectTo: "/home"

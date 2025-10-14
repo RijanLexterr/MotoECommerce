@@ -1,76 +1,92 @@
 <!DOCTYPE html>
 <html ng-app="myApp">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Main Dashboard</title>
-    <meta
-      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-      name="viewport"
-    />
-    <link
-      rel="icon"
-      href="assets/img/kaiadmin/favicon.ico"
-      type="image/x-icon"
-    />
 
-    <!-- Fonts and icons -->
-    <script src="assets/js/plugin/webfont/webfont.min.js"></script>
-     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Main Dashboard</title>
+  <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
+  <link rel="icon" href="assets/img/kaiadmin/favicon.ico" type="image/x-icon" />
+
+  <!-- Fonts and icons -->
+  <script src="assets/js/plugin/webfont/webfont.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
 
 
-    <script>
-      WebFont.load({
-        google: { families: ["Public Sans:300,400,500,600,700"] },
-        custom: {
-          families: [
-            "Font Awesome 5 Solid",
-            "Font Awesome 5 Regular",
-            "Font Awesome 5 Brands",
-            "simple-line-icons",
-          ],
-          urls: ["assets/css/fonts.min.css"],
-        },
-        active: function () {
-          sessionStorage.fonts = true;
-        },
-      });
-    </script>
+  <script>
+    WebFont.load({
+      google: { families: ["Public Sans:300,400,500,600,700"] },
+      custom: {
+        families: [
+          "Font Awesome 5 Solid",
+          "Font Awesome 5 Regular",
+          "Font Awesome 5 Brands",
+          "simple-line-icons",
+        ],
+        urls: ["assets/css/fonts.min.css"],
+      },
+      active: function () {
+        sessionStorage.fonts = true;
+      },
+    });
+  </script>
 
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="assets/css/plugins.min.css" />
-    <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="assets/css/plugins.min.css" />
+  <link rel="stylesheet" href="assets/css/kaiadmin.min.css" />
 
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link rel="stylesheet" href="assets/css/demo.css" />
+  <!-- CSS Just for demo purpose, don't include it in your project -->
+  <link rel="stylesheet" href="assets/css/demo.css" />
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
 
-    <style>
+  <style>
     .accordion-button {
-      font-size: 1.3rem; /* Bigger text */
+      font-size: 1.3rem;
+      /* Bigger text */
       font-weight: 600;
     }
+
     .accordion-button .icon-toggle {
-      font-size: 1.3rem; /* Match icon size with text */
+      font-size: 1.3rem;
+      /* Match icon size with text */
       transition: transform 0.3s ease;
     }
 
-    .accordion-body{
+    .accordion-body {
       height: 30vh;
     }
 
-    body { font-family: Arial}
-    .login-box { max-width: 300px; margin: auto; }
-    input { display: block; width: 100%; margin-bottom: 10px; padding: 8px; }
-    button { padding: 8px 16px; }
-    .error { color: red; }
-    </style>    
-  </head>
-  <body>
-    <div ng-controller="MainController">
+    body {
+      font-family: Arial
+    }
+
+    .login-box {
+      max-width: 300px;
+      margin: auto;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+
+    button {
+      padding: 8px 16px;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <div ng-controller="MainController">
     <div class="wrapper">
       <!-- Navbar -->
       <div ng-show="isLoggedIn" ng-include="'view/navbar.html'"></div>
@@ -82,64 +98,56 @@
         </div>
       </div>
 
-      <!-- Footer -->
-      <footer class="footer bg-dark text-light py-3 mt-auto" ng-show="isLoggedIn">
-        <div class="container-fluid d-flex flex-column flex-md-row justify-content-between align-items-center">
-          <div class="mb-2 mb-md-0">
-            &copy; 2025 <strong>Moto Supermarket</strong>
-          </div>
-          <div>
-            Distributed by
-            <a target="_blank" href="https://themewagon.com/" class="text-info text-decoration-none"></a>
-          </div>
-        </div>
-      </footer>
     </div>
   </div>
 
-    <!--   Core JS Files   -->
-    <script src="assets/js/core/jquery-3.7.1.min.js"></script>
-    <script src="assets/js/core/popper.min.js"></script>
-    <script src="assets/js/core/bootstrap.min.js"></script>
 
-    <!-- jQuery Scrollbar -->
-    <script src="assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+  <!--   Core JS Files   -->
+  <script src="assets/js/core/jquery-3.7.1.min.js"></script>
+  <script src="assets/js/core/popper.min.js"></script>
+  <script src="assets/js/core/bootstrap.min.js"></script>
 
-    <!-- Chart JS -->
-    <script src="assets/js/plugin/chart.js/chart.min.js"></script>
+  <!-- jQuery Scrollbar -->
+  <script src="assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
 
-    <!-- jQuery Sparkline -->
-    <script src="assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+  <!-- Chart JS -->
+  <script src="assets/js/plugin/chart.js/chart.min.js"></script>
 
-    <!-- Chart Circle -->
-    <script src="assets/js/plugin/chart-circle/circles.min.js"></script>
+  <!-- jQuery Sparkline -->
+  <script src="assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
 
-    <!-- Datatables -->
-    <script src="assets/js/plugin/datatables/datatables.min.js"></script>
+  <!-- Chart Circle -->
+  <script src="assets/js/plugin/chart-circle/circles.min.js"></script>
 
-    <!-- Bootstrap Notify -->
-    <script src="assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+  <!-- Datatables -->
+  <script src="assets/js/plugin/datatables/datatables.min.js"></script>
 
-    <!-- jQuery Vector Maps -->
-    <script src="assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
-    <script src="assets/js/plugin/jsvectormap/world.js"></script>
+  <!-- Bootstrap Notify -->
+  <script src="assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
 
-    <!-- Sweet Alert -->
-    <script src="assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+  <!-- jQuery Vector Maps -->
+  <script src="assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
+  <script src="assets/js/plugin/jsvectormap/world.js"></script>
+
+  <!-- Sweet Alert -->
+  <script src="assets/js/plugin/sweetalert/sweetalert.min.js"></script>
 
 
-    <script src="app.js"></script>
-    <script src="controllers/userController.js"></script>
-    <script src="controllers/product.controller.js"></script>
-    <script src="controllers/inventoryController.js"></script>
-	  <script src="controllers/categoryController.js"></script>
-	  <script src="controllers/dashboardController.js"></script>
-	  <script src="controllers/orderController.js"></script>
-    <script src="controllers/inventoryTransByPrdoductsController.js"></script>
-    <script src="controllers/navController.js"></script>
-    <script src="controllers/loginController.js"></script>
-    <script src="controllers/mainController.js"></script>
-    <script src="controllers/paymentTypeController.js"></script>
+  <script src="app.js"></script>
+  <script src="controllers/userController.js"></script>
+  <script src="controllers/product.controller.js"></script>
+  <script src="controllers/inventoryController.js"></script>
+  <script src="controllers/categoryController.js"></script>
+  <script src="controllers/dashboardController.js"></script>
+  <script src="controllers/orderController.js"></script>
+  <script src="controllers/inventoryTransByPrdoductsController.js"></script>
+  <script src="controllers/navController.js"></script>
+  <script src="controllers/loginController.js"></script>
+  <script src="controllers/mainController.js"></script>
+  <script src="controllers/paymentTypeController.js"></script>
+  <script src="controllers/brandController.js"></script>
 
-  </body>
+
+</body>
+
 </html>

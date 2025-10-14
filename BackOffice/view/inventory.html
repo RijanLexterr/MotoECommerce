@@ -1,79 +1,70 @@
 <div class="page-header">
-  <h3 class="fw-bold mb-3">Inventory Transactions</h3>
+  <h3 class="fw-bold mb-3">Inventory</h3>
   <ul class="breadcrumbs mb-3">
-    <li class="nav-home"><a href="#"><i class="icon-home"></i></a></li>
-    <li class="separator"><i class="icon-arrow-right"></i></li>
-    <li class="nav-item"><a href="#">Inventory</a></li>
+    <li class="nav-home">
+      <a href="#">
+        <i class="icon-home"></i>
+      </a>
+    </li>
+    <li class="separator">
+      <i class="icon-arrow-right"></i>
+    </li>
+    <li class="nav-item">
+      <a href="#">Inventory</a>
+    </li>
   </ul>
 </div>
-
 <div class="row" ng-controller="InventoryController">
   <div class="col-md-12">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <div class="card-title">Products</div>
-        <button class="btn btn-primary btn-round ms-auto" ng-click="openAddTransaction(null)">
-          + Add Transaction
-        </button>
+        <button class="btn btn-success btn-sm" ng-click="openAddTransaction(null)"> + Add Transaction </button>
       </div>
-
       <div class="card-body">
-
-        <div ng-repeat="item in Items track by item.product_id" class="accordion" id="accordionDashboard">
-
-          <!-- Accordion Item -->
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="heading-{{item.product_id}}">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#collapse-{{item.product_id}}" aria-expanded="false"
-                aria-controls="collapse-{{item.product_id}}">
-                <div class="row align-items-center col-icon">
-                  <div class="icon-big text-center icon-primary bubble-shadow-small">
-                    <span class="h5"><i class="icon-information"></i> {{item.name}}</span>
-                    <span class="badge bg-info text-dark">{{item.stock}} pcs</span>
-                    <span class="badge bg-danger ms-2" ng-if="item.stock < 50">Low stock</span>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="item in Items track by item.product_id">
+              <td>
+                <a data-bs-toggle="collapse" href="#collapseRow{{$index}}" role="button" aria-expanded="false" aria-controls="collapseRow{{$index}}">
+                  <span class="h5">
+                    <i class="icon-information"></i> {{item.name}}
+                  </span>
+                </a>
+                <!-- Collapsible: transactions -->
+                <div class="collapse mt-2" id="collapseRow{{$index}}">
+                  <div class="card card-body">
+                    <div ng-include="'view/inventoryTransByPrdoducts.html'" ng-controller="InventoryTransactionsController" ng-init="init(item.product_id)"></div>
                   </div>
                 </div>
-              </button>
-            </h2>
-            <div id="collapse-{{item.product_id}}" class="accordion-collapse collapse"
-              aria-labelledby="heading-{{item.product_id}}" data-bs-parent="#accordionDashboard">
-              <div class="accordion-body">
-                <div ng-include="'view/inventoryTransByPrdoducts.html'" ng-controller="InventoryTransactionsController"
-                  ng-init="init(item.product_id)">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-
+              </td>
+              <td>
+                <span class="badge bg-info text-dark">{{item.stock}} pcs</span>
+                <span class="badge bg-danger ms-2" ng-if="item.stock < 50">Low stock </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
         <!-- Pagination controls -->
         <div class="d-flex justify-content-between align-items-center mt-3">
           <div>
-            <label>Show
-              <select ng-model="pagination.pageSize" ng-change="changePageSize()"
-                ng-options="s for s in [5,10]"></select> entries
-            </label>
+            <label>Show <select ng-model="pagination.pageSize" ng-change="changePageSize()" ng-options="s for s in [5,10,25,50]"></select> entries </label>
           </div>
-
           <div>
-            <button class="btn btn-sm btn-secondary" ng-disabled="pagination.page === 1"
-              ng-click="goToPage(pagination.page - 1)">Prev</button>
-
-            Page {{pagination.page}} of {{pagination.totalPages}}
-
-            <button class="btn btn-sm btn-secondary" ng-disabled="pagination.page === pagination.totalPages"
-              ng-click="goToPage(pagination.page + 1)">Next</button>
+            <button class="btn btn-sm btn-secondary" ng-disabled="pagination.page === 1" ng-click="goToPage(pagination.page - 1)">Prev</button> Page {{pagination.page}} of {{pagination.totalPages}}
+            <button class="btn btn-sm btn-secondary" ng-disabled="pagination.page === pagination.totalPages" ng-click="goToPage(pagination.page + 1)">Next</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 <!-- Modal -->
 <div class="modal fade" id="transactionFormModal" tabindex="-1">
   <div class="modal-dialog">
@@ -89,12 +80,11 @@
           <div class="mb-3">
             <label class="form-label">Product</label>
             <select class="form-select" ng-model="transaction.product_id" required>
-              <option ng-repeat="p in Items track by p.product_id" value="{{p.product_id}}">
+              <option ng-repeat="p in DropdownItems track by p.product_id" value="{{p.product_id}}">
                 {{p.name}}
               </option>
             </select>
           </div>
-
           <div class="mb-3">
             <label class="form-label">Type</label>
             <select class="form-select" ng-model="transaction.type_id" required>
@@ -103,18 +93,15 @@
               <option value="3">ADJUSTMENT</option>
             </select>
           </div>
-
           <div class="mb-3">
             <label class="form-label">Quantity</label>
             <input type="number" class="form-control" ng-model="transaction.qty">
           </div>
-
           <div class="mb-3">
             <label class="form-label">Remarks</label>
             <textarea class="form-control" ng-model="transaction.remarks"></textarea>
           </div>
         </div>
-
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-primary">Save Transaction</button>

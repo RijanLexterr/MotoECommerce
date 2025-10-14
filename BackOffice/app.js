@@ -1,6 +1,6 @@
 var app = angular.module("myApp", ["ngRoute"]);
 
-app.config(function($routeProvider) {
+app.config(function ($routeProvider) {
   $routeProvider
     .when("/login", {
       templateUrl: "view/login.html",
@@ -9,6 +9,12 @@ app.config(function($routeProvider) {
     .when("/users", {
       templateUrl: "view/user.html",
       controller: "UserController",
+      resolve: {
+        auth: checkAuth
+      }
+    }).when("/brands", {
+      templateUrl: "view/brand.html",
+      controller: "BrandController",
       resolve: {
         auth: checkAuth
       }
@@ -67,7 +73,7 @@ app.config(function($routeProvider) {
     });
 });
 
-var checkAuth = function($q, $location) {
+var checkAuth = function ($q, $location) {
   var deferred = $q.defer();
 
   if (sessionStorage.getItem('isLoggedIn') === 'true') {

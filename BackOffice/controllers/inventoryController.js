@@ -3,7 +3,11 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
     $scope.transaction = {};
     $scope.isEdit = false;
 
-    $scope.pagination = { page: 1, pageSize: 5, totalPages: 1 };
+    $scope.DropdownItems = [];
+
+
+
+    $scope.pagination = { page: 1, pageSize: 10, totalPages: 1 };
 
     // ======================
     // Load products
@@ -18,6 +22,16 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
             .catch(err => console.error(err));
     };
 
+
+    // ======================
+    $scope.loadDropdown= function(page = 1) {
+        let params = { page: page, pageSize: 99999 };
+        $http.get("../Core/Controller/InventoryController.php?action=GetAllProducts", { params })
+            .then(function(response) {
+                $scope.DropdownItems = response.data.data || [];
+            })
+            .catch(err => console.error(err));
+    };
     // ======================
     // Open Add/Edit Modal
     // ======================
@@ -103,4 +117,5 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
     // Initial load
     // ======================
     $scope.loadProducts();
+    $scope.loadDropdown();
 });

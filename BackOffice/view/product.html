@@ -1,10 +1,10 @@
+
 <div class="add-user-btn-container d-flex justify-content-between align-items-center mb-3">
     <div>
         <input class="form-control" type="text" placeholder="search" ng-model="searchQuery">
     </div>
     <div>
-        <button type="button" class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal"
-            data-bs-target="#ProductCreateModal" ng-click="addProductOnClick()">
+        <button type="button" class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#ProductCreateModal" ng-click="addProductOnClick()">
             <i class="fa fa-plus"></i>
             Add Product
         </button>
@@ -12,210 +12,200 @@
 </div>
 
 <!-- Add User Modal -->
-<div class="modal fade" id="ProductCreateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" ng-show="!product.product_id" id="ProductCreateModalLabel">Add Product</h5>
-                <h5 class="modal-title" ng-show="product.product_id" id="ProductCreateModalLabel">Edit Product</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" ng-click="updateProductFields()"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="product.name" class="form-label">Product Name</label>
-                    <input type="text" class="form-control" id="product.name" ng-model="product.name"
-                        ng-blur="validateName()" placeholder="Enter Product Name">
-                    <span ng-show="nameHasError" style="color: red; font-size: 0.9em;">
-                        {{nameError}}
-                    </span>
+    <div class="modal fade" id="ProductCreateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" ng-show="!product.product_id" id="ProductCreateModalLabel">Add Product</h5>
+					<h5 class="modal-title" ng-show="product.product_id" id="ProductCreateModalLabel">Edit Product</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" ng-click="updateProductFields()" aria-label="Close" ></button>
+				</div>
+                <div class="modal-body">					
+                    <div class="mb-3">						
+                        <label for="product.name" class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="product.name" ng-model="product.name" ng-blur="validateName()" placeholder="Enter Product Name">
+                        <span ng-show="nameHasError" style="color: red; font-size: 0.9em;">
+                            {{nameError}}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="product.description" ng-model="product.description" ng-blur="validateDescription()" placeholder="Enter Description">
+                        <span ng-show="descriptionHasError" style="color: red; font-size: 0.9em;">
+                            Description is required.
+                        </span>
+                    </div>
+					
+					<div class="mb-3">
+						<label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" ng-change="validateCategory()" ng-model="product.category_id" ng-options="category.category_id as category.name for category in CategoryItems">
+                            <option value="">-- Select Category --</option>
+                        </select>
+						<span ng-show="selectedCategoryIdHasError" style="color: red; font-size: 0.9em;">
+							Category is required.
+						</span>
+					</div>
+
+					<div class="mb-3">
+						<label for="brand" class="form-label">Brand</label>
+                        <select class="form-select" id="brand" ng-change="validateBrand()" ng-model="product.brand_id" ng-options="brand.brand_id as brand.name for brand in BrandItems">
+                            <option value="">-- Select Brand --</option>
+                        </select>
+						<span ng-show="selectedBrandIdHasError" style="color: red; font-size: 0.9em;">
+							Brand is required.
+						</span>
+					</div>
+
+                    <div class="mb-3">
+                        <label for="Price" class="form-label">Price</label>
+                        <input type="text" class="form-control" id="decimalInput" ng-model="product.price" ng-blur="validatePrice()" placeholder="Enter Price">
+                        <span ng-show="priceHasError" style="color: red; font-size: 0.9em;">
+                            {{priceError}}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Stock" class="form-label">Stock</label>
+                        <input type="number" value="{{product.stock}}" class="form-control" id="Stock" name = "Stock" placeholder="Enter Stock">
+                    </div>
+                    <div class="mb-3">
+                        <label for="ExpirationDate" class="form-label">Expiration Date</label>
+                        <input type="date" value="{{product.expiration_date}}" class="form-control" id="ExpirationDate" name = "ExpirationDate">
+                    </div>
+					
+                    <form id="uploadForm" enctype="multipart/form-data">
+						<input type="file" accept="image/*" name="imageInput" ng-model="product.image_location" id="imageInput" onchange="angular.element(this).scope().uploadImage(this.files)">
+						<img id="previewImage" src="#" alt="Image Preview" style="width: 100px; height: 100px;">
+						<br>
+					</form>
+
+					<label class="containerShipAdd">Is Promoted Items
+					<input type="checkbox" id="is_promoted" name="is_promoted" ng-model="product.is_promoted" ng-blur="validateNewPrice()">
+					<span class="checkmarkShipAdd"></span>
+					</label>
+
+					<div class="mb-3">
+                        <label for="NewPrice" class="form-label">New Price</label>
+                        <input type="text" class="form-control" id="decimalInputNew" ng-model="product.new_price" ng-blur="validateNewPrice()" placeholder="Enter New Price">
+                        <span ng-show="newpriceHasError" style="color: red; font-size: 0.9em;">
+                            {{newpriceError}}
+                        </span>
+                    </div>
+					
                 </div>
-                <div class="mb-3">
-                    <label for="Description" class="form-label">Description</label>
-                    <input type="text" class="form-control" id="name" ng-model="product.description"
-                        ng-blur="validateDescription()" placeholder="Enter Description">
-                    <span ng-show="descriptionHasError" style="color: red; font-size: 0.9em;">
-                        Description is required.
-                    </span>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" ng-click="updateProductFields()">Cancel</button>
+                    <button ng-show="!product.product_id" type="button" class="btn btn-primary"  ng-click="submit()">Create</button>
+                    <button ng-show="product.product_id" type="button" class="btn btn-primary"  ng-click="submit()">Save</button>
                 </div>
-
-                <div class="mb-3">
-                    <label for="category" class="form-label">Category</label>
-                    <select class="form-select" id="category" ng-change="validateCategory()"
-                        ng-model="product.category_id"
-                        ng-options="category.category_id as category.name for category in CategoryItems">
-                        <option value="">-- Select Category --</option>
-                    </select>
-                    <span ng-show="selectedCategoryIdHasError" style="color: red; font-size: 0.9em;">
-                        Category is required.
-                    </span>
-                </div>
-
-                <div class="mb-3">
-                    <label for="brand" class="form-label">Brand</label>
-                    <select class="form-select" id="brand" ng-change="validateBrand()" ng-model="product.brand_id"
-                        ng-options="brand.brand_id as brand.name for brand in BrandItems">
-                        <option value="">-- Select Brand --</option>
-                    </select>
-                    <span ng-show="selectedBrandIdHasError" style="color: red; font-size: 0.9em;">
-                        Brand is required.
-                    </span>
-                </div>
-
-                <div class="mb-3">
-                    <label for="Price" class="form-label">Price</label>
-                    <input type="text" class="form-control" id="name" ng-model="product.price" ng-blur="validatePrice()"
-                        placeholder="Enter Price">
-                    <span ng-show="priceHasError" style="color: red; font-size: 0.9em;">
-                        Price is required.
-                    </span>
-                </div>
-                <div class="mb-3">
-                    <label for="Stock" class="form-label">Stock</label>
-                    <input type="text" class="form-control" id="name" ng-model="product.stock"
-                        placeholder="Enter Stock">
-                </div>
-                <div class="mb-3">
-                    <label for="Expiration Date" class="form-label">Expiration Date</label>
-                    <input type="text" class="form-control" id="name" ng-model="product.expiration_date"
-                        placeholder="YYYY-MM-DD">
-                </div>
-
-
-                <!-- <form action="upload.php" method="POST" enctype="multipart/form-data">
-						<input type="file" name="image" accept="image/*" required><br><br>
-						<button type="submit">Upload</button>
-					  </form> -->
-
-                <form id="uploadForm" enctype="multipart/form-data" style="display: none;">
-                    <input type="file" name="image" id="imageInput"
-                        onchange="angular.element(this).scope().uploadImage(this.files)">
-                </form>
-
-                <input type="hidden" ng-model="productId" value="123">
-                <button ng-click="triggerUpload()">Upload Image</button>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    ng-click="updateProductFields()">Cancel</button>
-                <button ng-show="!product.product_id" type="button" class="btn btn-primary"
-                    ng-click="submit()">Create</button>
-                <button ng-show="product.product_id" type="button" class="btn btn-primary"
-                    ng-click="submit()">Save</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-
-<div class="modal fade" id="deleteProductConfirmationModal" tabindex="-1"
-    aria-labelledby="deleteProductConfirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteProductConfirmationModalLabel">Delete Product</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete the product name: {{productNameForDelete}}?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                <button type="button" class="btn btn-primary" ng-click="deleteProductById()">Yes</button>
+				
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+
+<div class="modal fade" id="deleteProductConfirmationModal" tabindex="-1" aria-labelledby="deleteProductConfirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteProductConfirmationModalLabel">Delete Product</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the product name: {{productNameForDelete}}?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" ng-click="deleteProductById()">Yes</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 
 
 <div>
-    <form ng-submit="save">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Product Name</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Brand</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Stock</th>
-                    <th scope="col">Expiration Date</th>
-                    <th scope="col">Image</th>
-                </tr>
-            </thead>
-            </thead>
-            <tbody>
-                <tr ng-repeat="item in products | filter:searchQuery">
-                    <td>{{($index + 1) + ((pagination.page - 1) * pagination.limit)}}</td>
-                    <td>{{item.name}}</td>
-                    <td>{{item.description}}</td>
-                    <td>{{item.CategoryName}}</td>
-                    <td>{{item.BrandName}}</td>
-                    <td>{{item.price}}</td>
-                    <td>{{item.stock}}</td>
-                    <td>{{item.expiration_date}}</td>
-                    <td>
-                    <td>
-                        <img ng-if="item.img_loc" ng-src="../Backoffice/uploads/{{item.img_loc}}" alt="Product Image"
-                            style="width: 100px; height: 100px;">
-                    </td>
-                    </td>
-                    <td>
-                        <div class="action-btn-container">
-                            <div>
-                                <button type="button" class="btn btn-link btn-primary"
-                                    ng-click="updateProductOnClick(item)" data-bs-toggle="modal"
-                                    data-bs-target="#ProductCreateModal">
-                                    <i class="fa fa-edit" data-bs-toggle="tooltip" data-bs-placement="top"
-                                        title="Update"></i>
-                                </button>
-                            </div>
-                            <div>
-                                <button class="btn btn-link btn-danger" ng-click="deleteProductOnClick(item)"
-                                    data-bs-toggle="modal" data-bs-target="#deleteProductConfirmationModal">
-                                    <i class="fa fa-times" data-bs-toggle="tooltip" data-bs-placement="top"
-                                        title="Delete"></i>
-                                </button>
-                            </div>
+	<form ng-submit="save">
+    <table class="table">
+        <thead>
+            <tr>
+            <th scope="col">#</th>
+            <th scope="col">Product Name</th>
+			<th scope="col">Description</th>
+			<th scope="col">Category</th>
+			<th scope="col">Brand</th>
+			<th scope="col">Price</th>
+			<th scope="col">Stock</th>
+			<th scope="col">Expiration Date</th>
+			<th scope="col">Promoted Item</th>
+			<th scope="col">New Price</th>
+            <th scope="col">Image</th>    
+			<th scope="col">Action</th>			
+            </tr>
+        </thead>
+        </thead>
+        <tbody>
+			<tr ng-repeat="item in products | filter:searchQuery">
+				<td>{{($index + 1) + ((pagination.page - 1) * pagination.limit)}}</td>
+				<td>{{item.name}}</td>
+				<td>{{item.description}}</td>
+				<td>{{item.CategoryName}}</td>
+				<td>{{item.BrandName}}</td>
+				<td>{{item.price}}</td>
+				<td>{{item.stock}}</td>
+				<td>{{item.expiration_date}}</td>
+				<td>{{item.yes_if_promoted}}</td>
+				<td>{{item.new_price}}</td>
+                <td>
+                    <img src="uploads/{{item.img_loc}}" alt="" srcset="" style="width: 100px; height: 100px;">
+                </td>
+                <td>
+                    <div class="action-btn-container">
+                        <div>
+                            <button type="button" class="btn btn-link btn-primary" ng-click="updateProductOnClick(item)" data-bs-toggle="modal" data-bs-target="#ProductCreateModal">
+                                <i class="fa fa-edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Update"></i>
+                            </button>
                         </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </form>
+                        <div>
+                            <button class="btn btn-link btn-danger" ng-click="deleteProductOnClick(item)" data-bs-toggle="modal" data-bs-target="#deleteProductConfirmationModal">
+                                <i class="fa fa-times"  data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+	</form>
     <div>
         <!-- Pagination controls -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="d-flex justify-content-between align-items-center mt-3">
             <div>
-                <label>Show
-                    <select ng-model="pageSize" ng-change="changePageSize()"
-                        ng-options="s for s in [5,10,25,50]"></select>
-                    entries
+                <label>Show 
+                <select ng-model="pageSize" ng-change="changePageSize()" 
+                        ng-options="s for s in [5,10,25,50]"></select> 
+                entries
                 </label>
             </div>
 
             <div>
-                <button class="btn btn-sm btn-outline-primary" ng-disabled="pagination.page === 1"
-                    ng-click="loadTransactions(pagination.page - 1)">
-                    Prev
+                <button class="btn btn-sm btn-outline-primary"
+                        ng-disabled="pagination.page === 1"
+                        ng-click="loadTransactions(pagination.page - 1)">
+                Prev
                 </button>
 
                 Page {{pagination.page}} of {{pagination.totalPages}}
 
-                <button class="btn btn-sm btn-outline-primary" ng-disabled="pagination.page === pagination.totalPages"
-                    ng-click="loadTransactions(pagination.page + 1)">next</button>
+            <button class="btn btn-sm btn-outline-primary"
+                        ng-disabled="pagination.page === pagination.totalPages"
+                        ng-click="loadTransactions(pagination.page + 1)">next</button>
 
-            </div>
+                </div>
+                </div>
+
         </div>
-
+            </div>
     </div>
-</div>
-</div>
-
+    
 </div>
