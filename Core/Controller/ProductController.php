@@ -215,7 +215,7 @@ class ProductController {
 		
 		if ($data['image_location'])
 		{
-			$fileToDelete = "C:\\xampp\\htdocs\\eCommerce\\BackOffice\\uploads\\"; // Specify the file name or path
+			$fileToDelete = "C:\\xampp\\htdocs\\MotoECommerce\\BackOffice\\uploads\\"; // Specify the file name or path
 			$fileToDelete = $fileToDelete . $data['image_location'];
 			
 			if (file_exists($fileToDelete)) { // Check if the file exists before attempting to delete
@@ -339,7 +339,7 @@ public function readByFilter($categoryIds, $brandIds, $page = 1, $limit = 6, $se
 
 		if (isset($_POST['image_location'])) 
 		{
-			$fileToDelete = "C:\\xampp\\htdocs\\eCommerce\\BackOffice\\uploads\\"; // Specify the file name or path
+			$fileToDelete = "C:\\xampp\\htdocs\\MotoECommerce\\BackOffice\\uploads\\"; // Specify the file name or path
 			$fileToDelete = $fileToDelete . $_POST['image_location'];
 			
 			if (file_exists($fileToDelete)) 
