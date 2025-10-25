@@ -82,6 +82,81 @@
     .error {
       color: red;
     }
+	/* The container */
+    .containerShipAdd {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 22px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Hide the browser's default checkbox */
+    .containerShipAdd input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    /* Create a custom checkbox */
+    .checkmarkShipAdd {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #ccc;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .containerShipAdd:hover input~.checkmarkShipAdd {
+      background-color: #ccc;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    .containerShipAdd input:checked~.checkmarkShipAdd {
+      background-color: #2196F3;
+    }
+
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .checkmarkShipAdd:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    /* Show the checkmark when checked */
+    .containerShipAdd input:checked~.checkmarkShipAdd:after {
+      display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    .containerShipAdd .checkmarkShipAdd:after {
+      left: 9px;
+      top: 5px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+
+    img {
+      display: block;
+      margin-top: 2px;
+      max-width: 200px;
+      max-height: 150px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 
@@ -146,7 +221,7 @@
   <script src="controllers/mainController.js"></script>
   <script src="controllers/paymentTypeController.js"></script>
   <script src="controllers/brandController.js"></script>
-
+  <script src="controllers/usershippingdetailsController.js"></script>
 
 </body>
 
