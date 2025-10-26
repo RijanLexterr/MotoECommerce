@@ -42,6 +42,10 @@
   animation: slideDown 0.3s ease-out;
 }
 
+.header-ctn .dropdown:hover {
+ cursor: pointer;
+}
+
 /* Hide desktop nav on small screens */
 @media (max-width: 767px) {
   #responsive-nav.hidden-xs {

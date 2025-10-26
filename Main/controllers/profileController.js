@@ -15,7 +15,13 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     $rootScope.currentUser = null;
     $scope.currentUser = null;
   }
-
+ $rootScope.$on("isLoggedIn", function(event, status) {
+    $scope.isLoggedIn = status;
+     if (!$scope.isLoggedIn) {
+    $location.path('/login');
+    return;
+  }
+  });
   $scope.successMessage = null;
   let currentUser = $scope.currentUser;
 
@@ -113,10 +119,11 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     $http.post(`../Core/Controller/UserController.php?action=updateUserProfile&id=${parseInt($scope.currentUser.user_id)}`, request)
       .then(function (response) {
         if (response.data.status == "success") {
-          alert('Password updated successfully!');
+          
           $scope.cancelChangePassword();
-          document.querySelector('#passwordModal .btn-close').click();
+          document.querySelector('#passwordModal .close').click();
           getUserById();
+          alert('Password updated successfully!');
         }
       })
       .catch(function (error) {

@@ -1,9 +1,35 @@
 app.controller("CartOrderController", function($scope, $http, $rootScope, $location, $timeout) {
 
-  $scope.isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
-  $scope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+  // $scope.isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+  // $scope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
   $scope.addedtoCart = [];
   $scope.userWithAddresses = [];
+
+  if (sessionStorage.getItem('isLoggedIn') === 'true') {
+  $rootScope.isLoggedIn = true;
+  $scope.isLoggedIn = true;
+} else {
+  $rootScope.isLoggedIn = false;
+  $scope.isLoggedIn = false;
+}
+
+if (sessionStorage.getItem('currentUser')) {
+  $rootScope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+  $scope.currentUser = $rootScope.currentUser;
+} else {
+  $rootScope.currentUser = null;
+  $scope.currentUser = null;
+}
+
+ $rootScope.$on("isLoggedIn", function(event, status) {
+    $scope.isLoggedIn = status;
+  });
+
+  // Listen for currentUser event
+  $rootScope.$on("currentUser", function(event, user) {
+    $scope.currentUser = user;
+    loadUserInfo(); // Optional: if you want to trigger logic here too
+  });
 
   init();
 

@@ -79,7 +79,8 @@ $scope.$watch(function() {
           sessionStorage.setItem("isLoggedIn", "true");
           sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
 
-          $scope.$emit("isLoggedIn", res.data.user);
+          $scope.$emit("isLoggedIn", true);
+          $scope.$emit("currentUser", res.data.user);
           $("#loginModal").modal("hide");
         } else {
           $scope.error = res.data.message;
@@ -94,6 +95,8 @@ $scope.logout = function () {
       $rootScope.isLoggedIn = false;
       $rootScope.currentUser = '';
       sessionStorage.clear();
+      $scope.$emit("isLoggedIn", false);
+      $scope.$emit("currentUser", currentUser);
       // $location.path('/login');
     });
   };
