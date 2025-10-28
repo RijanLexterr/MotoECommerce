@@ -1,32 +1,32 @@
-app.controller("CartOrderController", function($scope, $http, $rootScope, $location, $timeout) {
+app.controller("CartOrderController", function ($scope, $http, $rootScope, $location, $timeout) {
 
   // $scope.isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
   // $scope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
   $scope.addedtoCart = [];
   $scope.userWithAddresses = [];
-
+  $scope.paymentType = 0;
   if (sessionStorage.getItem('isLoggedIn') === 'true') {
-  $rootScope.isLoggedIn = true;
-  $scope.isLoggedIn = true;
-} else {
-  $rootScope.isLoggedIn = false;
-  $scope.isLoggedIn = false;
-}
+    $rootScope.isLoggedIn = true;
+    $scope.isLoggedIn = true;
+  } else {
+    $rootScope.isLoggedIn = false;
+    $scope.isLoggedIn = false;
+  }
 
-if (sessionStorage.getItem('currentUser')) {
-  $rootScope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-  $scope.currentUser = $rootScope.currentUser;
-} else {
-  $rootScope.currentUser = null;
-  $scope.currentUser = null;
-}
+  if (sessionStorage.getItem('currentUser')) {
+    $rootScope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    $scope.currentUser = $rootScope.currentUser;
+  } else {
+    $rootScope.currentUser = null;
+    $scope.currentUser = null;
+  }
 
- $rootScope.$on("isLoggedIn", function(event, status) {
+  $rootScope.$on("isLoggedIn", function (event, status) {
     $scope.isLoggedIn = status;
   });
 
   // Listen for currentUser event
-  $rootScope.$on("currentUser", function(event, user) {
+  $rootScope.$on("currentUser", function (event, user) {
     $scope.currentUser = user;
     loadUserInfo(); // Optional: if you want to trigger logic here too
   });
@@ -53,7 +53,7 @@ if (sessionStorage.getItem('currentUser')) {
     $scope.addedtoCart = [];
 
     productsOnCart.forEach((product, index) => {
-      console.log(product );
+
       $http.get("../Core/Controller/ProductController.php?action=readOne&id=" + parseInt(product.id))
         .then((response) => {
           const data = response.data;
@@ -84,24 +84,24 @@ if (sessionStorage.getItem('currentUser')) {
 
   // 👤 Load addresses
   function loadUserInfo() {
-    
+
     $scope.userWithAddresses = [];
     if (!$scope.isLoggedIn || !$scope.currentUser?.user_id) return;
 
     const userId = parseInt($scope.currentUser.user_id);
     $http.get("../Core/Controller/UserShippingDetailsController.php?action=getByUserId&user_id=" + userId)
       .then((response) => {
-        if (response.data.status === "success") {          
+        if (response.data.status === "success") {
           $scope.userWithAddresses = response.data.userAddress || [];
           console.log("User addresses:", $scope.userWithAddresses);
-                  
-          if ($scope.userWithAddresses[parseInt($scope.currentUser.user_id)].Addresses.length > 0) {
-                let user = $scope.userWithAddresses[parseInt($scope.currentUser.user_id)];
-                let defaultAddress = user.Addresses.find(a => a.IsDefault === 1);
 
-                if (defaultAddress) {
-                  $scope.selectedAddressId = defaultAddress.ShippingId;
-                }
+          if ($scope.userWithAddresses[parseInt($scope.currentUser.user_id)].Addresses.length > 0) {
+            let user = $scope.userWithAddresses[parseInt($scope.currentUser.user_id)];
+            let defaultAddress = user.Addresses.find(a => a.IsDefault === 1);
+
+            if (defaultAddress) {
+              $scope.selectedAddressId = defaultAddress.ShippingId;
+            }
           }
         }
       })
@@ -109,25 +109,31 @@ if (sessionStorage.getItem('currentUser')) {
   }
 
   // 📦 Quantity controls
-  $scope.increaseQty = function(item) {
+  $scope.increaseQty = function (item) {
     if (item.quantity < item.stock) item.quantity++;
   };
 
-  $scope.decreaseQty = function(item) {
+  $scope.decreaseQty = function (item) {
     if (item.quantity > 1) item.quantity--;
   };
 
   // 🧮 Total
-  $scope.getTotal = function() {
+  $scope.getTotal = function () {
     return $scope.addedtoCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
   // 🧾 Place order
-  $scope.proceedCheckOut = function() {
+  $scope.proceedCheckOut = function () {
     if (!$scope.isLoggedIn) {
       sessionStorage.setItem('redirectAfterLogin', $location.path());
       $location.path('/login');
       return;
+    }
+
+    if (!$scope.paymentType) { 
+      alert("Please select payment type!");
+      return;
+
     }
 
     if ($scope.addedtoCart.length === 0) {
