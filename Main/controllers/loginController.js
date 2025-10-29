@@ -11,9 +11,7 @@ app.controller('LoginController', function($scope, $http, $location, $rootScope)
     // Manual validation
     if (!$scope.username) {
       $scope.emailError = 'Email is required.';
-    } else if (!validateEmail($scope.username)) {
-      $scope.emailError = 'Please enter a valid email address.';
-    }
+    } 
 
     if (!$scope.password) {
       $scope.passwordError = 'Password is required.';
