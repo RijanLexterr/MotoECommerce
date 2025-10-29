@@ -40,19 +40,6 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
 
   $scope.img_location = '';
 
-  const imageInput = document.getElementById('imageInput');
-  const previewImage = document.getElementById('previewImage');
-
-  imageInput.addEventListener('change', function (event) {
-    const file = event.target.files[0];
-    if (file) {
-      const imageURL = URL.createObjectURL(file);
-      previewImage.src = imageURL;
-      previewImage.style.display = 'block';
-    } else {
-      clearPreview();
-    }
-  });
 
 
   // 🛒 Load cart items
@@ -65,6 +52,31 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       console.warn("No products found in sessionStorage.");
       return;
     }
+    $scope.isShowImage = false;
+    $scope.showImage = function (value) {
+      if (value == 2) {
+        $scope.isShowImage = true;
+
+        $timeout(function () {
+          const imageInput = document.getElementById('imageInput');
+          const previewImage = document.getElementById('previewImage');
+
+          if (imageInput) {
+            imageInput.addEventListener('change', function (event) {
+              const file = event.target.files[0];
+              if (file) {
+                const imageURL = URL.createObjectURL(file);
+                previewImage.src = imageURL;
+                previewImage.style.display = 'block';
+              } else {
+                previewImage.src = '';
+                previewImage.style.display = 'none';
+              }
+            });
+          }
+        }, 0);
+      }
+    };
 
     // Clear first
     $scope.addedtoCart = [];
@@ -139,25 +151,51 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
     return $scope.addedtoCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   };
 
-  // 🧾 Place order
   $scope.proceedCheckOut = function () {
+    // ✅ Check if user is logged in
     if (!$scope.isLoggedIn) {
       sessionStorage.setItem('redirectAfterLogin', $location.path());
       $location.path('/login');
       return;
     }
 
+    // ✅ Validate payment type
     if (!$scope.paymentType) {
       alert("Please select payment type!");
       return;
-
     }
 
+    // ✅ Validate cart contents
     if ($scope.addedtoCart.length === 0) {
       alert("Your cart is empty!");
       return;
     }
 
+   
+    const fileInput = document.getElementById('imageInput');
+    const files = fileInput ? fileInput.files : [];
+    let uploadedFile = null;
+
+    // If payment type is Gcash/Maya (2), make image required
+    if ($scope.paymentType == 2) {
+      if (!files || files.length === 0) {
+        alert('Payment transaction proof is required!');
+        return;
+      }
+    }
+
+    // Validate file type if uploaded
+    if (files && files.length > 0) {
+      uploadedFile = files[0];
+
+      if (!uploadedFile.type.startsWith('image/')) {
+        alert('It is not an image file.');
+        return;
+      }
+    }
+
+
+    // ✅ Build order data
     const userId = parseInt($scope.currentUser.user_id);
     const orderData = {
       order_id: -1,
@@ -165,23 +203,45 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       user_shipping_id: $scope.selectedAddressId || null,
       total: $scope.getTotal(),
       items: $scope.addedtoCart,
-      payment_type_id : $scope.paymentType
+      payment_type_id: $scope.paymentType
     };
 
+    // ✅ Create the order first
     $http.post("../Core/Controller/OrderController.php?action=create", orderData)
-      .then((response) => {
+      .then(function (response) {
         if (response.data.status === "success") {
-          
 
+          // ✅ Clear cart
           sessionStorage.setItem('productsOnCart', JSON.stringify([]));
-          $location.path('/result').search({ status: 'success', orderId: response.data.created_order_id });
+
+          // ✅ Redirect user
+          $location.path('/result').search({
+            status: 'success',
+            orderId: response.data.created_order_id
+          });
+
+          // ✅ Upload payment proof image if provided
+          if (uploadedFile) {
+            const formData = new FormData();
+            formData.append('order_id', response.data.created_order_id);
+            formData.append('image', uploadedFile); // ✅ Include the actual file
+            formData.append('image_location', "");
+
+            $http.post('../Core/Controller/OrderController.php?action=uploadImage', formData, {
+              headers: { 'Content-Type': undefined }
+            }).then(function (res) {
+              console.log('Upload success:', res.data);
+            }, function (error) {
+              console.error('Upload failed:', error);
+            });
+          }
         } else {
           alert("Order failed: " + response.data.message);
         }
-      })
-      .catch((err) => {
-        console.error("Order submission failed:", err);
+      }, function (error) {
+        console.error("Order submission failed:", error);
         alert("Error placing order.");
       });
   };
+
 });
