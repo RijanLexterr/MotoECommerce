@@ -101,7 +101,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="user in users | filter:searchQuery">
+            <tr ng-repeat="user in users | filter:roleFilter | filter:searchQuery">
                 <td>{{($index + 1) + ((pagination.page - 1) * pagination.limit)}}</td>
                 <td>{{user.name}}</td>
                 <td>{{user.email}}</td>

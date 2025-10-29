@@ -1,5 +1,14 @@
 
-app.controller("UserController", function($scope, $http) {
+app.controller("UserController", function($scope, $http, $routeParams) {
+
+  // Get the view param or default to 'super_admin'
+  $scope.userView = $routeParams.view || "Super Admin";
+
+  // If route param missing, update URL automatically
+  if (!$routeParams.view) {
+    $location.path("/users/Super Admin");  
+    return; // stop here so it doesn’t call the API twice
+  }
 
   $scope.userIdForDelete;
 
@@ -217,5 +226,10 @@ $scope.changePageSize = function() {
           console.error("Error fetching data:", error);
         });
     }
+
+     $scope.roleFilter = function (user) {
+        // show only matching role
+        return user.role_name === $scope.userView;
+    };
 
 });
