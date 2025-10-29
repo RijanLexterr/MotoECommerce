@@ -37,12 +37,15 @@ CREATE TABLE payment_types (
 -- MAIN TABLES
 -- ======================
 
--- USERS
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    failed_attempts INT DEFAULT 0,
+    last_failed_login DATETIME DEFAULT NULL,
+    is_locked BOOLEAN DEFAULT FALSE,
+    image_loc VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
