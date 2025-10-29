@@ -37,7 +37,7 @@
 // $stmt->close();
 // $conn->close();
 
-https://github.com/RijanLexterr/MotoECommerce.gitsession_start();
+session_start();
 $data = json_decode(file_get_contents("php://input"));
 $email = $data->email;
 $password = $data->password;
@@ -61,7 +61,7 @@ if ($user) {
   if ($user['is_locked']) {
     $lockTime = strtotime($user['last_failed_login']);
     $currentTime = time();
-    if (($currentTime - $lockTime) > 300) { // 5 minutes
+    if (($currentTime - $lockTime) < 300) { // 5 minutes
       echo json_encode(['status' => 'error', 'message' => 'Account locked. Try again in 5 minutes.']);
       exit;
     } else {

@@ -65,7 +65,32 @@ $scope.$watch(function() {
   // ==========================
   // AUTHENTICATION
   // ==========================
+
+  $scope.error = '';
+  $scope.emailError = '';
+  $scope.passwordError = '';
   $scope.login = function () {
+    $scope.error = '';
+    $scope.emailError = '';
+    $scope.passwordError = '';
+
+    // Manual validation
+    if (!$scope.username) {
+      $scope.emailError = 'Email is required.';
+    } else if (!validateEmail($scope.username)) {
+      $scope.emailError = 'Please enter a valid email address.';
+    }
+
+    if (!$scope.password) {
+      $scope.passwordError = 'Password is required.';
+    } else if ($scope.password.length < 0) {
+      $scope.passwordError = 'Password must be at least 6 characters.';
+    }
+
+    if ($scope.emailError || $scope.passwordError) {
+      return;
+    }
+
     $http
       .post("../Core/Controller/Login/login.php", {
         email: $scope.username,
