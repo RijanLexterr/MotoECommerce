@@ -43,7 +43,7 @@ app.controller('LoginController', function($scope, $http, $location) {
         sessionStorage.setItem('isLoggedIn', 'true');
         sessionStorage.setItem('currentUser', JSON.stringify(response.data.user));
         $scope.$emit('isLoggedIn', response.data.user);
-        $location.path('/users');
+        $location.path('/users/Super Admin');
         
       } else {
         $scope.error = response.data.message;

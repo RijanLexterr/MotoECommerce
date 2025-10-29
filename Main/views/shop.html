@@ -75,12 +75,33 @@
                                 <h6 class="product-price" ng-if="!product.price">
                                     ₱0.00
                                 </h6>
+
+                                <!-- 🧾 Stock Display -->
+                                <div class="text-muted small">
+                                    <i class="fa fa-box"></i>
+                                    <span ng-if="product.stock > 5">
+                                        {{product.stock}} in stock
+                                    </span>
+                                    <span class="text-warning" ng-if="product.stock > 0 && product.stock <= 5">
+                                        Only {{product.stock}} left!
+                                    </span>
+                                    <span class="text-danger" ng-if="product.stock == 0">
+                                        Out of stock
+                                    </span>
+                                </div>
                             </div>
                             <div class="add-to-cart">
+                                <button ng-click="decreaseQty(product)">
+                                    <i class="fa fa-minus"></i>
+                                </button>
 
-                                <input type="number" class="form-check-input" style="margin-bottom: 10px;">
+                                <input ng-model="product.Qty" class="form-check-input" style="margin-bottom: 5px;width: 40px;">
 
-                                <button class="add-to-cart-btn" ng-click="addToCart(product.product_id)" data-toggle="modal" data-target="#addToCartModal">
+                                <button ng-click="increaseQty(product)">
+                                    <i class="fa fa-plus" ></i>
+                                </button>
+
+                                <button class="add-to-cart-btn" ng-click="addToCart(product.product_id, product.Qty)" data-toggle="modal" data-target="#addToCartModal">
                                     <i class="fa fa-shopping-cart"></i> add to cart
                                 </button>
                             </div>

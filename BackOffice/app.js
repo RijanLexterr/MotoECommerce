@@ -6,7 +6,7 @@ app.config(function ($routeProvider) {
       templateUrl: "view/login.html",
       controller: "LoginController"
     })
-    .when("/users", {
+    .when("/users/:view", {
       templateUrl: "view/user.html",
       controller: "UserController",
       resolve: {
