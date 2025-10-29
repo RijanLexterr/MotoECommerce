@@ -130,17 +130,21 @@
 
 						<div class="order-products">
 							<div class="form-check me-3">
-								<input class="form-check-input" type="radio" name="paymentType"
-									 ng-model="paymentType" ng-value="1"
-									ng-change="">
-								<label > Cash on Delivery </label>
+								<input class="form-check-input" type="radio" name="paymentType" ng-model="paymentType"
+									ng-value="1" ng-change="">
+								<label> Cash on Delivery </label>
 							</div>
 							<div class="form-check me-3">
-								<input class="form-check-input" type="radio" name="paymentType"
-									 ng-model="paymentType" ng-value="2"
-									ng-change="">
-								<label > Gcash/Maya</label>
+								<input class="form-check-input" type="radio" name="paymentType" ng-model="paymentType"
+									ng-value="2" ng-change="">
+								<label> Gcash/Maya</label>
 							</div>
+							<form id="uploadForm" enctype="multipart/form-data">
+								<input type="file" accept="image/*" name="imageInput" ng-model="img_location"
+									id="imageInput" onchange="angular.element(this).scope().uploadImage(this.files)">
+								<img id="previewImage" src="#" alt="Image Preview" style="width: 100px; height: 100px;">
+								<br>
+							</form>
 						</div>
 
 					</div>

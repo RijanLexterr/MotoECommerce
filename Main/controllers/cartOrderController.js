@@ -38,6 +38,23 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
     loadUserInfo();
   }
 
+  $scope.img_location = '';
+
+  const imageInput = document.getElementById('imageInput');
+  const previewImage = document.getElementById('previewImage');
+
+  imageInput.addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const imageURL = URL.createObjectURL(file);
+      previewImage.src = imageURL;
+      previewImage.style.display = 'block';
+    } else {
+      clearPreview();
+    }
+  });
+
+
   // 🛒 Load cart items
   function loadCart() {
     console.log("Loading cart from sessionStorage...");
@@ -130,7 +147,7 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       return;
     }
 
-    if (!$scope.paymentType) { 
+    if (!$scope.paymentType) {
       alert("Please select payment type!");
       return;
 
@@ -147,13 +164,15 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       user_id: userId,
       user_shipping_id: $scope.selectedAddressId || null,
       total: $scope.getTotal(),
-      items: $scope.addedtoCart
+      items: $scope.addedtoCart,
+      payment_type_id : $scope.paymentType
     };
 
     $http.post("../Core/Controller/OrderController.php?action=create", orderData)
       .then((response) => {
         if (response.data.status === "success") {
-          alert("Order placed successfully!");
+          
+
           sessionStorage.setItem('productsOnCart', JSON.stringify([]));
           $location.path('/result').search({ status: 'success', orderId: response.data.created_order_id });
         } else {
