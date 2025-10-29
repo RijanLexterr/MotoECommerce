@@ -61,7 +61,7 @@ if ($user) {
   if ($user['is_locked']) {
     $lockTime = strtotime($user['last_failed_login']);
     $currentTime = time();
-    if (($currentTime - $lockTime) < 300) { // 5 minutes
+    if (($currentTime - $lockTime) > 300) { // 5 minutes
       echo json_encode(['status' => 'error', 'message' => 'Account locked. Try again in 5 minutes.']);
       exit;
     } else {
