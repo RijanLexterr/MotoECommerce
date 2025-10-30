@@ -118,8 +118,9 @@ $scope.logout = function () {
       $rootScope.isLoggedIn = false;
       $rootScope.currentUser = '';
       sessionStorage.clear();
+      $("#logoutModal").modal("hide");
       $scope.$emit("isLoggedIn", false);
-      $scope.$emit("currentUser", currentUser);
+      // $scope.$emit("currentUser", currentUser);
       // $location.path('/login');
     });
   };
