@@ -300,7 +300,7 @@ class ProductController
         // Fetch paginated results
         $sql = "
         SELECT p.product_id, p.name, p.description,
-               p.category_id, p.brand_id, p.price, p.stock,
+               p.category_id, p.brand_id, p.price, CASE WHEN p.is_promoted = 1 THEN p.new_price ELSE p.price END as item_price, p.stock,
                p.expiration_date, p.image_location,
                b.name AS BrandName, c.name AS CategoryName
         FROM products p
@@ -336,6 +336,98 @@ class ProductController
         ]);
     }
 
+	public function PromotedItemsReadByFilter($categoryIds, $brandIds, $page = 1, $limit = 6, $searchText = "")
+    {
+        $page = isset($_GET['page']) ? intval($_GET['page']) : $page;
+        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : $limit;
+        $offset = ($page - 1) * $limit;
+
+        $categoryIds = array_filter(array_map('intval', explode(',', $categoryIds)));
+        $brandIds = array_filter(array_map('intval', explode(',', $brandIds)));
+        $searchText = isset($_GET['searchText']) ? trim($_GET['searchText']) : $searchText;
+
+        $promotedconditions = [];
+        $params = [];
+        $types = "";
+
+        // Category filter
+        if (!empty($categoryIds) && !(count($categoryIds) === 1 && $categoryIds[0] === 0)) {
+            $placeholders = implode(",", array_fill(0, count($categoryIds), "?"));
+            $promotedconditions[] = "p.category_id IN ($placeholders)";
+            foreach ($categoryIds as $id) {
+                $params[] = $id;
+                $types .= "i";
+            }
+        }
+
+        // Brand filter
+        if (!empty($brandIds) && !(count($brandIds) === 1 && $brandIds[0] === 0)) {
+            $placeholders = implode(",", array_fill(0, count($brandIds), "?"));
+            $promotedconditions[] = "p.brand_id IN ($placeholders)";
+            foreach ($brandIds as $id) {
+                $params[] = $id;
+                $types .= "i";
+            }
+        }
+
+        // 🔍 Search filter (match name or description)
+        if (!empty($searchText)) {
+            $promotedconditions[] = "(p.name LIKE ? OR p.description LIKE ?)";
+            $params[] = "%{$searchText}%";
+            $params[] = "%{$searchText}%";
+            $types .= "ss";
+        }
+		
+		//$promotedwhere = "WHERE p.is_promoted = 1"
+        $promotedwhere = !empty($promotedconditions) ? " AND " . implode(" AND ", $promotedconditions) : "";
+
+        // Count total rows
+        $countSql = "SELECT COUNT(*) AS total FROM products p WHERE p.is_promoted = 1 $promotedwhere";
+        $countStmt = $this->db->prepare($countSql);
+        if (!empty($params)) {
+            $countStmt->bind_param($types, ...$params);
+        }
+        $countStmt->execute();
+        $total = (int) $countStmt->get_result()->fetch_assoc()['total'];
+
+        // Fetch paginated results
+        $sql = "
+        SELECT p.product_id, p.name, p.description,
+               p.category_id, p.brand_id, p.price, CASE WHEN p.is_promoted = 1 THEN p.new_price ELSE p.price END as item_price, p.stock,
+               p.expiration_date, p.image_location, ROUND(((p.price - p.new_price)/p.price)*100) as percent, 
+               b.name AS BrandName, c.name AS CategoryName
+        FROM products p
+        LEFT JOIN brands b ON p.brand_id = b.brand_id
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        WHERE p.is_promoted = 1 $promotedwhere 
+        ORDER BY p.created_at DESC
+        LIMIT $limit OFFSET $offset
+    ";
+
+        $stmt = $this->db->prepare($sql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        echo json_encode([
+            'categoryIds' => $categoryIds,
+            'brandIds' => $brandIds,
+            'searchText' => $searchText,
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total,
+            'pages' => max(1, ceil($total / $limit)),
+            'count' => count($data),
+            'data' => $data
+        ]);
+    }
 
     public function uploadImage()
     {
@@ -498,9 +590,9 @@ if (isset($_GET['action'])) {
         case 'globalSearch':
             $controller->globalSearch($_GET['query'] ?? "");
             break;
-
-
-
+		case 'PromotedItemsReadByFilter':
+            $controller->PromotedItemsReadByFilter($_GET['categoryIds'] ?? "0", $_GET['brandIds'] ?? "0");
+            break;
         default:
             echo json_encode(["status" => "error", "message" => "Invalid action"]);
     }

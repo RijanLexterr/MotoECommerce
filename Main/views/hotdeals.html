@@ -68,7 +68,7 @@
 
                 <div class="row">
                     <!-- product -->
-                    <div class="col-md-4 col-xs-6" ng-repeat="product in Products">
+                    <div class="col-md-4 col-xs-6" ng-repeat="product in PromotedProducts">
                         <div class="product" ng-if="product">
                             <div class="product-img">
                                 <img class="img-fluid w-100" ng-if="product.image_location"
@@ -76,10 +76,9 @@
                                 <img class="img-fluid w-100" ng-if="!product.image_location"
                                     ng-src="assets/img/default.jpg" alt="No image available" style="width: 250px; height: 280px;">
 
-<!--                                 <div class="product-label">
-                                    <span class="sale">-30%</span>
-                                    <span class="new">NEW</span>
-                                </div> -->
+                                <div class="product-label">
+                                    <span style="width: 200px; height: 200px; color: red; font-weight: bold; background-color: white; font-size: 18px;">-{{product.percent}}%</span>
+                                </div>
                             </div>
                             <div class="product-body">
                                 <h5 class="product-name">
@@ -87,7 +86,7 @@
                                 </h5>
                                 <h6 class="product-item_price" ng-if="product.item_price">
                                     ₱{{ product.item_price | number:2 }}
-                                    <!-- <del class="product-old-price">₱{{ product.price | number:2 }}</del> -->
+                                    <del class="product-old-price">₱{{ product.price | number:2 }}</del>
                                 </h6>
                                 <h6 class="product-item_price" ng-if="!product.item_price">
                                     ₱0.00

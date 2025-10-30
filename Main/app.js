@@ -24,6 +24,11 @@ app.config(function ($routeProvider, $locationProvider) {
       templateUrl: "views/home.html",
       controller: "HomeController"
     })
+	// add parameter :categoryId
+    .when("/hotdeals/:categoryId?", {
+      templateUrl: "views/hotdeals.html",   // fixed here
+      controller: "HotDealsController"
+    })
     // add parameter :categoryId
     .when("/shop/:categoryId?", {
       templateUrl: "views/shop.html",   // fixed here
