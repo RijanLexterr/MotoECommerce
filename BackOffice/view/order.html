@@ -12,6 +12,7 @@
                 <th scope="col">Order By</th>
                 <th scope="col">Status</th>
                 <th scope="col">Order Created At</th>
+                <th scope="col">Payment Type</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -22,6 +23,7 @@
                 <td>{{ order.order_by_name }}</td>
                 <td>{{ order.order_status_name }}</td>
                 <td>{{ order.order_created_at }}</td>
+                <td>{{ order.paymentType }}</td>
                 <td>
                     <div class="action-btn-container">
                         <div>
@@ -39,6 +41,15 @@
                                     title="Tag as Ship Order"></i>
                             </button>
                         </div>
+
+                        <!-- <div>
+                            <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order.order_id)"
+                                data-bs-toggle="modal" data-bs-target="#shippedOrderConfirmationModal"
+                                ng-show="order.order_status_name == 'Paid'||order.order_status_name == 'Pending'">
+                                <i class="fas fa-times" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Reject Order"></i>
+                            </button>
+                        </div> -->
 
                         <div>
                             <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order.order_id)"
@@ -78,46 +89,79 @@
     </div>
 </div>
 
-
 <!-- Show Items Modal -->
 <div class="modal fade" id="showItemsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    aria-labelledby="showItemsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" style="max-width:65%;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="showItemsModalLabel">Order Items</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="showItemsModalLabel">
+                    <i class="bi bi-bag-check me-2"></i> Order Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
-                <!-- Table wrapped in a div with `table-responsive` class -->
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead>
+                <!-- 🧾 Order Items Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
                             <tr>
                                 <th>Child Item ID</th>
                                 <th>Brand Name</th>
                                 <th>Category Name</th>
                                 <th>Quantity</th>
                                 <th>Price</th>
-                                <th>Item Total Amount</th>
+                                <th>Item Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="item in selectedParent.items">
-                                <td>{{ item.item_id}}</td>
+                                <td>{{ item.item_id }}</td>
                                 <td>{{ item.item_brand_name }}</td>
                                 <td>{{ item.item_category_name }}</td>
                                 <td>{{ item.item_qty }}</td>
-                                <td>{{ item.item_price }}</td>
-                                <td>{{ item.item_total_amt }}</td>
+                                <td>₱{{ item.item_price | number:2 }}</td>
+                                <td>₱{{ item.item_total_amt | number:2 }}</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- 💳 Proof of Payment Section -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-header bg-light text-center">
+                        <h6 class="mb-0 fw-bold text-uppercase">
+                            <i class="bi bi-receipt me-2"></i> Proof of Payment
+                        </h6>
+                    </div>
+
+                    <div class="card-body text-center">
+                        <!-- If payment image exists -->
+                        <div ng-if="selectedParent.paymentImg">
+                            <div class="d-flex justify-content-center align-items-center flex-column">
+                                <img ng-src="{{ '../BackOffice/uploads/' + selectedParent.paymentImg }}"
+                                    alt="Proof of Payment" class="img-fluid rounded shadow border"
+                                    style="min-width: 400px; min-height: 400px;  background-color: #f8f9fa; padding: 10px;">
+                                <p class="mt-3 text-muted small">
+                                    File: <span class="fw-semibold">{{ selectedParent.paymentImg }}</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- If no image -->
+                        <div ng-if="!selectedParent.paymentImg" class="text-muted py-3">
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            No proof of payment available.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="shippedOrderConfirmationModal" tabindex="-1"
     aria-labelledby="shippedOrderConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">

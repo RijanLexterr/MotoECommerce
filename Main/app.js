@@ -41,6 +41,10 @@ app.config(function ($routeProvider, $locationProvider) {
       templateUrl: "views/profile.html",   // fixed here
       controller: "ProfileController"
     })
+    .when('/result', {
+      templateUrl: 'views/checkoutComplete.html',
+      controller: 'CheckOutCompleteController'
+    })
     .otherwise({
       redirectTo: "/home"
     });

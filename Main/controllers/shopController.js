@@ -2,8 +2,8 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
     // Initialize filter params
     $scope.categoryIds = $routeParams.categoryId || "0";
     $scope.brandIds = $routeParams.brandIds || "0";
-
-    // Initialize lists
+    $scope.searchText = $routeParams.search || "";
+    // Initialize lists$routeParams.brandIds || "0";
     $scope.Products = [];
     $scope.brandList = [];
     $scope.categoryList = [];
@@ -16,6 +16,7 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
         let url = "../Core/Controller/ProductController.php?action=readByFilter"
             + "&categoryIds=" + categoryIds
             + "&brandIds=" + brandIds
+            + "&searchText=" + $scope.searchText
             + "&page=" + page
             + "&limit=" + $scope.pagination.limit;
 
@@ -23,6 +24,9 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
             let res = response.data;
 
             $scope.Products = res.data || [];
+            $scope.Products.forEach(function (product) {
+                product.Qty = 1;
+            });
 
             // ✅ Update pagination
             $scope.pagination.page = parseInt(res.page) || 1;
@@ -34,6 +38,13 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
             $scope.Products = [];
         });
     }
+
+    $scope.clearSearch = function () {
+        $scope.searchText = "";
+        $scope.updateFilters(); // reset filter results
+    };
+
+
 
     // -------------------- UPDATE FILTERS --------------------
     $scope.updateFilters = function () {
@@ -81,6 +92,11 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
             });
     }
 
+    $scope.Products.forEach(function (product) {
+        product.Qty = 1;
+    });
+
+
     // -------------------- INITIAL LOAD --------------------
     getAllBrands();
     getAllCategories();
@@ -90,8 +106,16 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
     let productsOnCartList = JSON.parse(sessionStorage.getItem('productsOnCart')) || [];
     $scope.alertMessage = '';
 
+    $scope.increaseQty = function (item) {
+        item.Qty++;
+    };
+
+    $scope.decreaseQty = function (item) {
+        if (item.Qty > 1) item.Qty--;
+    };
+
     // ✅ Add to Cart with stock validation & live update
-    $scope.addToCart = function (currentProductId) {
+    $scope.addToCart = function (currentProductId, newQty) {
         const currentProduct = $scope.Products.find(p => p.product_id === currentProductId);
         if (!currentProduct) return;
 
@@ -111,12 +135,12 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
                 return;
             }
 
-            existingProduct.count += 1;
-            currentProduct.stock -= 1; // 🟢 update stock visually
+            existingProduct.count += newQty;
+            currentProduct.stock -= newQty; // 🟢 update stock visually
             $scope.showModal("Quantity updated in cart.");
         } else {
-            productsOnCartList.push({ id: currentProductId, count: 1 });
-            currentProduct.stock -= 1; // 🟢 update stock visually
+            productsOnCartList.push({ id: currentProductId, count: newQty });
+            currentProduct.stock -= newQty; // 🟢 update stock visually
             $scope.showModal("Item added to cart.");
         }
 

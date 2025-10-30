@@ -278,18 +278,17 @@ class OrderController {
         $remarks = "Placed Item already";
 
         $stmt = $this->db->prepare("
-            INSERT INTO orders (user_id, status_id, total, created_at, user_shipping_id,payment_type_id)
-            VALUES (?, ?, ?, ?, ?,?)
+            INSERT INTO orders (user_id, status_id, total, created_at, user_shipping_id)
+            VALUES (?, ?, ?, ?, ?)
         ");
 
         $stmt->bind_param(
-            "iidsii",
+            "iidsi",
             $data['user_id'],
             $statusId,
             $data['total'],
             $created_at,
-            $data['user_shipping_id'],
-            $data['payment_type_id']
+            $data['user_shipping_id']
         );
 
         if ($stmt->execute()) {
@@ -349,75 +348,6 @@ class OrderController {
         }
     }
   
-    public function uploadImage() 
-	{
-		if ($_POST['image_location'] == 'dont_delete_this_image.png' || $_POST['image_location'] == 'dont_delete_this_image.PNG' )
-		{
-			return;
-		}
-
-		if (isset($_POST['image_location'])) 
-		{
-			$fileToDelete = "C:\\xampp\\htdocs\\MotoECommerce\\BackOffice\\uploads\\"; // Specify the file name or path
-			$fileToDelete = $fileToDelete . $_POST['image_location'];
-			
-			if (file_exists($fileToDelete)) 
-			{ // Check if the file exists before attempting to delete
-				if (unlink($fileToDelete)) 
-				{
-					echo json_encode(["status" => "error", "message" => "The file '{$fileToDelete}' successfully deleted."]);
-				} 
-				else 
-				{
-					echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' could not be deleted. Check permissions."]);
-				}
-			} 
-			else 
-			{
-				echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' does not exist."]);
-			}
-		}
-
-		if (!isset($_POST['product_id']) || !isset($_FILES['image'])) {
-			echo json_encode(["status" => "error", "message" => "Missing oredr_id or image"]);
-			return;
-		}
-		
-		$product_id = (int)$_POST['oredr_id'];
-		$alt_text = $_POST['alt_text'] ?? '';
-		$caption = $_POST['caption'] ?? '';
-		$sort_order = (int)($_POST['sort_order'] ?? 0);
-		$created_at = date("Y-m-d H:i:s");
-
-		$uploadDir = '../../Backoffice/uploads/';
-		if (!is_dir($uploadDir)) {
-			mkdir($uploadDir, 0755, true);
-		}
-
-		$imageName = time() . '_' . basename($_FILES['image']['name']);
-		$targetFile = $uploadDir . $imageName;
-
-		if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
-			// Save to product_images table
-
-			// Save image path to products table
-			$updateStmt = $this->db->prepare("
-				UPDATE orders SET payment_img = ? WHERE oredr_id = ?
-			");
-			$updateStmt->bind_param("si", $imageName, $product_id);
-			$updateStmt->execute();
-
-			echo json_encode([
-				"status" => "success",
-				"message" => "Image uploaded and saved to product",
-				"image_id" => $this->db->insert_id
-			]);
-		} else {
-			echo json_encode(["status" => "error", "message" => "Failed to move uploaded file"]);
-		}	
-		
-	}
-
 }
 
 $controller = new OrderController($conn);
@@ -442,15 +372,9 @@ if (isset($_GET['action'])) {
         case 'readAllItemsByUser':
             $controller->readAllItemsByUser($_GET['id'] ?? 0);
             break;
-        case 'uploadImage':
-            $controller->uploadImage();
-            break;
         default:
             echo json_encode(["status" => "error", "message" => "Invalid action"]);
     }
 } else {
     echo json_encode(["status" => "error", "message" => "No action specified"]);
 }
-  
-
-

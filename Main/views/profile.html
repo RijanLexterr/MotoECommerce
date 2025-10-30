@@ -251,7 +251,8 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">
                       No
                     </button>
-                    <button type="button" class="btn btn-primary" ng-click="deleteUserShippingDetailsById()" data-dismiss="modal">
+                    <button type="button" class="btn btn-primary" ng-click="deleteUserShippingDetailsById()"
+                      data-dismiss="modal">
                       Yes
                     </button>
                   </div>
@@ -357,6 +358,7 @@
               <!-- ===================== TO SHIP ===================== -->
               <div ng-show="activeTab === 'toShip'">
                 <h4>To Ship</h4>
+
                 <div ng-if="toShipOrders.length === 0" class="text-center text-muted" style="margin-top:20px;">
                   <p>No orders to ship at the moment.</p>
                 </div>
@@ -365,14 +367,15 @@
                   <div class="panel panel-default" ng-repeat="order in orders | filter:{order_status_name: 'Pending'}">
                     <div class="panel-heading">
                       <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#toShipAccordion" href="#collapseShip{{$index}}">
+                        <a href="" ng-click="toggleCollapse($index, $event)" ng-class="{'collapsed': !isOpen[$index]}"
+                          style="cursor:pointer;">
                           Order #{{ order.order_id }}
                         </a>
                       </h4>
                     </div>
-                    <div id="collapseShip{{$index}}" class="panel-collapse collapse">
-                      <div class="panel-body">
 
+                    <div class="panel-collapse collapse" ng-class="{'in': isOpen[$index]}">
+                      <div class="panel-body">
                         <div class="row" ng-repeat="item in order.items" style="margin-bottom:15px;">
                           <div class="col-sm-3">
                             <img
@@ -392,7 +395,6 @@
                         <div class="text-right">
                           <h5>Total: ₱{{ getTotal(order.items) | number:2 }}</h5>
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -407,17 +409,24 @@
                 </div>
 
                 <div class="panel-group" id="toReceiveAccordion">
-                  <div class="panel panel-default" ng-repeat="order in orders | filter:{order_status_name: 'Shipped'}">
+                  <div class="panel panel-default"
+                    ng-repeat="order in orders | filter:{order_status_name: 'To Ship'} track by $index">
                     <div class="panel-heading">
                       <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#toReceiveAccordion" href="#collapseReceive{{$index}}">
+                        <a href="" ng-click="togglePanel('toReceive', $index, $event)"
+                          ng-class="{'collapsed': !isPanelOpen('toReceive', $index)}"
+                          aria-expanded="{{ isPanelOpen('toReceive', $index) ? 'true' : 'false' }}"
+                          style="cursor:pointer; display:block;">
                           Order #{{ order.order_id }}
+                          <span class="pull-right"><i class="fa"
+                              ng-class="{'fa-chevron-up': isPanelOpen('toReceive',$index), 'fa-chevron-down': !isPanelOpen('toReceive',$index)}"></i></span>
                         </a>
                       </h4>
                     </div>
-                    <div id="collapseReceive{{$index}}" class="panel-collapse collapse">
-                      <div class="panel-body">
 
+                    <!-- use Bootstrap 3 'in' to show -->
+                    <div class="panel-collapse collapse" ng-class="{'in': isPanelOpen('toReceive', $index)}">
+                      <div class="panel-body">
                         <div class="row" ng-repeat="item in order.items" style="margin-bottom:15px;">
                           <div class="col-sm-3">
                             <img
@@ -442,12 +451,13 @@
                             <button class="btn btn-primary btn-sm" ng-click="markAsReceived(order)">Received</button>
                           </div>
                         </div>
-
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+
 
               <!-- ===================== COMPLETED ===================== -->
               <div ng-show="activeTab === 'completed'">
@@ -457,15 +467,25 @@
                 </div>
 
                 <div class="panel-group" id="completedAccordion">
-                  <div class="panel panel-default" ng-repeat="order in orders | filter:{order_status_name: 'Paid'}">
+                  <div class="panel panel-default"
+                    ng-repeat="order in orders | filter:{order_status_name: 'Paid'} track by $index">
                     <div class="panel-heading">
                       <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#completedAccordion" href="#collapseCompleted{{$index}}">
+                        <!-- Prevent hash redirect -->
+                        <a href="" ng-click="togglePanel('completed', $index, $event)"
+                          ng-class="{'collapsed': !isPanelOpen('completed', $index)}"
+                          aria-expanded="{{ isPanelOpen('completed', $index) ? 'true' : 'false' }}"
+                          style="cursor:pointer; display:block;">
                           Order #{{ order.order_id }} - {{ order.order_created_at }}
+                          <span class="pull-right">
+                            <i class="fa"
+                              ng-class="{'fa-chevron-up': isPanelOpen('completed', $index), 'fa-chevron-down': !isPanelOpen('completed', $index)}"></i>
+                          </span>
                         </a>
                       </h4>
                     </div>
-                    <div id="collapseCompleted{{$index}}" class="panel-collapse collapse">
+
+                    <div class="panel-collapse collapse" ng-class="{'in': isPanelOpen('completed', $index)}">
                       <div class="panel-body">
 
                         <div class="row" ng-repeat="item in order.items" style="margin-bottom:15px;">
@@ -492,7 +512,9 @@
                     </div>
                   </div>
                 </div>
-              </div> <!-- End Completed -->
+              </div>
+              <!-- End Completed -->
+
 
             </div> <!-- End Container -->
           </div>

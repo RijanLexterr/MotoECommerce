@@ -3,7 +3,8 @@
     <div class="container-fluid">
       <!-- Logo -->
       <a class="navbar-brand" href="index.html">
-        <img src="assets/img/kaiadmin/logo_light.svg" alt="navbar brand" height="20" style="filter: brightness(0) invert(1);" />
+        <img src="assets/img/kaiadmin/logo_light.svg" alt="navbar brand" height="20"
+          style="filter: brightness(0) invert(1);" />
       </a>
 
       <!-- Toggler for mobile -->
@@ -17,11 +18,20 @@
           <li class="nav-item active">
             <a class="nav-link text-light" href="#!/"><i class="fas fa-home me-1"></i>Dashboard</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link text-light" href="#!/users"><i class="fas fa-layer-group me-1"></i>Users</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-light" href="#" id="usersDropdown" role="button"
+              data-bs-toggle="dropdown">
+              <i class="fas fa-layer-group me-1"></i>Users
+            </a>
+            <ul class="dropdown-menu">
+              <li ng-repeat="type in ['Super Admin', 'Admin', 'Customer']">
+                <a class="dropdown-item" ng-href="#!/users/{{type}}">{{ type }}</a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-light" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown">
+            <a class="nav-link dropdown-toggle text-light" href="#" id="productsDropdown" role="button"
+              data-bs-toggle="dropdown">
               <i class="fas fa-th-list me-1"></i>Products
             </a>
             <ul class="dropdown-menu">
@@ -36,15 +46,16 @@
           <li class="nav-item">
             <a class="nav-link text-light" href="#!/orders"><i class="fas fa-pen-square me-1"></i>Orders</a>
           </li>
-           <li class="nav-item">
+          <li class="nav-item">
             <a class="nav-link text-light" href="#!/paymentType"><i class="fas fa-pen-square me-1"></i>Payment Type</a>
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-light" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown">
+            <a class="nav-link dropdown-toggle text-light" href="#" id="reportsDropdown" role="button"
+              data-bs-toggle="dropdown">
               <i class="far fa-chart-bar me-1"></i>Reports
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="charts/charts.html">Reporting 1</a></li>
+              <li><a class="dropdown-item" href="#!/report">Reporting 1</a></li>
               <li><a class="dropdown-item" href="charts/sparkline.html">Reporting 2</a></li>
             </ul>
           </li>
@@ -65,11 +76,11 @@
             </ul>
           </li>
           <li class="nav-item topbar-user dropdown hidden-caret">
-              <div class="user-details-nav">
-                <span class="">Hi, </span>
-                <span class="fw-bold">{{currentUser.name}} <a class="" href="#" ng-click="logout()">
-                <i class="fas fa-sign-out-alt me-2" style="margin-left: 10px"></i>
-              </div>
+            <div class="user-details-nav">
+              <span class="">Hi, </span>
+              <span class="fw-bold">{{currentUser.name}} <a class="" href="#" ng-click="logout()">
+                  <i class="fas fa-sign-out-alt me-2" style="margin-left: 10px"></i>
+            </div>
           </li>
         </ul>
       </div>

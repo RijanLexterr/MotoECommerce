@@ -6,7 +6,7 @@ app.config(function ($routeProvider) {
       templateUrl: "view/login.html",
       controller: "LoginController"
     })
-    .when("/users", {
+    .when("/users/:view", {
       templateUrl: "view/user.html",
       controller: "UserController",
       resolve: {
@@ -64,6 +64,13 @@ app.config(function ($routeProvider) {
     .when("/orders", {
       templateUrl: "view/order.html",
       controller: "OrderController",
+      resolve: {
+        auth: checkAuth
+      }
+    })
+    .when("/report", {
+      templateUrl: "view/InventoryReport.html",
+      controller: "InventoryController",
       resolve: {
         auth: checkAuth
       }

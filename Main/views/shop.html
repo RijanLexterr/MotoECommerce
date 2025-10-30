@@ -31,7 +31,7 @@
                         <div class="input-checkbox">
                             <input type="checkbox" id="brand-{{brand.brand_id}}" ng-model="brand.selected"
                                 ng-change="updateFilters()">
-                            <label  for="brand-{{brand.brand_id}}">
+                            <label for="brand-{{brand.brand_id}}">
                                 <span></span>
                                 {{brand.name}}
                             </label>
@@ -45,19 +45,34 @@
             <!-- STORE -->
             <div id="store" class="col-md-9">
                 <!-- store products -->
+                <div class="col-5 pb-1">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <!-- Search -->
+                        <form ng-submit="searchProducts()" class="w-100">
+                            <div class="position-relative">
+                                <input type="text" class="form-control pr-5" placeholder="Search by name"
+                                    ng-model="searchText" ng-change="updateFilters()">
+
+                                <!-- Clear button (X) -->
+                                <button type="button" class="btn-clear" ng-if="searchText && searchText.length"
+                                    ng-click="clearSearch()">
+                                    &times;
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
                 <div class="row">
                     <!-- product -->
                     <div class="col-md-4 col-xs-6" ng-repeat="product in Products">
                         <div class="product" ng-if="product">
                             <div class="product-img">
-                                <img class="img-fluid w-100"
-                                    ng-if="product.image_location"
-                                    ng-src="../BackOffice/uploads/{{product.image_location}}"
-                                    alt="{{ product.name }}">
-                                <img class="img-fluid w-100"
-                                    ng-if="!product.image_location"
-                                    ng-src="assets/img/default.jpg"
-                                    alt="No image available">
+                                <img class="img-fluid w-100" ng-if="product.image_location"
+                                    ng-src="../BackOffice/uploads/{{product.image_location}}" alt="{{ product.name }}">
+                                <img class="img-fluid w-100" ng-if="!product.image_location"
+                                    ng-src="assets/img/default.jpg" alt="No image available">
 
                                 <div class="product-label">
                                     <span class="sale">-30%</span>
@@ -75,24 +90,47 @@
                                 <h6 class="product-price" ng-if="!product.price">
                                     ₱0.00
                                 </h6>
+
+                                <!-- 🧾 Stock Display -->
+                                <div class="text-muted small">
+                                    <i class="fa fa-box"></i>
+                                    <span ng-if="product.stock > 5">
+                                        {{product.stock}} in stock
+                                    </span>
+                                    <span class="text-warning" ng-if="product.stock > 0 && product.stock <= 5">
+                                        Only {{product.stock}} left!
+                                    </span>
+                                    <span class="text-danger" ng-if="product.stock == 0">
+                                        Out of stock
+                                    </span>
+                                </div>
                             </div>
                             <div class="add-to-cart">
+                                <button ng-click="decreaseQty(product)">
+                                    <i class="fa fa-minus"></i>
+                                </button>
 
-                                <input type="number" class="form-check-input" style="margin-bottom: 10px;">
+                                <input ng-model="product.Qty" class="form-check-input"
+                                    style="margin-bottom: 5px;width: 40px;">
 
-                                <button class="add-to-cart-btn" ng-click="addToCart(product.product_id)" data-toggle="modal" data-target="#addToCartModal">
+                                <button ng-click="increaseQty(product)">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+
+                                <button class="add-to-cart-btn" ng-click="addToCart(product.product_id, product.Qty)"
+                                    data-toggle="modal" data-target="#addToCartModal">
                                     <i class="fa fa-shopping-cart"></i> add to cart
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <!-- /product -->    
+                    <!-- /product -->
                 </div>
                 <!-- /store products -->
 
                 <!-- store bottom filter -->
                 <div class="store-filter clearfix">
-                   <nav aria-label="Page navigation" class="">
+                    <nav aria-label="Page navigation" class="">
                         <ul class="store-pagination">
                             <!-- Previous -->
                             <li class="page-item" ng-class="{disabled: pagination.page === 1}">

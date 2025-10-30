@@ -1,4 +1,4 @@
-app.controller("NavController", function ($scope, $http, $location, $rootScope) {
+app.controller("NavController", function ($scope, $http, $location, $rootScope, $timeout) {
   // ==========================
   // INIT VARIABLES
   // ==========================
@@ -11,32 +11,32 @@ app.controller("NavController", function ($scope, $http, $location, $rootScope) 
   $scope.cartCount = $scope.productsOnCart.length;
 
   if (sessionStorage.getItem('isLoggedIn') === 'true') {
-  $rootScope.isLoggedIn = true;
-  $scope.isLoggedIn = true;
-} else {
-  $rootScope.isLoggedIn = false;
-  $scope.isLoggedIn = false;
-}
+    $rootScope.isLoggedIn = true;
+    $scope.isLoggedIn = true;
+  } else {
+    $rootScope.isLoggedIn = false;
+    $scope.isLoggedIn = false;
+  }
 
-if (sessionStorage.getItem('currentUser')) {
-  $rootScope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
-  $scope.currentUser = $rootScope.currentUser;
-} else {
-  $rootScope.currentUser = null;
-  $scope.currentUser = null;
-}
+  if (sessionStorage.getItem('currentUser')) {
+    $rootScope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    $scope.currentUser = $rootScope.currentUser;
+  } else {
+    $rootScope.currentUser = null;
+    $scope.currentUser = null;
+  }
 
-  $scope.$watch(function() {
-  return $rootScope.isLoggedIn;
-}, function(newVal) {
-  $scope.isLoggedIn = newVal;
-});
+  $scope.$watch(function () {
+    return $rootScope.isLoggedIn;
+  }, function (newVal) {
+    $scope.isLoggedIn = newVal;
+  });
 
-$scope.$watch(function() {
-  return $rootScope.currentUser;
-}, function(newVal) {
-  $scope.currentUser = newVal;
-});
+  $scope.$watch(function () {
+    return $rootScope.currentUser;
+  }, function (newVal) {
+    $scope.currentUser = newVal;
+  });
 
   // Pagination for cart modal
   $scope.currentPage = 1;
@@ -111,7 +111,7 @@ $scope.$watch(function() {
       });
   };
 
-$scope.logout = function () {
+  $scope.logout = function () {
     $http.post('../Core/Controller/Login/logout.php').then(function () {
       $scope.isLoggedIn = false;
       $scope.currentUser = '';
@@ -239,28 +239,28 @@ $scope.logout = function () {
 
   $scope.removeItem = function (item) {
     $scope.productsOnCart = JSON.parse(sessionStorage.getItem('productsOnCart')) || [];
-        var index = productsOnCart.findIndex(p => p.id === item.id);
-        if (index !== -1) {
-          $scope.productsOnCart.splice(index, 1);
-          $scope.addedtoCart.splice(index, 1);
-          sessionStorage.setItem('productsOnCart', JSON.stringify($scope.productsOnCart));
-          $scope.$emit('productsOnCart', $scope.productsOnCart);
-          loadCart();
-          $scope.cartCount = $scope.productsOnCart.length;
-        } 
+    var index = productsOnCart.findIndex(p => p.id === item.id);
+    if (index !== -1) {
+      $scope.productsOnCart.splice(index, 1);
+      $scope.addedtoCart.splice(index, 1);
+      sessionStorage.setItem('productsOnCart', JSON.stringify($scope.productsOnCart));
+      $scope.$emit('productsOnCart', $scope.productsOnCart);
+      loadCart();
+      $scope.cartCount = $scope.productsOnCart.length;
+    }
   };
 
-  $scope.getTotal = function() {
+  $scope.getTotal = function () {
     if ($scope.addedtoCart != null && $scope.addedtoCart.length != 0) {
-      return $scope.addedtoCart.reduce(function(sum, item) {
+      return $scope.addedtoCart.reduce(function (sum, item) {
         return sum + (item.price * item.quantity);
       }, 0);
     }
-  }; 
+  };
 
   $scope.cartVisible = false;
 
-  $scope.toggleCart = function() {
+  $scope.toggleCart = function () {
     $scope.cartVisible = !$scope.cartVisible;
     if ($scope.cartVisible) {
       loadCart();
@@ -268,32 +268,32 @@ $scope.logout = function () {
   };
 
   function loadCart() {
-    $scope.addedtoCart = [];      
+    $scope.addedtoCart = [];
     productsOnCart = JSON.parse(sessionStorage.getItem('productsOnCart')) || [];
 
     //Questionnnnn...
     //IF NULL SI SESSION, QUERY to DB
 
-    if (productsOnCart.length != 0){
-      productsOnCart.forEach(function(product) {
-          return $http.get("../Core/Controller/ProductController.php?action=readOne&id=" + parseInt(product.id))
-            .then(function(response) {
-              var exists = $scope.addedtoCart.find(function(item) {
-                  return item.id === product.id;
-              });
-
-              if (!exists) {
-                  $scope.addedtoCart.push({
-                  id: product.id,
-                  name: response.data.name,
-                  price: response.data.price,
-                  quantity: product.count,
-                  stock: response.data.stock,
-                  stockError: false
-                  });
-              }
+    if (productsOnCart.length != 0) {
+      productsOnCart.forEach(function (product) {
+        return $http.get("../Core/Controller/ProductController.php?action=readOne&id=" + parseInt(product.id))
+          .then(function (response) {
+            var exists = $scope.addedtoCart.find(function (item) {
+              return item.id === product.id;
             });
-        });
+
+            if (!exists) {
+              $scope.addedtoCart.push({
+                id: product.id,
+                name: response.data.name,
+                price: response.data.price,
+                quantity: product.count,
+                stock: response.data.stock,
+                stockError: false
+              });
+            }
+          });
+      });
     }
   }
 
@@ -310,33 +310,98 @@ $scope.logout = function () {
     if (page >= 1 && page <= $scope.totalPages()) $scope.currentPage = page;
   };
 
-  $scope.signupOnClick = function() {
+  $scope.signupOnClick = function () {
     sessionStorage.setItem('redirectAfterLogin', $location.path());
     $location.path('/signup');
   }
 
-  $scope.openModal = function(modalId) {
-  $(modalId).modal('show');
-};
+  $scope.openModal = function (modalId) {
+    $(modalId).modal('show');
+  };
 
-$scope.isLoginPage = function() {
-   return $location.path() === '/login' || $location.path() === '/signup';
-};
+  $scope.isLoginPage = function () {
+    return $location.path() === '/login' || $location.path() === '/signup';
+  };
 
-$scope.signupOnClick = function () {
-  // Close the modal with ID 'loginModal'
-  $('#loginModal').modal('hide');
+  $scope.signupOnClick = function () {
+    // Close the modal with ID 'loginModal'
+    $('#loginModal').modal('hide');
 
-  // Redirect to the signup page
-  $location.path('/signup');
+    // Redirect to the signup page
+    $location.path('/signup');
 
-};
+  };
 
-$scope.menuVisible = false;
 
-$scope.toggleMenu = function () {
-  $scope.menuVisible = !$scope.menuVisible;
-};
+
+  $scope.searchText = "";
+  $scope.searchResults = null;
+  let searchTimeout = null;
+
+  $scope.hasResults = function () {
+    return (
+      ($scope.searchResults?.products?.length > 0) ||
+      ($scope.searchResults?.brands?.length > 0) ||
+      ($scope.searchResults?.categories?.length > 0)
+    );
+  };
+
+  $scope.searchProducts = function () {
+    if (searchTimeout) $timeout.cancel(searchTimeout);
+    if (!$scope.searchText.trim()) {
+      $scope.searchResults = null;
+      return;
+    }
+
+    searchTimeout = $timeout(function () {
+      $http
+        .get('../Core/Controller/ProductController.php?action=globalSearch&query=' +
+          encodeURIComponent($scope.searchText))
+        .then(function (response) {
+          $scope.searchResults = response.data;
+        }, function (error) {
+          console.error('Search error:', error);
+        });
+    }, 400);
+  };
+
+
+
+  document.addEventListener('click', function (event) {
+    const searchBox = document.querySelector('.header-search');
+    if (searchBox && !searchBox.contains(event.target)) {
+      // Clicked outside search area → close results
+      if (!$scope.$$phase) {
+        $scope.$apply(() => {
+          $scope.searchResults = null;
+        });
+      } else {
+        $scope.searchResults = null;
+      }
+    }
+
+  });
+
+
+  // Redirect helpers
+  $scope.goToCategory = function (category) {
+    // Navigate to /shop/:categoryId
+    $location.path("/shop/" + category.category_id);
+    $scope.searchResults = null; // close dropdown
+  };
+
+  $scope.goToBrand = function (brand) {
+    // Navigate to /shop/0?brand=BrandName
+    $location.path("/shop/0").search({ brand: brand.brand_id });
+    $scope.searchResults = null;
+  };
+
+  $scope.goToProduct = function (product) {
+    // Navigate to /shop/0?search=ProductName
+    $location.path("/shop/0").search({ search: product.name });
+    $scope.searchResults = null;
+  };
+
 
 
 

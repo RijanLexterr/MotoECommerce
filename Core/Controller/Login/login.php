@@ -37,6 +37,7 @@
 // $stmt->close();
 // $conn->close();
 
+
 session_start();
 $data = json_decode(file_get_contents("php://input"));
 $email = $data->email;
@@ -59,18 +60,30 @@ $user = $result->fetch_assoc();
 if ($user) {
   // Check if user is locked
   if ($user['is_locked']) {
+    date_default_timezone_set("Asia/Manila");
+
     $lockTime = strtotime($user['last_failed_login']);
     $currentTime = time();
-    if (($currentTime - $lockTime) > 300) { // 5 minutes
-      echo json_encode(['status' => 'error', 'message' => 'Account locked. Try again in 5 minutes.']);
-      exit;
-    } else {
+    $remainingMinutes = 300 - ($currentTime - $lockTime);
+
+    if (($currentTime - $lockTime) > 300) { // 5 minutes passed
       // Unlock user
       $stmt = $conn->prepare("UPDATE users SET failed_attempts = 0, is_locked = 0 WHERE email = ?");
       $stmt->bind_param("s", $email);
       $stmt->execute();
+    } else {
+      
+      
+      echo json_encode([
+        'status' => 'error',
+        'message' => "Account locked. Try again in {$remainingMinutes} seconds."
+      ]);
+      
+
+      exit;
     }
   }
+  
 
   // Check password
   if ($password === $user['password']) {
@@ -102,6 +115,8 @@ if ($user) {
 
 $stmt->close();
 $conn->close();
+
+
 
 
 ?>
