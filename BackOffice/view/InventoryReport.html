@@ -1,0 +1,224 @@
+<div class="container" ng-controller="InventoryReportController" ng-init="activeTab='monthly'">
+  <h3 class="mb-4">📊 Inventory Reports</h3>
+
+  <!-- Nav Tabs -->
+  <!-- Stylish Tab Navigation -->
+  <ul class="nav nav-tabs mb-4 border-0 justify-content-center">
+    <li class="nav-item">
+      <a href="" class="nav-link fw-semibold"
+        ng-class="{'active text-white bg-success shadow-sm': activeTab === 'monthly'}" ng-click="activeTab='monthly'">
+        <i class="bi bi-calendar3 me-1"></i> Monthly Report
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a href="" class="nav-link fw-semibold"
+        ng-class="{'active text-white bg-success shadow-sm': activeTab === 'yearly'}" ng-click="activeTab='yearly'">
+        <i class="bi bi-bar-chart-line me-1"></i> Yearly Report
+      </a>
+    </li>
+
+
+  </ul>
+
+
+  <!-- Tab Content -->
+  <div class="tab-content p-3 border rounded bg-white">
+    <!-- ================= MONTHLY TAB ================= -->
+    <div ng-show="isTab('monthly')">
+      <h4 class="text-primary mb-3">📅 Monthly Report</h4>
+
+      <!-- Filters -->
+      <div class="row">
+        <div class="col-md-5">
+          <label>Year</label>
+          <input type="number" ng-model="filter.year" class="form-control">
+
+          <label class="mt-2">Month</label>
+          <select ng-model="filter.month" ng-options="m for m in [1,2,3,4,5,6,7,8,9,10,11,12]"
+            class="form-control"></select>
+        </div>
+
+        <div class="col-md-5">
+          <label>Product</label>
+          <select ng-model="filter.product_id" ng-options="item.product_id as item.name for item in DropdownItems"
+            class="form-control">
+            <option value="">All Products</option>
+          </select>
+        </div>
+        <div class="col-md-12" style="margin-top: 20px; text-align: center;">
+          <button class="btn btn-primary" ng-click="loadMonthlyReport()" style="margin-right: 10px;">
+            Generate Monthly Report
+          </button>
+
+          <button class="btn btn-success" ng-click="exportReport('monthly')">
+            Export to Excel
+          </button>
+        </div>
+
+      </div>
+
+      <hr>
+
+      <!-- Chart -->
+      <canvas id="monthlyChart" height="100"></canvas>
+
+      <!-- Table -->
+      <div ng-if="monthlyReports.length">
+        <h5 class="mt-3 text-secondary">
+          Showing data for: {{ currentPeriod }} ({{ filterText }})
+        </h5>
+
+        <table class="table table-bordered table-striped mt-3">
+          <thead class="table-primary">
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Total IN</th>
+              <th>Total OUT</th>
+              <th>Adjustments</th>
+              <th>Net Change</th>
+              <th>Total Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="item in monthlyReports">
+              <td>{{ item.product_name }}</td>
+              <td>{{ item.price | currency:'₱' }}</td>
+              <td>{{ item.total_in || 0 }}</td>
+              <td>{{ item.total_out || 0 }}</td>
+              <td>{{ item.total_adjustment || 0 }}</td>
+              <td>{{ item.net_change || 0 }}</td>
+              <td>{{ item.total_value | currency:'₱' }}</td>
+            </tr>
+          </tbody>
+          <tfoot ng-if="monthlyReports.length">
+            <tr class="fw-bold table-light">
+              <td colspan="2" class="text-end"><strong>Grand Total:</strong></td>
+              <td>{{ getColumnTotal('total_in') }}</td>
+              <td>{{ getColumnTotal('total_out') }}</td>
+              <td>{{ getColumnTotal('total_adjustment') }}</td>
+              <td>{{ getColumnTotal('net_change') }}</td>
+              <td>{{ getColumnTotal('total_value') | currency:'₱' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <p ng-if="!monthlyReports.length" class="text-muted text-center mt-3">
+        No data found for selected filters.
+      </p>
+    </div>
+
+
+    <!-- ================= YEARLY TAB ================= -->
+    <div ng-show="isTab('yearly')">
+      <h4 class="text-success mb-3">Yearly Report</h4>
+
+      <div class="row">
+        <div class="col-md-4">
+          <label>Year</label>
+          <input type="number" ng-model="filter.year" class="form-control">
+        </div>
+
+        <div class="col-md-4">
+          <label>Product (Optional)</label>
+          <select ng-model="filter.product_id" ng-options="item.product_id as item.name for item in DropdownItems"
+            class="form-control">
+            <option value="">All Products</option>
+          </select>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+          <button class="btn btn-success btn-block mt-4" ng-click="loadYearlyReport()">
+            Generate Yearly Report
+          </button>
+          <button class="btn btn-secondary mt-4" ng-click="exportReport('yearly')">
+            Export to Excel
+          </button>
+        </div>
+      </div>
+
+      <hr>
+      <canvas id="yearlyChart" height="100"></canvas>
+
+      <div ng-if="yearlyReports.length">
+        <table class="table table-bordered table-striped mt-3">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Total IN</th>
+              <th>Total OUT</th>
+              <th>Adjustments</th>
+              <th>Total Transactions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="item in yearlyReports">
+              <td>{{ item.month }}</td>
+              <td>{{ item.total_in || 0 }}</td>
+              <td>{{ item.total_out || 0 }}</td>
+              <td>{{ item.total_adjustment || 0 }}</td>
+              <td>{{ (item.total_in || 0) + (item.total_out || 0) + (item.total_adjustment || 0) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p ng-if="!yearlyReports.length" class="text-muted text-center mt-3">
+        No yearly data found.
+      </p>
+    </div>
+
+
+    <!-- ================= PRODUCT TAB ================= -->
+    <div ng-show="isTab('product')">
+      <h4 class="text-info mb-3">Report by Product</h4>
+
+      <div class="row">
+        <div class="col-md-6">
+          <label>Select Product</label>
+          <select ng-model="filter.product_id" ng-options="item.product_id as item.name for item in DropdownItems"
+            class="form-control">
+            <option value="">Select Product</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end">
+          <button class="btn btn-info btn-block mt-4" ng-click="loadProductReport()">
+            Generate Product Report
+          </button>
+        </div>
+      </div>
+
+      <hr>
+      <div ng-if="productReport && productReport.length">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Product</th>
+              <th>Type</th>
+              <th>Quantity</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="item in productReport">
+              <td>{{ item.created_at | date:'mediumDate' }}</td>
+              <td>{{ item.product_name }}</td>
+              <td>{{ item.type_id == 1 ? 'IN' : (item.type_id == 2 ? 'OUT' : 'ADJUSTMENT') }}</td>
+              <td>{{ item.qty }}</td>
+              <td>{{ item.remarks }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p ng-if="!productReport || !productReport.length" class="text-muted text-center mt-3">
+        No transactions found for selected product.
+      </p>
+    </div>
+
+
+  </div>
+</div>
