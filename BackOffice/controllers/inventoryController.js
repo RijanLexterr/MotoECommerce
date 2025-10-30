@@ -1,4 +1,4 @@
-app.controller("InventoryController", function($scope, $http, $timeout,$route) {
+app.controller("InventoryController", function ($scope, $http, $timeout, $route) {
     $scope.Items = [];
     $scope.transaction = {};
     $scope.isEdit = false;
@@ -12,10 +12,10 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
     // ======================
     // Load products
     // ======================
-    $scope.loadProducts = function(page = 1) {
+    $scope.loadProducts = function (page = 1) {
         let params = { page: page, pageSize: $scope.pagination.pageSize };
         $http.get("../Core/Controller/InventoryController.php?action=GetAllProducts", { params })
-            .then(function(response) {
+            .then(function (response) {
                 $scope.Items = response.data.data || [];
                 $scope.pagination = response.data.pagination || $scope.pagination;
             })
@@ -23,11 +23,33 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
     };
 
 
+    $scope.recalculateAll = function () {
+        if (!confirm("Are you sure you want to recalculate stock for all products?")) return;
+
+        $scope.isRecalculating = true; // optional flag for loading spinner
+
+        $http
+            .get("../Core/Controller/InventoryController.php?action=recalculateAllStock")
+            .then(function (response) {
+                console.log("Recalculate response:", response.data);
+                alert("✅ Stock successfully recalculated for all products.");
+                $scope.loadProducts(); // refresh the product list
+            })
+            .catch(function (err) {
+                console.error("Error recalculating stock:", err);
+                alert("❌ Failed to recalculate stock. Please try again.");
+            })
+            .finally(function () {
+                $scope.isRecalculating = false;
+            });
+    };
+
+
     // ======================
-    $scope.loadDropdown= function(page = 1) {
+    $scope.loadDropdown = function (page = 1) {
         let params = { page: page, pageSize: 99999 };
         $http.get("../Core/Controller/InventoryController.php?action=GetAllProducts", { params })
-            .then(function(response) {
+            .then(function (response) {
                 $scope.DropdownItems = response.data.data || [];
             })
             .catch(err => console.error(err));
@@ -35,13 +57,13 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
     // ======================
     // Open Add/Edit Modal
     // ======================
-    $scope.openAddTransaction = function(productId) {
+    $scope.openAddTransaction = function (productId) {
         $scope.isEdit = false;
         $scope.transaction = { product_id: productId, qty: 0, type_id: 1 };
         $("#transactionFormModal").modal("show");
     };
 
-    $scope.openEditTransaction = function(item) {
+    $scope.openEditTransaction = function (item) {
         $scope.isEdit = true;
         $scope.transaction = angular.copy(item);
         $scope.transaction.qty = Number(item.qty) || 0;
@@ -52,7 +74,7 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
     // ======================
     // Save Transaction
     // ======================
-    $scope.saveTransaction = function() {
+    $scope.saveTransaction = function () {
         let action = $scope.isEdit ? 'update' : 'create';
         let url = `../Core/Controller/InventoryController.php?action=${action}`;
         let productId = $scope.transaction.product_id;
@@ -62,13 +84,13 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
         $scope.transaction.type_id = Number($scope.transaction.type_id);
 
         $http.post(url, $scope.transaction)
-            .then(function(response) {
+            .then(function (response) {
                 alert(response.data.message);
 
                 // ✅ Recalculate stock, then reload products
                 $http.get(`../Core/Controller/InventoryController.php?action=recalculateStock&product_id=${productId}`)
-                    .then(function(resp) {
-                        
+                    .then(function (resp) {
+
 
                         // Clear form & hide modal
                         $scope.transaction = {};
@@ -76,8 +98,8 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
                         $("#transactionFormModal").modal("hide");
 
                         // Reload products to refresh stock
-                        $timeout(function() { 
-                            $scope.loadProducts(); 
+                        $timeout(function () {
+                            $scope.loadProducts();
                             $route.reload();
                         }, 0);
                     })
@@ -89,17 +111,17 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
     // ======================
     // Delete Transaction
     // ======================
-    $scope.deleteTransaction = function(id, productId) {
+    $scope.deleteTransaction = function (id, productId) {
         if (!confirm("Delete this transaction?")) return;
 
         $http.get(`../Core/Controller/InventoryController.php?action=delete&id=${id}`)
-            .then(function(resp) {
+            .then(function (resp) {
                 alert(resp.data.message);
 
                 // Recalculate stock after deletion
                 $http.get(`../Core/Controller/InventoryController.php?action=recalculateStock&product_id=${productId}`)
-                    .then(function(resp) {
-                        $timeout(function() { $scope.loadProducts(); }, 0);
+                    .then(function (resp) {
+                        $timeout(function () { $scope.loadProducts(); }, 0);
                     });
             })
             .catch(err => console.error(err));
@@ -108,9 +130,9 @@ app.controller("InventoryController", function($scope, $http, $timeout,$route) {
     // ======================
     // Pagination
     // ======================
-    $scope.changePageSize = function() { $scope.loadProducts(1); };
-    $scope.goToPage = function(page) { 
-        if(page >= 1 && page <= $scope.pagination.totalPages) $scope.loadProducts(page); 
+    $scope.changePageSize = function () { $scope.loadProducts(1); };
+    $scope.goToPage = function (page) {
+        if (page >= 1 && page <= $scope.pagination.totalPages) $scope.loadProducts(page);
     };
 
     // ======================

@@ -1,7 +1,10 @@
 app.controller("ShopController", function ($scope, $http, $routeParams) {
     // Initialize filter params
     $scope.categoryIds = $routeParams.categoryId || "0";
-    $scope.brandIds = $routeParams.brandIds || "0";
+    $scope.brandIds = $routeParams.brand || 0;
+
+
+
     $scope.searchText = $routeParams.search || "";
     // Initialize lists$routeParams.brandIds || "0";
     $scope.Products = [];
@@ -20,6 +23,8 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
             + "&page=" + page
             + "&limit=" + $scope.pagination.limit;
 
+
+        console.log($scope.brandIds);
         $http.get(url).then(function (response) {
             let res = response.data;
 
@@ -43,8 +48,6 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
         $scope.searchText = "";
         $scope.updateFilters(); // reset filter results
     };
-
-
 
     // -------------------- UPDATE FILTERS --------------------
     $scope.updateFilters = function () {
