@@ -30,7 +30,9 @@
                     <div class="checkbox-filter" ng-repeat="brand in brandList">
                         <div class="input-checkbox">
                             <input type="checkbox" id="brand-{{brand.brand_id}}" ng-model="brand.selected"
-                                ng-change="updateFilters()">
+                                ng-change="updateFilters()"
+                                
+                                checked=" brandIds.includes(brand.brand_id) ? true : false">
                             <label for="brand-{{brand.brand_id}}">
                                 <span></span>
                                 {{brand.name}}
