@@ -2,53 +2,102 @@
 <div ng-controller="NavController">
     <!-- HEADER -->
     <header>
-        <!-- TOP HEADER -->
-
-
-        <!-- MAIN HEADER -->
         <div id="header">
-            <!-- container -->
             <div class="container">
-                <!-- row -->
-                <div class="row">
+                <div class="row align-items-center">
+
                     <!-- LOGO -->
-                    <div class="col-md-3">
+                    <div class="col-md-3 col-12 text-center text-md-left mb-2 mb-md-0">
                         <div class="header-logo">
-                            <a href="#" class="logo">
-                                <img src="./assets/img/logo.png" alt="">
+                            <a href="#!/" class="logo d-inline-block">
+                                <img src="./assets/img/logo.png" alt="Logo" class="img-fluid" style="max-height: 60px;">
                             </a>
                         </div>
                     </div>
                     <!-- /LOGO -->
 
                     <!-- SEARCH BAR -->
-                    <div class="col-md-6">
-                        <div class="header-search">
+                    <div class="col-md-6 col-12">
+                        <div class="header-search position-relative">
+
+                            <!-- 🔍 Search Input -->
+                            <input class="input form-control" placeholder="Search here..." ng-model="searchText"
+                                ng-change="searchProducts()" ng-trim="true" />
+
+                            <!-- 📄 Search Results Dropdown -->
+                            <div class="search-dropdown card mt-2 position-absolute w-100 p-2"
+                                ng-if="searchResults && hasResults()"
+                                style="position:absolute; width:100%; z-index:999; top:100%; left:0;padding:10px">
+                                <div class="card-body p-2" style="max-height: 300px; overflow-y: auto;">
+
+                                    <!-- 🧱 Products -->
+                                    <div ng-if="searchResults.products.length">
+                                        <h6 class="text-primary mb-1">Products</h6>
+                                        <ul class="list-group mb-2">
+                                            <li class="list-group-item py-1" ng-repeat="p in searchResults.products"
+                                                ng-click="goToProduct(p)">
+                                                <strong>{{p.name}}</strong> — ₱{{p.price | number:2}}
+                                                <br><small>{{p.brand_name}} | {{p.category_name}}</small>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- 🏷️ Brands -->
+                                    <div ng-if="searchResults.brands.length">
+                                        <h6 class="text-success mb-1">Brands</h6>
+                                        <ul class="list-group mb-2">
+                                            <li class="list-group-item py-1" ng-repeat="b in searchResults.brands"
+                                                ng-click="goToBrand(b)">
+                                                {{b.name}}
+                                            </li>
+                                        </ul>
+                                    </div>
+
+
+                                    <!-- 📂 Categories -->
+                                    <div ng-if="searchResults.categories.length">
+                                        <h6 class="text-warning mb-1">Categories</h6>
+                                        <ul class="list-group">
+                                            <li class="list-group-item py-1" ng-repeat="c in searchResults.categories"
+                                                ng-click="goToCategory(c)">
+                                                {{c.name}}
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- 🕳️ No Results -->
+                            <div class="alert alert-light mt-2 text-center" ng-if="searchResults && !hasResults()">
+                                No results found.
+                            </div>
 
                         </div>
                     </div>
                     <!-- /SEARCH BAR -->
 
                     <!-- ACCOUNT -->
-                    <div class="col-md-3 clearfix">
-                        <div class="header-ctn">
+                    <div class="col-md-3 col-12 text-md-right mt-2 mt-md-0">
+                        <div
+                            class="header-ctn d-flex justify-content-md-end justify-content-center align-items-center gap-3">
+
                             <!-- Cart -->
-                            <div class="dropdown">
-                                <a class="dropdown-toggle" ng-click="toggleCart()" data-toggle="dropdown"
-                                    aria-expanded="true">
+                            <div class="dropdown me-3" style="position: relative;">
+                                <a class="dropdown-toggle" ng-click="toggleCart()" aria-expanded="true">
                                     <i class="fa fa-shopping-cart"></i>
                                     <span>Your Cart</span>
-                                    <div class="qty"> {{cartCount}}
-                                    </div>
+                                    <div class="qty">{{cartCount}}</div>
                                 </a>
-                                <div class="cart-dropdown" ng-show="cartVisible">
+
+                                <!-- CART DROPDOWN -->
+                                <div class="cart-dropdown shadow" ng-show="cartVisible">
                                     <div class="cart-list">
                                         <div class="product-widget" ng-repeat="item in addedtoCart">
                                             <div class="product-img">
                                                 <img class="img-fluid w-100" ng-if="item.image_location"
                                                     ng-src="../BackOffice/uploads/{{item.image_location}}"
-                                                    alt="{{ item.id.name }}">
-
+                                                    alt="{{ item.name }}">
                                                 <img class="img-fluid w-100" ng-if="!item.image_location"
                                                     ng-src="assets/img/default.jpg" alt="No image available">
                                             </div>
@@ -58,132 +107,107 @@
                                                 </h3>
                                                 <h4 class="product-price">
                                                     <span class="qty">{{ item.quantity }} × </span>
-                                                    ₱{{ (item.price || item.price || 0) | number:2 }}
+                                                    ₱{{ (item.price || 0) | number:2 }}
                                                 </h4>
                                             </div>
-
-                                            <button class="delete" ng-click="removeItem(item)"><i
-                                                    class="fa fa-close"></i></button>
+                                            <button class="delete" ng-click="removeItem(item)">
+                                                <i class="fa fa-close"></i>
+                                            </button>
                                         </div>
-
                                     </div>
+
                                     <div class="cart-summary">
                                         <small>{{cartCount}} Item(s) selected</small>
                                         <h5>SUBTOTAL: {{ getTotal() | currency:"₱":2 }}</h5>
                                     </div>
+
                                     <div class="cart-btns">
                                         <a href="#!/cart">Checkout <i class="fa fa-arrow-circle-right"></i></a>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Account -->
                             <div class="my-account" ng-show="isLoggedIn">
-
-                                <a href="#!/profile"> <i class="fa fa-user"></i> My Account</a>
+                                <a href="#!/profile"><i class="fa fa-user"></i> My Account</a>
                             </div>
-                            <!-- /Cart -->
 
-                            <!-- Menu Toogle -->
-                            <div class="menu-toggle">
-                                <a href="#">
-                                    <i class="fa fa-bars"></i>
-                                    <span>Menu</span>
-                                </a>
+                            <!-- Menu Toggle -->
+                            <div class="menu-toggle d-md-none">
+                                <a href="#"><i class="fa fa-bars"></i></a>
                             </div>
-                            <!-- /Menu Toogle -->
                         </div>
                     </div>
                     <!-- /ACCOUNT -->
+
                 </div>
-                <!-- row -->
             </div>
-            <!-- container -->
         </div>
-        <!-- /MAIN HEADER -->
     </header>
     <!-- /HEADER -->
 
     <!-- NAVIGATION -->
-    <!-- NAVIGATION -->
-    <nav id="navigation">
+    <nav id="navigation" class="bg-dark">
         <div class="container">
-            <div id="responsive-nav" >
+            <div id="responsive-nav" class="d-flex justify-content-between align-items-center flex-wrap">
+
                 <!-- Left Navigation -->
-                <div class="col-md-6">
-                    <ul class="main-nav nav navbar-nav">
-                        <li class="active"><a href="#!/">Home</a></li>
-                        <li><a href="#">Hot Deals</a></li>
-                        <li><a href="#!/shop/0">Shop</a></li>
-                    </ul>
-                </div>
+                <ul class="main-nav nav navbar-nav flex-row flex-wrap">
+                    <li class="active"><a href="#!/">Home</a></li>
+                    <li><a href="#">Hot Deals</a></li>
+                    <li><a href="#!/shop/0">Shop</a></li>
+                </ul>
+
                 <!-- Right Navigation -->
-                <div class="col-md-6 text-right">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li ng-show="!isLoggedIn">
-                            <a href="" ng-click="openModal('#loginModal')">Login</a>
-                        </li>
-                        <li ng-show="!isLoggedIn">
-                            <a href="" ng-click="signupOnClick()">Sign Up</a>
-                        </li>
-                        <li ng-show="isLoggedIn">
-                            <a href="" type="button" ng-click="logout()">Logout</a>
-                        </li>
-                    </ul>
-                </div>
+                <ul class="nav navbar-nav navbar-right flex-row flex-wrap">
+                    <li ng-show="!isLoggedIn"><a href="" ng-click="openModal('#loginModal')">Login</a></li>
+                    <li ng-show="!isLoggedIn"><a href="" ng-click="signupOnClick()">Sign Up</a></li>
+                    <li ng-show="isLoggedIn"><a href="" ng-click="logout()">Logout</a></li>
+                </ul>
+
             </div>
         </div>
     </nav>
-
     <!-- /NAVIGATION -->
 
-
-
-
-    <!-- Login Modal -->
+    <!-- LOGIN MODAL -->
     <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <!-- Modal Header -->
-                <div class="modal-header clearfix">
-                    <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa fa-user"></i> Login to Your Account</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
                     </button>
-                    <h4 class="modal-title" id="loginModalLabel">
-                        <i class="fa fa-user"></i> Login to Your Account
-                    </h4>
                 </div>
 
                 <!-- Modal Body -->
                 <div class="modal-body">
-                    <form>
-                        <!-- Email input -->
+                    <form ng-submit="login()">
                         <div class="form-group">
                             <label for="email">Email address</label>
                             <input type="email" id="email" ng-model="username" class="form-control"
                                 placeholder="Enter your email" />
-                                <small class="text-danger" ng-if="emailError">{{ emailError }}</small>
+                            <small class="text-danger" ng-if="emailError">{{ emailError }}</small>
                         </div>
 
-                        <!-- Password input -->
                         <div class="form-group">
                             <label for="password">Password</label>
                             <input type="password" id="password" ng-model="password" class="form-control"
                                 placeholder="Enter your password" />
-                                <small class="text-danger" ng-if="passwordError">{{ passwordError }}</small>
+                            <small class="text-danger" ng-if="passwordError">{{ passwordError }}</small>
                         </div>
 
                         <p class="text-danger text-center" ng-if="error">{{ error }}</p>
 
-                        <!-- Submit button -->
-                        <button type="submit" class="btn btn-primary btn-block" ng-click="login()">
+                        <button type="submit" class="btn btn-primary btn-block">
                             <i class="fa fa-sign-in"></i> Login
                         </button>
                     </form>
 
-                    <!-- Signup Message -->
                     <hr>
-                    <p class="text-center">
-                        Don't have an account?
-                    </p>
+                    <p class="text-center mb-2">Don't have an account?</p>
                     <div class="text-center">
                         <a class="btn btn-default" ng-click="signupOnClick()">
                             <i class="fa fa-user-plus"></i> Sign Up
@@ -193,8 +217,5 @@
             </div>
         </div>
     </div>
-
-
-
-
 </div>
+<!-- /Topbar End -->

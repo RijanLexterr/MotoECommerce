@@ -2,8 +2,8 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
     // Initialize filter params
     $scope.categoryIds = $routeParams.categoryId || "0";
     $scope.brandIds = $routeParams.brandIds || "0";
-
-    // Initialize lists
+    $scope.searchText = $routeParams.search || "";
+    // Initialize lists$routeParams.brandIds || "0";
     $scope.Products = [];
     $scope.brandList = [];
     $scope.categoryList = [];
@@ -16,6 +16,7 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
         let url = "../Core/Controller/ProductController.php?action=readByFilter"
             + "&categoryIds=" + categoryIds
             + "&brandIds=" + brandIds
+            + "&searchText=" + $scope.searchText
             + "&page=" + page
             + "&limit=" + $scope.pagination.limit;
 
@@ -23,8 +24,6 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
             let res = response.data;
 
             $scope.Products = res.data || [];
-
-            // ✅ Add Qty property to each product
             $scope.Products.forEach(function (product) {
                 product.Qty = 1;
             });
@@ -39,6 +38,13 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
             $scope.Products = [];
         });
     }
+
+    $scope.clearSearch = function () {
+        $scope.searchText = "";
+        $scope.updateFilters(); // reset filter results
+    };
+
+
 
     // -------------------- UPDATE FILTERS --------------------
     $scope.updateFilters = function () {
@@ -86,6 +92,11 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
             });
     }
 
+    $scope.Products.forEach(function (product) {
+        product.Qty = 1;
+    });
+
+
     // -------------------- INITIAL LOAD --------------------
     getAllBrands();
     getAllCategories();
@@ -95,11 +106,11 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
     let productsOnCartList = JSON.parse(sessionStorage.getItem('productsOnCart')) || [];
     $scope.alertMessage = '';
 
-    $scope.increaseQty = function(item) {
+    $scope.increaseQty = function (item) {
         item.Qty++;
     };
 
-    $scope.decreaseQty = function(item) {
+    $scope.decreaseQty = function (item) {
         if (item.Qty > 1) item.Qty--;
     };
 

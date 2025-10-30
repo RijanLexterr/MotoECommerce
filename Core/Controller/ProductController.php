@@ -2,14 +2,17 @@
 require_once '../config.php'; // gives $conn (mysqli)
 require_once '../model.php';
 
-class ProductController {
+class ProductController
+{
     private $db; // mysqli
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->db = $db;
     }
 
-    public function create() {
+    public function create()
+    {
         $rawData = file_get_contents("php://input");
         $data = json_decode($rawData, true);
 
@@ -29,14 +32,14 @@ class ProductController {
             $data['stock'],
             $data['expiration_date'],
             $created_at,
-			$data['image_location'],
-			$data['is_promoted'],
-			$data['new_price']
+            $data['image_location'],
+            $data['is_promoted'],
+            $data['new_price']
         );
 
         if ($stmt->execute()) {
             echo json_encode([
-				"status" => "success",
+                "status" => "success",
                 "message" => "Product created",
                 "id" => $this->db->insert_id
             ]);
@@ -45,13 +48,14 @@ class ProductController {
         }
     }
 
-    public function readAll() {
-		$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+    public function readAll()
+    {
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
         $offset = ($page - 1) * $limit;
 
 
-		// Get total count
+        // Get total count
         $countResult = $this->db->query("SELECT COUNT(*) as total FROM products");
         $total = $countResult->fetch_assoc()['total'];
 
@@ -72,8 +76,7 @@ class ProductController {
         $result = $this->db->query($query);
         $data = [];
 
-        while ($row = $result->fetch_assoc()) 
-		{
+        while ($row = $result->fetch_assoc()) {
             $data[] = $row;
         }
 
@@ -83,10 +86,11 @@ class ProductController {
             'total' => $total,
             'data' => $data
         ]);
-		
+
     }
 
-	public function readAllHomeProducts() {
+    public function readAllHomeProducts()
+    {
 
         $result = $this->db->query("SELECT *, CASE WHEN is_promoted = 1 THEN new_price ELSE price END as item_price FROM products ORDER BY created_at DESC");
         $data = [];
@@ -97,8 +101,9 @@ class ProductController {
             'data' => $data
         ]);
     }
-	
-	public function readAllHomePromotedProducts() {
+
+    public function readAllHomePromotedProducts()
+    {
 
         $result = $this->db->query("SELECT * FROM products WHERE is_promoted = 1 ORDER BY created_at DESC");
         $data = [];
@@ -109,8 +114,9 @@ class ProductController {
             'data' => $data
         ]);
     }
-	
-	public function readAllCategories() {
+
+    public function readAllCategories()
+    {
 
         $result = $this->db->query("SELECT * FROM categories ORDER BY name ASC");
         $data = [];
@@ -121,8 +127,9 @@ class ProductController {
             'data' => $data
         ]);
     }
-	
-	public function readAllBrands() {
+
+    public function readAllBrands()
+    {
 
         $result = $this->db->query("SELECT * FROM brands ORDER BY name ASC");
         $data = [];
@@ -133,8 +140,9 @@ class ProductController {
             'data' => $data
         ]);
     }
-	
-    public function readOne($id) {
+
+    public function readOne($id)
+    {
         $stmt = $this->db->prepare("SELECT * FROM products WHERE product_id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -149,10 +157,10 @@ class ProductController {
         }
     }
 
-	// 🔍 SEARCH BY PRODUCT NAME
-    public function getByProductName($product_name,$id) 
-	{		
-		$stmt = $this->db->prepare("SELECT * FROM products WHERE name = ? and product_id <> ?");
+    // 🔍 SEARCH BY PRODUCT NAME
+    public function getByProductName($product_name, $id)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM products WHERE name = ? and product_id <> ?");
         $stmt->bind_param("si", $product_name, $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -164,10 +172,11 @@ class ProductController {
             echo json_encode(["isExisting" => false]);
         }
     }
-    public function update($id) {
+    public function update($id)
+    {
         $rawData = file_get_contents("php://input");
         $data = json_decode($rawData, true);
-		
+
         $stmt = $this->db->prepare("
             UPDATE products
             SET brand_id = ?, category_id = ?, name = ?, description = ?, price = ?, stock = ?, expiration_date = ?, is_promoted = ?, new_price = ? 
@@ -183,115 +192,113 @@ class ProductController {
             $data['price'],
             $data['stock'],
             $data['expiration_date'],
-			$data['is_promoted'],
-			$data['new_price'],
+            $data['is_promoted'],
+            $data['new_price'],
             $id
         );
 
         if ($stmt->execute()) {
-            echo json_encode(["status" => "success","message" => "Product updated"]);
+            echo json_encode(["status" => "success", "message" => "Product updated"]);
         } else {
             echo json_encode(["status" => "error", "message" => $stmt->error]);
         }
     }
-	
-    public function delete($id) 
-	{
-		$rawData = file_get_contents("php://input");
+
+    public function delete($id)
+    {
+        $rawData = file_get_contents("php://input");
         $data = json_decode($rawData, true);
-		
-		if ($data['image_location'] == 'dont_delete_this_image.png' || $data['image_location'] == 'dont_delete_this_image.PNG')
-		{
-			$stmt = $this->db->prepare("DELETE FROM products WHERE product_id = ?");
-			$stmt->bind_param("i", $id);
 
-			if ($stmt->execute()) {
-				echo json_encode(["status" => "success","message" => "The product successfully deleted."]);
-			} else {
-				echo json_encode(["status" => "error", "message" => $stmt->error]);
-			}	
-			return;
-		}
-		
-		if ($data['image_location'])
-		{
-			$fileToDelete = "C:\\xampp\\htdocs\\MotoECommerce\\BackOffice\\uploads\\"; // Specify the file name or path
-			$fileToDelete = $fileToDelete . $data['image_location'];
-			
-			if (file_exists($fileToDelete)) { // Check if the file exists before attempting to delete
-				if (unlink($fileToDelete)) {
-					$stmt = $this->db->prepare("DELETE FROM products WHERE product_id = ?");
-					$stmt->bind_param("i", $id);
+        if ($data['image_location'] == 'dont_delete_this_image.png' || $data['image_location'] == 'dont_delete_this_image.PNG') {
+            $stmt = $this->db->prepare("DELETE FROM products WHERE product_id = ?");
+            $stmt->bind_param("i", $id);
 
-					if ($stmt->execute()) {
-						echo json_encode(["status" => "success","message" => "The file '{$fileToDelete}' successfully deleted."]);
-					} else {
-						echo json_encode(["status" => "error", "message" => $stmt->error]);
-					}
-				} 
-				else {
-					echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' could not be deleted. Check permissions."]);
-				}
-			} else {
-				echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' does not exist."]);
-			}
-		}
-    }
+            if ($stmt->execute()) {
+                echo json_encode(["status" => "success", "message" => "The product successfully deleted."]);
+            } else {
+                echo json_encode(["status" => "error", "message" => $stmt->error]);
+            }
+            return;
+        }
 
-public function readByFilter($categoryIds, $brandIds, $page = 1, $limit = 6, $searchText = "") {
-    $page = isset($_GET['page']) ? intval($_GET['page']) : $page;
-    $limit = isset($_GET['limit']) ? intval($_GET['limit']) : $limit;
-    $offset = ($page - 1) * $limit;
+        if ($data['image_location']) {
+            $fileToDelete = "C:\\xampp\\htdocs\\eCommerce\\BackOffice\\uploads\\"; // Specify the file name or path
+            $fileToDelete = $fileToDelete . $data['image_location'];
 
-    $categoryIds = array_filter(array_map('intval', explode(',', $categoryIds)));
-    $brandIds    = array_filter(array_map('intval', explode(',', $brandIds)));
-    $searchText  = isset($_GET['searchText']) ? trim($_GET['searchText']) : $searchText;
+            if (file_exists($fileToDelete)) { // Check if the file exists before attempting to delete
+                if (unlink($fileToDelete)) {
+                    $stmt = $this->db->prepare("DELETE FROM products WHERE product_id = ?");
+                    $stmt->bind_param("i", $id);
 
-    $conditions = [];
-    $params = [];
-    $types = "";
-
-    // Category filter
-    if (!empty($categoryIds) && !(count($categoryIds) === 1 && $categoryIds[0] === 0)) {
-        $placeholders = implode(",", array_fill(0, count($categoryIds), "?"));
-        $conditions[] = "p.category_id IN ($placeholders)";
-        foreach ($categoryIds as $id) {
-            $params[] = $id;
-            $types .= "i";
+                    if ($stmt->execute()) {
+                        echo json_encode(["status" => "success", "message" => "The file '{$fileToDelete}' successfully deleted."]);
+                    } else {
+                        echo json_encode(["status" => "error", "message" => $stmt->error]);
+                    }
+                } else {
+                    echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' could not be deleted. Check permissions."]);
+                }
+            } else {
+                echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' does not exist."]);
+            }
         }
     }
 
-    // Brand filter
-    if (!empty($brandIds) && !(count($brandIds) === 1 && $brandIds[0] === 0)) {
-        $placeholders = implode(",", array_fill(0, count($brandIds), "?"));
-        $conditions[] = "p.brand_id IN ($placeholders)";
-        foreach ($brandIds as $id) {
-            $params[] = $id;
-            $types .= "i";
+    public function readByFilter($categoryIds, $brandIds, $page = 1, $limit = 6, $searchText = "")
+    {
+        $page = isset($_GET['page']) ? intval($_GET['page']) : $page;
+        $limit = isset($_GET['limit']) ? intval($_GET['limit']) : $limit;
+        $offset = ($page - 1) * $limit;
+
+        $categoryIds = array_filter(array_map('intval', explode(',', $categoryIds)));
+        $brandIds = array_filter(array_map('intval', explode(',', $brandIds)));
+        $searchText = isset($_GET['searchText']) ? trim($_GET['searchText']) : $searchText;
+
+        $conditions = [];
+        $params = [];
+        $types = "";
+
+        // Category filter
+        if (!empty($categoryIds) && !(count($categoryIds) === 1 && $categoryIds[0] === 0)) {
+            $placeholders = implode(",", array_fill(0, count($categoryIds), "?"));
+            $conditions[] = "p.category_id IN ($placeholders)";
+            foreach ($categoryIds as $id) {
+                $params[] = $id;
+                $types .= "i";
+            }
         }
-    }
 
-    // 🔍 Search filter (match name or description)
-    if (!empty($searchText)) {
-        $conditions[] = "(p.name LIKE ? OR p.description LIKE ?)";
-        $params[] = "%{$searchText}%";
-        $params[] = "%{$searchText}%";
-        $types .= "ss";
-    }
+        // Brand filter
+        if (!empty($brandIds) && !(count($brandIds) === 1 && $brandIds[0] === 0)) {
+            $placeholders = implode(",", array_fill(0, count($brandIds), "?"));
+            $conditions[] = "p.brand_id IN ($placeholders)";
+            foreach ($brandIds as $id) {
+                $params[] = $id;
+                $types .= "i";
+            }
+        }
 
-    $where = !empty($conditions) ? " WHERE " . implode(" AND ", $conditions) : "";
+        // 🔍 Search filter (match name or description)
+        if (!empty($searchText)) {
+            $conditions[] = "(p.name LIKE ? OR p.description LIKE ?)";
+            $params[] = "%{$searchText}%";
+            $params[] = "%{$searchText}%";
+            $types .= "ss";
+        }
 
-    // Count total rows
-    $countSql = "SELECT COUNT(*) AS total FROM products p $where";
-    $countStmt = $this->db->prepare($countSql);
-    if (!empty($params)) {
-        $countStmt->bind_param($types, ...$params);
-    }
-    $countStmt->execute();
-    $total = (int) $countStmt->get_result()->fetch_assoc()['total'];
+        $where = !empty($conditions) ? " WHERE " . implode(" AND ", $conditions) : "";
 
-    // Fetch paginated results
-    $sql = "
+        // Count total rows
+        $countSql = "SELECT COUNT(*) AS total FROM products p $where";
+        $countStmt = $this->db->prepare($countSql);
+        if (!empty($params)) {
+            $countStmt->bind_param($types, ...$params);
+        }
+        $countStmt->execute();
+        $total = (int) $countStmt->get_result()->fetch_assoc()['total'];
+
+        // Fetch paginated results
+        $sql = "
         SELECT p.product_id, p.name, p.description,
                p.category_id, p.brand_id, p.price, p.stock,
                p.expiration_date, p.image_location,
@@ -304,101 +311,143 @@ public function readByFilter($categoryIds, $brandIds, $page = 1, $limit = 6, $se
         LIMIT $limit OFFSET $offset
     ";
 
-    $stmt = $this->db->prepare($sql);
-    if (!empty($params)) {
-        $stmt->bind_param($types, ...$params);
+        $stmt = $this->db->prepare($sql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+
+        echo json_encode([
+            'categoryIds' => $categoryIds,
+            'brandIds' => $brandIds,
+            'searchText' => $searchText,
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total,
+            'pages' => max(1, ceil($total / $limit)),
+            'count' => count($data),
+            'data' => $data
+        ]);
     }
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $data = [];
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-    }
-
-    echo json_encode([
-        'categoryIds' => $categoryIds,
-        'brandIds'    => $brandIds,
-        'searchText'  => $searchText,
-        'page'        => $page,
-        'limit'       => $limit,
-        'total'       => $total,
-        'pages'       => max(1, ceil($total / $limit)),
-        'count'       => count($data),
-        'data'        => $data
-    ]);
-}
 
 
-	public function uploadImage() 
-	{
-		if ($_POST['image_location'] == 'dont_delete_this_image.png' || $_POST['image_location'] == 'dont_delete_this_image.PNG' )
-		{
-			return;
-		}
+    public function uploadImage()
+    {
+        if ($_POST['image_location'] == 'dont_delete_this_image.png' || $_POST['image_location'] == 'dont_delete_this_image.PNG') {
+            return;
+        }
 
-		if (isset($_POST['image_location'])) 
-		{
-			$fileToDelete = "C:\\xampp\\htdocs\\MotoECommerce\\BackOffice\\uploads\\"; // Specify the file name or path
-			$fileToDelete = $fileToDelete . $_POST['image_location'];
-			
-			if (file_exists($fileToDelete)) 
-			{ // Check if the file exists before attempting to delete
-				if (unlink($fileToDelete)) 
-				{
-					echo json_encode(["status" => "error", "message" => "The file '{$fileToDelete}' successfully deleted."]);
-				} 
-				else 
-				{
-					echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' could not be deleted. Check permissions."]);
-				}
-			} 
-			else 
-			{
-				echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' does not exist."]);
-			}
-		}
+        if (isset($_POST['image_location'])) {
+            $fileToDelete = "C:\\xampp\\htdocs\\eCommerce\\BackOffice\\uploads\\"; // Specify the file name or path
+            $fileToDelete = $fileToDelete . $_POST['image_location'];
 
-		if (!isset($_POST['product_id']) || !isset($_FILES['image'])) {
-			echo json_encode(["status" => "error", "message" => "Missing product_id or image"]);
-			return;
-		}
-		
-		$product_id = (int)$_POST['product_id'];
-		$alt_text = $_POST['alt_text'] ?? '';
-		$caption = $_POST['caption'] ?? '';
-		$sort_order = (int)($_POST['sort_order'] ?? 0);
-		$created_at = date("Y-m-d H:i:s");
+            if (file_exists($fileToDelete)) { // Check if the file exists before attempting to delete
+                if (unlink($fileToDelete)) {
+                    echo json_encode(["status" => "error", "message" => "The file '{$fileToDelete}' successfully deleted."]);
+                } else {
+                    echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' could not be deleted. Check permissions."]);
+                }
+            } else {
+                echo json_encode(["status" => "error", "message" => "Error: The file '{$fileToDelete}' does not exist."]);
+            }
+        }
 
-		$uploadDir = '../../Backoffice/uploads/';
-		if (!is_dir($uploadDir)) {
-			mkdir($uploadDir, 0755, true);
-		}
+        if (!isset($_POST['product_id']) || !isset($_FILES['image'])) {
+            echo json_encode(["status" => "error", "message" => "Missing product_id or image"]);
+            return;
+        }
 
-		$imageName = time() . '_' . basename($_FILES['image']['name']);
-		$targetFile = $uploadDir . $imageName;
+        $product_id = (int) $_POST['product_id'];
+        $alt_text = $_POST['alt_text'] ?? '';
+        $caption = $_POST['caption'] ?? '';
+        $sort_order = (int) ($_POST['sort_order'] ?? 0);
+        $created_at = date("Y-m-d H:i:s");
 
-		if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
-			// Save to product_images table
+        $uploadDir = '../../Backoffice/uploads/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
 
-			// Save image path to products table
-			$updateStmt = $this->db->prepare("
+        $imageName = time() . '_' . basename($_FILES['image']['name']);
+        $targetFile = $uploadDir . $imageName;
+
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
+            // Save to product_images table
+
+            // Save image path to products table
+            $updateStmt = $this->db->prepare("
 				UPDATE products SET image_location = ? WHERE product_id = ?
 			");
-			$updateStmt->bind_param("si", $imageName, $product_id);
-			$updateStmt->execute();
+            $updateStmt->bind_param("si", $imageName, $product_id);
+            $updateStmt->execute();
 
-			echo json_encode([
-				"status" => "success",
-				"message" => "Image uploaded and saved to product",
-				"image_id" => $this->db->insert_id
-			]);
-		} else {
-			echo json_encode(["status" => "error", "message" => "Failed to move uploaded file"]);
-		}	
-		
-	}
+            echo json_encode([
+                "status" => "success",
+                "message" => "Image uploaded and saved to product",
+                "image_id" => $this->db->insert_id
+            ]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Failed to move uploaded file"]);
+        }
 
+    }
+
+    public function globalSearch($query)
+    {
+        $query = trim($query);
+        if ($query === "") {
+            echo json_encode(["status" => "error", "message" => "Empty search query"]);
+            return;
+        }
+
+        // 🔍 Search Products (by name or description)
+        $stmt = $this->db->prepare("
+        SELECT 
+            p.product_id, 
+            p.name, 
+            p.description, 
+            p.price, 
+            p.image_location,
+            b.name AS brand_name, 
+            c.name AS category_name
+        FROM products p
+        LEFT JOIN brands b ON p.brand_id = b.brand_id
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        WHERE p.name LIKE ? OR p.description LIKE ?
+        ORDER BY p.created_at DESC
+        LIMIT 10
+    ");
+        $like = "%{$query}%";
+        $stmt->bind_param("ss", $like, $like);
+        $stmt->execute();
+        $products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        // 🔍 Search Brands
+        $stmt = $this->db->prepare("SELECT brand_id, name FROM brands WHERE name LIKE ? LIMIT 10");
+        $stmt->bind_param("s", $like);
+        $stmt->execute();
+        $brands = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        // 🔍 Search Categories
+        $stmt = $this->db->prepare("SELECT category_id, name FROM categories WHERE name LIKE ? LIMIT 10");
+        $stmt->bind_param("s", $like);
+        $stmt->execute();
+        $categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        echo json_encode([
+            "status" => "success",
+            "query" => $query,
+            "products" => $products,
+            "brands" => $brands,
+            "categories" => $categories
+        ]);
+    }
 
 }
 
@@ -425,27 +474,30 @@ if (isset($_GET['action'])) {
         case 'delete':
             $controller->delete($_GET['id'] ?? 0);
             break;
-		case 'readAllCategories':
+        case 'readAllCategories':
             $controller->readAllCategories();
             break;
-		case 'readAllBrands':
+        case 'readAllBrands':
             $controller->readAllBrands();
             break;
-		case 'getByProductName':
-			$controller->getByProductName($_GET['product_name'] ?? "", $_GET['id'] ?? 0);
+        case 'getByProductName':
+            $controller->getByProductName($_GET['product_name'] ?? "", $_GET['id'] ?? 0);
             break;
         case 'readByFilter':
             $controller->readByFilter($_GET['categoryIds'] ?? "0", $_GET['brandIds'] ?? "0");
-			break;
-		case 'readAllHomePromotedProducts':
+            break;
+        case 'readAllHomePromotedProducts':
             $controller->readAllHomePromotedProducts();
             break;
-		case 'readAllHomeProducts':
+        case 'readAllHomeProducts':
             $controller->readAllHomeProducts();
             break;
         case 'uploadImage':
-    $controller->uploadImage();
-    break;
+            $controller->uploadImage();
+            break;
+        case 'globalSearch':
+            $controller->globalSearch($_GET['query'] ?? "");
+            break;
 
 
 

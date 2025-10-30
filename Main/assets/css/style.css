@@ -2265,3 +2265,66 @@ textarea.input {
   font-size: 20px;
   color: #D10024;
 }
+
+.search-results {
+  position: absolute;
+  width: 100%;
+  z-index: 999;
+}
+
+.search-results .list-group-item {
+  cursor: pointer;
+}
+
+.search-results .list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+.search-dropdown {
+  background-color: #fff !important;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 9999;
+}
+
+.search-dropdown .card-header {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.search-dropdown .list-group-item {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-dropdown .list-group-item:hover {
+  background-color: #f0f0f0;
+}
+
+.position-relative {
+  position: relative !important;
+}
+
+.btn-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  z-index: 10;
+}
+
+.btn-clear:hover {
+  color: #333;
+}

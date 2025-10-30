@@ -1,28 +1,40 @@
-app.controller("NavController", function($scope, $http, $location, $rootScope) {
+app.controller("NavController", function ($scope, $http, $location, $rootScope) {
   $scope.isLoggedIn = $rootScope.isLoggedIn;
   $scope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
 
   // Watch for changes to $rootScope.isLoggedIn
-  $scope.$watch(function() {
+  $scope.$watch(function () {
     return $rootScope.isLoggedIn;
-  }, function(newVal) {
+  }, function (newVal) {
     $scope.isLoggedIn = newVal;
   });
 
-  $scope.$watch(function() {
+  $scope.$watch(function () {
     return $rootScope.currentUser;
-  }, function(newVal) {
+  }, function (newVal) {
     $scope.currentUser = newVal;
-    
+
   });
 
-  $scope.logout = function() {
-    $http.post('../Core/Controller/Login/logout.php').then(function() {
+  $scope.logout = function () {
+    $http.post('../Core/Controller/Login/logout.php').then(function () {
       $rootScope.isLoggedIn = false;
       $scope.isLoggedIn = false;
       $scope.currentUser = '';
       sessionStorage.clear();
       $location.path('/login');
     });
+  };
+
+
+
+  $scope.searchProducts = function () {
+    const query = $scope.searchText.trim();
+    if (!query) return;
+
+    $http.get('api/ProductController.php?action=globalSearch&query=' + encodeURIComponent(query))
+      .then(response => {
+        $scope.searchResults = response.data;
+      });
   };
 });
