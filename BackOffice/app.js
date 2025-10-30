@@ -68,6 +68,13 @@ app.config(function ($routeProvider) {
         auth: checkAuth
       }
     })
+    .when("/report", {
+      templateUrl: "view/InventoryReport.html",
+      controller: "InventoryController",
+      resolve: {
+        auth: checkAuth
+      }
+    })
     .otherwise({
       redirectTo: "/login"
     });

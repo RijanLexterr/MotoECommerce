@@ -1,0 +1,33 @@
+<div ng-controller="CheckOutCompleteController">
+
+    <div class="container text-center" style="margin-top: 100px;">
+        <!-- Success Message -->
+        <div ng-if="status === 'success'" class="panel panel-success">
+            <div class="panel-heading">
+                <h2><span class="glyphicon glyphicon-ok-circle"></span> Thank You!</h2>
+            </div>
+            <div class="panel-body">
+                <p class="lead">Your order has been placed successfully.</p>
+                <p>Order Number: <strong>#{{orderNumber}}</strong></p>
+                <p ng-if="cartCleared">Your cart was cleared after checkout.</p>
+                <a href="#/" class="btn btn-success">
+                    <span class="glyphicon glyphicon-home"></span> Back to Home
+                </a>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div ng-if="status === 'error'" class="panel panel-danger">
+            <div class="panel-heading">
+                <h2><span class="glyphicon glyphicon-remove-circle"></span> Oops! Something went wrong.</h2>
+            </div>
+            <div class="panel-body">
+                <p class="lead">We could not process your order.</p>
+                <p>Please try again or contact support if the issue persists.</p>
+                <a href="#!/cart" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-repeat"></span> Try Again
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

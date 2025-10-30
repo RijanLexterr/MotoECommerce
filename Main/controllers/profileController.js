@@ -15,12 +15,12 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     $rootScope.currentUser = null;
     $scope.currentUser = null;
   }
- $rootScope.$on("isLoggedIn", function(event, status) {
+  $rootScope.$on("isLoggedIn", function (event, status) {
     $scope.isLoggedIn = status;
-     if (!$scope.isLoggedIn) {
-    $location.path('/login');
-    return;
-  }
+    if (!$scope.isLoggedIn) {
+      $location.path('/login');
+      return;
+    }
   });
   $scope.successMessage = null;
   let currentUser = $scope.currentUser;
@@ -119,7 +119,7 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     $http.post(`../Core/Controller/UserController.php?action=updateUserProfile&id=${parseInt($scope.currentUser.user_id)}`, request)
       .then(function (response) {
         if (response.data.status == "success") {
-          
+
           $scope.cancelChangePassword();
           document.querySelector('#passwordModal .close').click();
           getUserById();
@@ -169,7 +169,7 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
         }
 
         $scope.toShipOrders = allOrders.filter(o => o.order_status_name === 'Pending');
-        $scope.toReceiveOrders = allOrders.filter(o => o.order_status_name === 'Shipped');
+        $scope.toReceiveOrders = allOrders.filter(o => o.order_status_name === 'To Ship');
         $scope.completedOrders = allOrders.filter(o => o.order_status_name === 'Paid');
         $scope.orders = allOrders;
       })
@@ -289,7 +289,7 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
       }
     }
 
-    
+
   };
 
   function createUserShippingDetails() {
@@ -346,6 +346,71 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
       })
       .catch(function (error) {
         console.error("Error fetching User Shipping Details:", error);
+      });
+  };
+
+
+  $scope.isOpen = [];
+
+  $scope.toggleCollapse = function (index, $event) {
+    $event.preventDefault();
+    $scope.isOpen[index] = !$scope.isOpen[index];
+  };
+  // Panel open/close state
+  $scope.panelState = {
+    toShip: {},
+    toReceive: {},
+    completed: {}, // <-- added completed section
+  };
+
+  // Check if panel is open
+  $scope.isPanelOpen = function (section, index) {
+    return !!$scope.panelState[section][index];
+  };
+
+  // Toggle panel (prevent redirect and toggle collapse)
+  $scope.togglePanel = function (section, index, $event) {
+    if ($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    // Optional: true accordion behavior (only one open per section)
+    // $scope.panelState[section] = {};
+
+    $scope.panelState[section][index] = !$scope.panelState[section][index];
+  };
+
+  $scope.markAsReceived = function (Order) {
+    $http.get("../Core/Controller/OrderController.php?action=tagReceived&id=" + Order.order_id)
+      .then(function (response) {
+        if (response.data.status === "success") {
+
+          readAll(); // refresh
+
+          // Assuming you stored the user in sessionStorage after login
+          let user = JSON.parse(sessionStorage.getItem('currentUser')) || {};
+
+          // Prepare email data
+          let emailData = {
+            to: user.email, // Send to customer
+            subject: `Order #${Order.order_id} - Received Confirmation`,
+            body: `
+            <h3>Hello ${user.name},</h3>
+            <p>We’ve confirmed that your order <b>#${Order.order_id}</b> has been marked as received.</p>
+            <p>Thank you for trusting <br><br>Ester Store!</p>
+          `
+          };
+
+          // Send email
+          return $http.post('../Core/Controller/email.php?action=send', emailData);
+        }
+      })
+      .then(function (emailResponse) {
+        if (emailResponse) console.log("📧 Email response:", emailResponse.data);
+      })
+      .catch(function (error) {
+        console.error("Error marking as received:", error);
       });
   };
 

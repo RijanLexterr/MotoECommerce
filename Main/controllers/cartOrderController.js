@@ -54,6 +54,7 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
     }
     $scope.isShowImage = false;
     $scope.showImage = function (value) {
+      console.log(value);
       if (value == 2) {
         $scope.isShowImage = true;
 
@@ -171,7 +172,7 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       return;
     }
 
-   
+
     const fileInput = document.getElementById('imageInput');
     const files = fileInput ? fileInput.files : [];
     let uploadedFile = null;
@@ -214,11 +215,7 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
           // ✅ Clear cart
           sessionStorage.setItem('productsOnCart', JSON.stringify([]));
 
-          // ✅ Redirect user
-          $location.path('/result').search({
-            status: 'success',
-            orderId: response.data.created_order_id
-          });
+
 
           // ✅ Upload payment proof image if provided
           if (uploadedFile) {
@@ -235,6 +232,24 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
               console.error('Upload failed:', error);
             });
           }
+
+          //Recalculate stock
+          $http.get("../Core/Controller/OrderController.php?action=readAllItems&id=" + response.data.created_order_id)
+            .then(function (response) {
+              angular.forEach(response.data, function (item) {
+                $http.get(`../Core/Controller/InventoryController.php?action=recalculateStock&product_id=${item.product_id}`)
+                  .then(function (resp) {
+                    console.log("Item Recalculated!");
+                  })
+                  .catch(err => console.error(err));
+              });
+            }).catch(err => console.error(err));
+
+          // ✅ Redirect user
+          $location.path('/result').search({
+            status: 'success',
+            orderId: response.data.created_order_id
+          });
         } else {
           alert("Order failed: " + response.data.message);
         }
