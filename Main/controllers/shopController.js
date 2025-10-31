@@ -1,7 +1,7 @@
 app.controller("ShopController", function ($scope, $http, $routeParams) {
     // Initialize filter params
     $scope.categoryIds = $routeParams.categoryId || "0";
-    $scope.brandIds = $routeParams.brand || 0;
+    $scope.brandIds = $routeParams.brand || "0";
 
 
 
@@ -78,6 +78,10 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
         $http.get(`../Core/Controller/BrandController.php?action=readAll&page=1&limit=99999`)
             .then(function (response) {
                 $scope.brandList = response.data.data || [];
+
+                $scope.brandList.forEach(function (brand) {
+                    brand.selected = Number($scope.brandIds) === Number(brand.brand_id);
+                });
             });
     }
 
