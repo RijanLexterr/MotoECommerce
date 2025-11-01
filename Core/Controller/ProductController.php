@@ -17,19 +17,20 @@ class ProductController
         $data = json_decode($rawData, true);
 
         $stmt = $this->db->prepare("
-            INSERT INTO products (brand_id, category_id, name, description, price, stock, expiration_date, created_at, image_location, is_promoted, new_price)
+            INSERT INTO products (brand_id, category_id, name, description, price, stock,lowstock, expiration_date, created_at, image_location, is_promoted, new_price)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $created_at = date("Y-m-d H:i:s");
 
         $stmt->bind_param(
-            "iissdisssid",
+            "iissdiisssid",
             $data['brand_id'],
             $data['category_id'],
             $data['name'],
             $data['description'],
             $data['price'],
             $data['stock'],
+            $data['lowstock'],
             $data['expiration_date'],
             $created_at,
             $data['image_location'],
@@ -60,9 +61,18 @@ class ProductController
         $total = $countResult->fetch_assoc()['total'];
 
         // Get paginated data
-        $query = "SELECT p.product_id AS product_id, p.name AS name, p.description AS description,
-				p.category_id AS category_id, p.brand_id AS brand_id, p.price AS price, p.stock as stock, 
-				p.expiration_date as expiration_date, b.name AS BrandName, c.name AS CategoryName, 
+        $query = "SELECT 
+                p.product_id AS product_id, 
+                p.name AS name, 
+                p.description AS description,				
+                p.category_id AS category_id, 
+                p.brand_id AS brand_id, 
+                p.price AS price, 
+                p.stock as stock, 
+                p.lowstock as lowstock, 
+				p.expiration_date as expiration_date, 
+                b.name AS BrandName, 
+                c.name AS CategoryName, 
 				(CASE
 					WHEN p.image_location IS NULL OR p.image_location = '' THEN 'dont_delete_this_image.png' 
 					ELSE p.image_location  
@@ -179,18 +189,19 @@ class ProductController
 
         $stmt = $this->db->prepare("
             UPDATE products
-            SET brand_id = ?, category_id = ?, name = ?, description = ?, price = ?, stock = ?, expiration_date = ?, is_promoted = ?, new_price = ? 
+            SET brand_id = ?, category_id = ?, name = ?, description = ?, price = ?, stock = ?,lowstock = ?, expiration_date = ?, is_promoted = ?, new_price = ? 
             WHERE product_id = ?
         ");
 
         $stmt->bind_param(
-            "iissdisidi",
+            "iissdiisidi",
             $data['brand_id'],
             $data['category_id'],
             $data['name'],
             $data['description'],
             $data['price'],
             $data['stock'],
+            $data['lowstock'],
             $data['expiration_date'],
             $data['is_promoted'],
             $data['new_price'],
@@ -300,7 +311,8 @@ class ProductController
         // Fetch paginated results
         $sql = "
         SELECT p.product_id, p.name, p.description,
-               p.category_id, p.brand_id, p.price, CASE WHEN p.is_promoted = 1 THEN p.new_price ELSE p.price END as item_price, p.stock,
+               p.category_id, p.brand_id, p.price, CASE WHEN p.is_promoted = 1 THEN p.new_price ELSE p.price END as item_price, 
+               p.stock, p.lowstock,
                p.expiration_date, p.image_location,
                b.name AS BrandName, c.name AS CategoryName
         FROM products p
@@ -336,7 +348,7 @@ class ProductController
         ]);
     }
 
-	public function PromotedItemsReadByFilter($categoryIds, $brandIds, $page = 1, $limit = 6, $searchText = "")
+    public function PromotedItemsReadByFilter($categoryIds, $brandIds, $page = 1, $limit = 6, $searchText = "")
     {
         $page = isset($_GET['page']) ? intval($_GET['page']) : $page;
         $limit = isset($_GET['limit']) ? intval($_GET['limit']) : $limit;
@@ -377,8 +389,8 @@ class ProductController
             $params[] = "%{$searchText}%";
             $types .= "ss";
         }
-		
-		//$promotedwhere = "WHERE p.is_promoted = 1"
+
+        //$promotedwhere = "WHERE p.is_promoted = 1"
         $promotedwhere = !empty($promotedconditions) ? " AND " . implode(" AND ", $promotedconditions) : "";
 
         // Count total rows
@@ -393,7 +405,7 @@ class ProductController
         // Fetch paginated results
         $sql = "
         SELECT p.product_id, p.name, p.description,
-               p.category_id, p.brand_id, p.price, CASE WHEN p.is_promoted = 1 THEN p.new_price ELSE p.price END as item_price, p.stock,
+               p.category_id, p.brand_id, p.price, CASE WHEN p.is_promoted = 1 THEN p.new_price ELSE p.price END as item_price, p.stock, p.lowstock,
                p.expiration_date, p.image_location, ROUND(((p.price - p.new_price)/p.price)*100) as percent, 
                b.name AS BrandName, c.name AS CategoryName
         FROM products p
@@ -590,7 +602,7 @@ if (isset($_GET['action'])) {
         case 'globalSearch':
             $controller->globalSearch($_GET['query'] ?? "");
             break;
-		case 'PromotedItemsReadByFilter':
+        case 'PromotedItemsReadByFilter':
             $controller->PromotedItemsReadByFilter($_GET['categoryIds'] ?? "0", $_GET['brandIds'] ?? "0");
             break;
         default:

@@ -94,6 +94,7 @@ CREATE TABLE products (
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
     stock INT DEFAULT 0,
+    lowStock INT DEFAULT 0,
     expiration_date DATE NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     image_location VARCHAR(200) NULL,
@@ -155,15 +156,6 @@ CREATE TABLE order_items (
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
-
--- ALTER ORDERS TO ADD USER SHIPPING ID
-ALTER TABLE orders
-ADD user_shipping_id INT;
-
-ALTER TABLE orders
-ADD CONSTRAINT fk_orders_shipping
-FOREIGN KEY (user_shipping_id)
-REFERENCES user_shipping_details(user_shipping_id)
 
 
 -- ALTER ADD NEW PRICE 

@@ -70,11 +70,13 @@
                         <div class="product" ng-if="product">
                             <div class="product-img">
                                 <img class="img-fluid w-100" ng-if="product.image_location"
-                                    ng-src="../BackOffice/uploads/{{product.image_location}}" alt="{{ product.name }}" style="width: 250px; height: 280px;">
+                                    ng-src="../BackOffice/uploads/{{product.image_location}}" alt="{{ product.name }}"
+                                    style="width: 250px; height: 280px;">
                                 <img class="img-fluid w-100" ng-if="!product.image_location"
-                                    ng-src="assets/img/default.jpg" alt="No image available" style="width: 250px; height: 280px;">
+                                    ng-src="assets/img/default.jpg" alt="No image available"
+                                    style="width: 250px; height: 280px;">
 
-<!--                                 <div class="product-label">
+                                <!--                                 <div class="product-label">
                                     <span class="sale">-30%</span>
                                     <span class="new">NEW</span>
                                 </div> -->
@@ -94,10 +96,11 @@
                                 <!-- 🧾 Stock Display -->
                                 <div class="text-muted small">
                                     <i class="fa fa-box"></i>
-                                    <span ng-if="product.stock > 5">
+                                    <span ng-if="product.stock > product.lowstock">
                                         {{product.stock}} in stock
                                     </span>
-                                    <span class="text-warning" ng-if="product.stock > 0 && product.stock <= 5">
+                                    <span class="text-warning"
+                                        ng-if="product.stock > 0 && product.stock <= product.lowstock">
                                         Only {{product.stock}} left!
                                     </span>
                                     <span class="text-danger" ng-if="product.stock == 0">

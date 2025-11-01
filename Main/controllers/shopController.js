@@ -135,12 +135,15 @@ app.controller("ShopController", function ($scope, $http, $routeParams) {
         // 2️⃣ Check if product already in cart
         let existingProduct = productsOnCartList.find(p => p.id === currentProductId);
 
+        // 🚫 Prevent adding beyond stock
+        if (currentProduct.lowstock >= currentProduct.stock) {
+            console.log(currentProduct.lowstock+"-"+ currentProduct.stock);
+            $scope.showModal("Cannot add more. Stock limit reached.");
+            return;
+        }
+
         if (existingProduct) {
-            // 🚫 Prevent adding beyond stock
-            if (existingProduct.count >= currentProduct.stock) {
-                $scope.showModal("Cannot add more. Stock limit reached.");
-                return;
-            }
+
 
             existingProduct.count += newQty;
             currentProduct.stock -= newQty; // 🟢 update stock visually

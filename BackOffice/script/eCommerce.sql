@@ -192,3 +192,87 @@ INSERT INTO transaction_types (type_id, name) VALUES
 (0, 'Stock In'),
 (1, 'Stock Out'),
 (2, 'Return');
+
+-- ========================================
+-- Create Municipality and Barangay Tables
+-- ========================================
+
+CREATE TABLE Muni (
+    Muni_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Muni_Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Barangay (
+    Brgy_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Brgy_Name VARCHAR(100) NOT NULL,
+    Muni_ID INT NOT NULL,
+    Rates DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+-- ========================================
+-- Seed Data for Municipality
+-- ========================================
+
+INSERT INTO Muni (Muni_Name) VALUES
+('San Pedro, Laguna'),
+('Biñan, Laguna'),
+('Santa Rosa, Laguna'),
+('Muntinlupa City');
+
+-- ========================================
+-- Seed Data for Barangay
+-- ========================================
+
+-- San Pedro, Laguna (Muni_ID = 1)
+INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
+('San Antonio', 1, 10.50),
+('Landayan', 1, 11.00),
+('Santo Niño', 1, 9.75),
+('Fatima', 1, 10.25),
+('Nueva', 1, 9.50),
+('Cuyab', 1, 10.00),
+('Chrysanthemum', 1, 9.80),
+('San Vicente', 1, 11.25),
+('San Lorenzo Ruiz', 1, 9.90),
+('Magsaysay', 1, 10.30);
+
+-- Biñan, Laguna (Muni_ID = 2)
+INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
+('Sto. Domingo', 2, 11.50),
+('San Antonio', 2, 10.75),
+('Dela Paz', 2, 9.85),
+('Canlalay', 2, 10.10),
+('Langkiwa', 2, 10.20),
+('Poblacion', 2, 11.00),
+('Zapote', 2, 10.60),
+('San Francisco', 2, 9.95),
+('Platero', 2, 10.15),
+('Malaban', 2, 10.40);
+
+-- Santa Rosa, Laguna (Muni_ID = 3)
+INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
+('Balibago', 3, 11.80),
+('Market Area', 3, 11.25),
+('Dila', 3, 10.60),
+('Malitlit', 3, 10.75),
+('Macabling', 3, 9.95),
+('Tagapo', 3, 11.10),
+('Sinalhan', 3, 10.20),
+('Labas', 3, 10.50),
+('Aplaya', 3, 10.00),
+('Ibaba', 3, 9.85);
+
+-- Muntinlupa City (Muni_ID = 4)
+INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
+('Alabang', 4, 12.50),
+('Ayala Alabang', 4, 13.00),
+('Bayanan', 4, 11.20),
+('Buli', 4, 10.80),
+('Cupang', 4, 11.00),
+('Poblacion', 4, 10.90),
+('Putatan', 4, 11.10),
+('Sucat', 4, 11.40),
+('Tunasan', 4, 10.70);
