@@ -13,20 +13,24 @@ app.controller("UserController", function($scope, $http, $routeParams) {
   $scope.userIdForDelete;
 
   class User {
-    constructor(id = 0, name = "", email = "", password = "", role = "") {
+    constructor(id = 0, name = "", email = "", phonenumber = "", Address = "", password = "", role = "") {
       this.id = id;
       this.name = name;
       this.email = email;
-      this.password = password
-      this.role_id = role;;
+	  this.phonenumber = phonenumber;
+      this.Address = Address;
+      this.password = password;
+      this.role_id = role;
     }
   }
 
-  $scope.updateUserFields = function(id = null, name = null, email = null, password = null, confirmPassword = null, userRoleId = null) {
+  $scope.updateUserFields = function(id = null, name = null, email = null, phonenumber = null, Address = null, password = null, confirmPassword = null, userRoleId = null) {
     clearError();
     $scope.userId = id;
     $scope.name = name;
     $scope.email = email;
+	$scope.phonenumber = phonenumber;
+    $scope.Address = Address;
     $scope.password = password;
     $scope.confirmPassword = confirmPassword;
     $scope.selectedUserRoleId = userRoleId;
@@ -83,8 +87,6 @@ $scope.changePageSize = function() {
   getAllUser(1, $scope.pageSize); // Reset to page 1
 };
 
-
-
   function getAllRoles(id) {
     $http.get("../Core/Controller/UserController.php?action=readAllRoles")
     .then(function(response) {
@@ -93,7 +95,8 @@ $scope.changePageSize = function() {
         console.log($scope.users.find(u => u.user_id === id))
         let currentUser = $scope.users.find(u => u.user_id === id);
         $scope.updateUserFields(currentUser.user_id, currentUser.name, 
-          currentUser.email, currentUser.password, currentUser.password, currentUser.role_id)
+          currentUser.email, currentUser.phonenumber, 
+          currentUser.Address, currentUser.password, currentUser.password, currentUser.role_id)
       }
     }, function(error) {
       console.error("Error fetching data:", error);
@@ -227,9 +230,16 @@ $scope.changePageSize = function() {
         });
     }
 
-     $scope.roleFilter = function (user) {
+     $scope.roleFilter = function (user) 
+	 {
         // show only matching role
-        return user.role_name === $scope.userView;
+		$scope.showAddUserButton = true;
+		if($scope.userView == "Customer") 
+		{
+			$scope.showAddUserButton = false;
+		}
+        return user.role_name === $scope.userView;		
+		
     };
 
 });

@@ -104,7 +104,7 @@ app.controller("SignUpController", function ($scope, $http, $location, $rootScop
       .then(function (response) {
 
         $scope.roles = response.data;
-        $scope.role = $scope.roles.find(r => r.name === "Staff");
+        $scope.role = $scope.roles.find(r => r.name === "Customer");
 
       }, function (error) {
         console.error("Error fetching data:", error);
