@@ -211,13 +211,40 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
         $scope.pagination.page = response.data.page;
         $scope.pagination.limit = response.data.limit;
         $scope.pagination.totalPages = Math.ceil(response.data.total / response.data.limit);
+
+        $http.get(`../Core/Controller/UserShippingDetailsController.php?action=readAllMunicipalities`)
+          .then(function (response) {
+            $scope.muniAlllist = response.data.data;
+          }, function (error) {
+            console.error("Error fetching data:", error);
+          });
+
+        $http.get(`../Core/Controller/UserShippingDetailsController.php?action=readAllBrgy`)
+          .then(function (response) {
+            $scope.brgyAlllist = response.data.data;
+          }, function (error) {
+            console.error("Error fetching data:", error);
+          });
+
+
+        
+        
       })
       .catch(function (error) {
         console.error("Error fetching data:", error);
       });
   }
 
+  $scope.validateMunicipality = function () {
+		$scope.selectedMuniIdHasError = !$scope.usershippingdetail.Muni_ID;
+	}
+
+   $scope.validateBarangay = function () {
+		$scope.selectedBrgyIdHasError = !$scope.usershippingdetail.Brgy_ID;
+	}
+
   getAllUserShippingDetails();
+
 
   $scope.loadTransactions = function (page) {
     getAllUserShippingDetails(page, $scope.pageSize);
@@ -234,6 +261,10 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
       fullname: "",
       phonenumber: "",
       address: "",
+      muni_id: null,
+      muni_name: "",
+      brgy_id: null,
+      brgy_name: "",
       postalcode: "",
       user_id: null,
       is_default_address: null
@@ -245,6 +276,8 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     $scope.PhoneNumberHasError = false;
     $scope.AddressHasError = false;
     $scope.PostalCodeHasError = false;
+    $scope.selectedMuniIdHasError = false;
+    $scope.selectedBrgyIdHasError = false;
   }
 
   $scope.validateName = function () {
@@ -282,10 +315,12 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     $scope.validatePhoneNumber();
     $scope.validateAddress();
     $scope.validatePostalCode();
+    $scope.validateMunicipality();
+    $scope.validateBarangay();
 
     $scope.usershippingdetail.user_id = $scope.currentUser.user_id;
 
-    let isValid = (!$scope.nameHasError && !$scope.PhoneNumberHasError && !$scope.AddressHasError && !$scope.PostalCodeHasError);
+    let isValid = (!$scope.nameHasError && !$scope.PhoneNumberHasError && !$scope.AddressHasError && !$scope.PostalCodeHasError && !$scope.selectedMuniIdHasError && !$scope.selectedBrgyIdHasError);
 
     if (isValid) {
       if (!$scope.usershippingdetail.user_shipping_id) {

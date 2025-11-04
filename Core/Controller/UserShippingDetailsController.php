@@ -31,20 +31,22 @@ class UserShippingDetailsController {
 		}
 
         $stmt = $this->db->prepare("
-            INSERT INTO user_shipping_details (user_id, fullname, phonenumber, address, postalcode, is_default_address, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO user_shipping_details (user_id, fullname, phonenumber, address, postalcode, is_default_address, created_at, muni_id, brgy_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $created_at = date("Y-m-d H:i:s");
 
         $stmt->bind_param(
-            "issssis",
+            "issssisii",
             $data['user_id'],
             $data['fullname'],
             $data['phonenumber'],
             $data['address'],
             $data['postalcode'],
 			$data['is_default_address'],
-            $created_at
+            $created_at,
+            $data['Muni_ID'],
+            $data['Brgy_ID']
         );
 
         if ($stmt->execute()) {
@@ -69,10 +71,11 @@ class UserShippingDetailsController {
         $total = $countResult->fetch_assoc()['total'];
 
         // Get paginated data
-        $query = "SELECT *,  CASE WHEN is_default_address = 1 THEN 'Yes' ELSE '' END AS Def_Address 
+        $query = "SELECT *,  CASE WHEN is_default_address = 1 THEN 'Yes' ELSE '' END AS Def_Address,
+        m.Muni_Name, b.Brgy_Name 
 		FROM user_shipping_details 
-				ORDER BY created_at DESC 
-				LIMIT $limit OFFSET $offset";
+        LEFT JOIN muni m on m.Muni_ID = user_shipping_details.Muni_ID
+        LEFT JOIN barangay b on b.Brgy_ID = user_shipping_details.Brgy_ID";
 
         $result = $this->db->query($query);
         $data = [];
@@ -201,17 +204,19 @@ class UserShippingDetailsController {
 
         $stmt = $this->db->prepare("
             UPDATE user_shipping_details 
-            SET fullname = ?, phonenumber = ?, address = ?, postalcode = ?, is_default_address = ?  
+            SET fullname = ?, phonenumber = ?, address = ?, postalcode = ?, is_default_address = ?, muni_id = ?, brgy_id = ?  
             WHERE user_shipping_id = ?
         ");
 		
         $stmt->bind_param(
-            "ssssii",
+            "ssssiiii",
             $data['fullname'],
             $data['phonenumber'],
             $data['address'],
             $data['postalcode'],
 			$data['is_default_address'],
+			$data['Muni_ID'],
+			$data['Brgy_ID'],
             $id
         );
 
@@ -499,6 +504,18 @@ class UserShippingDetailsController {
         }
     }
 
+    public function readAllBrgy()
+    {
+        $result = $this->db->query("SELECT Muni_ID, Brgy_ID, Brgy_Name FROM barangay ORDER BY Brgy_Name ASC");
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode([
+            'data' => $data
+        ]);
+    }
+
 }
 
 
@@ -561,8 +578,11 @@ if (isset($_GET['action'])) {
         case 'deleteBarangay':
             $controller->deleteBarangay($_GET['id'] ?? 0); 
             break;
-         case 'getByBarangayName':
+        case 'getByBarangayName':
 			$controller->getByBarangayName($_GET['brgy_name'] ?? "", $_GET['id'] ?? 0);
+            break;
+        case "readAllBrgy":
+            $controller->readAllBrgy();
             break;
         // case 'readByFilter':
         //     $controller->readByFilter($_GET['categoryIds'] ?? "0", $_GET['brandIds'] ?? "0");
