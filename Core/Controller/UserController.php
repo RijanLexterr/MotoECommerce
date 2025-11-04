@@ -2,10 +2,12 @@
 require_once '../config.php'; // gives $conn (mysqli)
 require_once '../model.php';
 
-class UserController {
+class UserController
+{
     private $db; // mysqli
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->db = $db;
     }
 
@@ -38,62 +40,64 @@ class UserController {
     //     }
     // }
 
-    public function create() {
-    $rawData = file_get_contents("php://input");
-    $data = json_decode($rawData, true);
+    public function create()
+    {
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
 
-    $created_at = date("Y-m-d H:i:s");
+        $created_at = date("Y-m-d H:i:s");
 
-    // First insert into users
-    $stmt = $this->db->prepare("
+        // First insert into users
+        $stmt = $this->db->prepare("
         INSERT INTO users (name, email, password, created_at)
         VALUES (?, ?, ?, ?)
     ");
-    $stmt->bind_param(
-        "ssss",
-        $data['name'],
-        $data['email'],
-        $data['password'],
-        $created_at
-    );
+        $stmt->bind_param(
+            "ssss",
+            $data['name'],
+            $data['email'],
+            $data['password'],
+            $created_at
+        );
 
-    if ($stmt->execute()) {
-        $user_id = $this->db->insert_id;
+        if ($stmt->execute()) {
+            $user_id = $this->db->insert_id;
 
-        // Now insert into user_roles
-        $role_id = $data['role_id']; // Make sure this is passed in the input
-        $stmt2 = $this->db->prepare("
+            // Now insert into user_roles
+            $role_id = $data['role_id']; // Make sure this is passed in the input
+            $stmt2 = $this->db->prepare("
             INSERT INTO user_roles (user_id, role_id)
             VALUES (?, ?)
         ");
-        $stmt2->bind_param("ii", $user_id, $role_id);
+            $stmt2->bind_param("ii", $user_id, $role_id);
 
-        if ($stmt2->execute()) {
-            echo json_encode([
-                "status" => "success",
-                "message" => "User and role assigned",
-                "user_id" => $user_id,
-                "role_id" => $role_id
-            ]);
+            if ($stmt2->execute()) {
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "User and role assigned",
+                    "user_id" => $user_id,
+                    "role_id" => $role_id
+                ]);
+            } else {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "User created but role assignment failed: " . $stmt2->error
+                ]);
+            }
         } else {
             echo json_encode([
                 "status" => "error",
-                "message" => "User created but role assignment failed: " . $stmt2->error
+                "message" => "User creation failed: " . $stmt->error
             ]);
         }
-    } else {
-        echo json_encode([
-            "status" => "error",
-            "message" => "User creation failed: " . $stmt->error
-        ]);
     }
-}
 
 
-    public function readAll() {
+    public function readAll()
+    {
 
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
         $offset = ($page - 1) * $limit;
 
         // Get total count
@@ -121,12 +125,13 @@ class UserController {
             'total' => $total,
             'data' => $data
         ]);
-        
+
     }
 
-    public function validateUserByEmail($email) {
+    public function validateUserByEmail($email)
+    {
 
-        
+
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -138,11 +143,12 @@ class UserController {
         } else {
             echo json_encode(["isExisting" => false]);
         }
-}
+    }
 
-public function getUserByEmail($email) {
+    public function getUserByEmail($email)
+    {
 
-        
+
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -154,10 +160,11 @@ public function getUserByEmail($email) {
         } else {
             echo json_encode(["status" => "error", "user" => $user]);
         }
-}
+    }
 
 
-    public function readOne($id) {
+    public function readOne($id)
+    {
         $stmt = $this->db->prepare("SELECT a.user_id as user_id, a.name, a.email, a.password, b.role_id, c.name as role_name  FROM users a 
         JOIN user_roles b ON a.user_id = b.user_id JOIN roles c ON b.role_id = c.role_id WHERE a.user_id = ?");
         $stmt->bind_param("i", $id);
@@ -173,84 +180,87 @@ public function getUserByEmail($email) {
         }
     }
 
-    public function update($id) {
-    $rawData = file_get_contents("php://input");
-    $data = json_decode($rawData, true);
+    public function update($id)
+    {
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
 
-    // Update user info
-    $stmt = $this->db->prepare("
+        // Update user info
+        $stmt = $this->db->prepare("
         UPDATE users
         SET name = ?, email = ?, password = ?
         WHERE user_id = ?
     ");
-    $stmt->bind_param("sssi", $data['name'], $data['email'], $data['password'], $id);
+        $stmt->bind_param("sssi", $data['name'], $data['email'], $data['password'], $id);
 
-    if ($stmt->execute()) {
-        // Update user role
-        $role_id = $data['role_id'];
-        $stmt2 = $this->db->prepare("
+        if ($stmt->execute()) {
+            // Update user role
+            $role_id = $data['role_id'];
+            $stmt2 = $this->db->prepare("
             UPDATE user_roles
             SET role_id = ?
             WHERE user_id = ?
         ");
-        $stmt2->bind_param("ii", $role_id, $id);
+            $stmt2->bind_param("ii", $role_id, $id);
 
-        if ($stmt2->execute()) {
-            echo json_encode([
-                "status" => "success",
-                "message" => "User and role updated"
-            ]);
+            if ($stmt2->execute()) {
+                echo json_encode([
+                    "status" => "success",
+                    "message" => "User and role updated"
+                ]);
+            } else {
+                echo json_encode([
+                    "status" => "error",
+                    "message" => "User updated but role update failed: " . $stmt2->error
+                ]);
+            }
         } else {
             echo json_encode([
                 "status" => "error",
-                "message" => "User updated but role update failed: " . $stmt2->error
+                "message" => $stmt->error
             ]);
         }
-    } else {
-        echo json_encode([
-            "status" => "error",
-            "message" => $stmt->error
-        ]);
-    }
-}
-
-public function updateUserProfile($id) {
-    $rawData = file_get_contents("php://input");
-    $data = json_decode($rawData, true);
-
-    // Validate required fields
-    if (!isset($data['name'], $data['email'], $data['password'])) {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Missing required fields: name, email, or password"
-        ]);
-        return;
     }
 
-    // Update user info only
-    $stmt = $this->db->prepare("
+    public function updateUserProfile($id)
+    {
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        // Validate required fields
+        if (!isset($data['name'], $data['email'], $data['password'])) {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Missing required fields: name, email, or password"
+            ]);
+            return;
+        }
+
+        // Update user info only
+        $stmt = $this->db->prepare("
         UPDATE users
         SET name = ?, email = ?, password = ?
         WHERE user_id = ?
     ");
-    $stmt->bind_param("sssi", $data['name'], $data['email'], $data['password'], $id);
+        $stmt->bind_param("sssi", $data['name'], $data['email'], $data['password'], $id);
 
-    if ($stmt->execute()) {
-        echo json_encode([
-            "status" => "success",
-            "message" => "User information updated successfully"
-        ]);
-    } else {
-        echo json_encode([
-            "status" => "error",
-            "message" => "Update failed: " . $stmt->error
-        ]);
+        if ($stmt->execute()) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "User information updated successfully"
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => "Update failed: " . $stmt->error
+            ]);
+        }
     }
-}
 
 
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $stmt = $this->db->prepare("DELETE FROM users WHERE user_id = ?");
         $stmt->bind_param("i", $id);
 
@@ -261,7 +271,8 @@ public function updateUserProfile($id) {
         }
     }
 
-    public function readAllRoles() {
+    public function readAllRoles()
+    {
 
         $result = $this->db->query("SELECT * FROM roles ");
         $data = [];
@@ -270,6 +281,25 @@ public function updateUserProfile($id) {
         }
         echo json_encode($data);
     }
+
+    public function resetPassword()
+    {
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+        $email = $data['email'];
+        $password = $data['password'];
+        // $password = password_hash($data['password'], PASSWORD_BCRYPT);
+
+        $stmt = $this->db->prepare("UPDATE users SET password = ? WHERE email = ?");
+        $stmt->bind_param("ss", $password, $email);
+
+        if ($stmt->execute()) {
+            echo json_encode(["status" => "success", "message" => "Password updated"]);
+        } else {
+            echo json_encode(["status" => "error", "message" => $stmt->error]);
+        }
+    }
+
 }
 
 
@@ -306,6 +336,9 @@ if (isset($_GET['action'])) {
             break;
         case 'updateUserProfile':
             $controller->updateUserProfile($_GET['id'] ?? 0);
+            break;
+        case 'resetPassword':
+            $controller->resetPassword();
             break;
         default:
             echo json_encode(["status" => "error", "message" => "Invalid action"]);

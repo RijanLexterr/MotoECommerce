@@ -3,8 +3,8 @@
     <div class="col-md-6 col-md-offset-3">
       <div class="panel panel-default">
         <div class="panel-body">
-          <h3 class="text-center">Login</h3>
-          <p class="text-muted text-center">Please enter your email and password</p>
+          <h3 class="text-center">{{ isForgotPW ? 'Forgot Password' : 'Login' }}</h3>
+          <p class="text-muted text-center" >{{ isForgotPW ? 'Please enter your email' : 'Please enter your email and password ' }}</p>
 
           <form>
             <!-- Email input -->
@@ -15,21 +15,37 @@
             </div>
 
             <!-- Password input -->
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" ng-model="password" class="form-control" id="password" placeholder="Enter password">
-              <small class="text-danger" ng-if="passwordError">{{ passwordError }}</small>
-            </div>
+            <div ng-show="!isForgotPW">
+              <div class="form-group" ng-show="!isForgotPW">
+                <label for="password">Password</label>
+                <input type="password" ng-model="password" class="form-control" id="password"
+                  placeholder="Enter password">
+                <small class="text-danger" ng-if="passwordError">{{ passwordError }}</small>
+              </div>
 
-            <!-- Buttons -->
-            <div class="text-center">
-              <button type="button" ng-click="signupOnClick()" class="btn btn-default">Sign Up</button>
-              <button type="submit" ng-click="login()" class="btn btn-primary">Login</button>
+              <!-- Buttons -->
+              <div class="text-center" ng-show="!isForgotPW">
+                <button type="button" ng-click="signupOnClick()" class="btn btn-default">Sign Up</button>
+                <button type="submit" ng-click="login()" class="btn btn-primary">Login</button>
+              </div>
             </div>
 
             <!-- Error and Forgot Password -->
             <p class="text-danger text-center" ng-if="error">{{ error }}</p>
-            <p class="text-center"><a href="#!">Forgot password?</a></p>
+            <p class="text-center" ng-show="!isForgotPW"><a href="" ng-click="isForgotPW = true">Forgot password?</a>
+            </p>
+
+
+            <div ng-show="isForgotPW">
+              <div class="text-center">
+                <button type="button" class="btn btn-primary" ng-click="sendResetEmail()" ng-disabled="lockedOut">
+                  Send Email
+                </button>
+                <button type="submit" ng-click="isForgotPW = false;emailError=''" class="btn btn-default">Back to
+                  Login</button>
+              </div>
+
+            </div>
           </form>
         </div>
       </div>

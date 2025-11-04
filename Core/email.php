@@ -17,7 +17,7 @@ require_once 'phpmailer/SMTP.php';
  * @param string $fromName (optional) Sender name
  * @return bool True if sent successfully, false otherwise
  */
-function sendEmail($to, $subject, $body, $toName = '', $from = 'esterecommerce00@gmail.com', $fromName = 'Ester Admin')
+function sendEmail($to, $subject, $body, $toName = '', $from = 'MotorAdmin@gmail.com', $fromName = 'Motor Parts Admin')
 {
     $mail = new PHPMailer(true);
 

@@ -24,7 +24,7 @@ app.config(function ($routeProvider, $locationProvider) {
       templateUrl: "views/home.html",
       controller: "HomeController"
     })
-	// add parameter :categoryId
+    // add parameter :categoryId
     .when("/hotdeals/:categoryId?", {
       templateUrl: "views/hotdeals.html",   // fixed here
       controller: "HotDealsController"
@@ -49,6 +49,13 @@ app.config(function ($routeProvider, $locationProvider) {
     .when('/result', {
       templateUrl: 'views/checkoutComplete.html',
       controller: 'CheckOutCompleteController'
+    })
+    .when('/forgotpassword', {
+      templateUrl: 'views/forgotPassword.html',
+      controller: 'ForgotPasswordController'
+    })
+    .when('/forgotpasswordSent', {
+      templateUrl: 'views/forgotPasswordSent.html'
     })
     .otherwise({
       redirectTo: "/home"

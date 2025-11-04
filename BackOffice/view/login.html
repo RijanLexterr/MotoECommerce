@@ -27,8 +27,29 @@
                 <a class="text-white-50" href="#!">Forgot password?</a>
               </p> -->
 
-              <div class="text-center">
-                <button ng-click="login()" class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+
+              <!-- Login button -->
+              <div ng-show="!isForgotPW">
+                <button type="button" class="btn btn-primary btn-block" ng-click="login()" ng-disabled="lockedOut">
+                  Login
+                </button>
+                <p class="error" ng-if="lockoutMessage">{{ lockoutMessage }}</p>
+
+                <!-- Forgot Password link -->
+                <p class="text-center mt-2">
+                  <a href="" ng-click="isForgotPW = true">Forgot Password?</a>
+                </p>
+              </div>
+
+              <!-- Forgot Password section -->
+              <div ng-show="isForgotPW">
+                <button type="button" class="btn btn-primary btn-block" ng-click="sendResetEmail()"
+                  ng-disabled="lockedOut">
+                  Send Email
+                </button>
+                <p class="text-center mt-2">
+                  <a href="" ng-click="isForgotPW = false;emailError=''">Back to Login</a>
+                </p>
               </div>
 
             </div>
