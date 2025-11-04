@@ -37,6 +37,24 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+
+CREATE TABLE Muni (
+    Muni_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Muni_Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Barangay (
+    Brgy_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Brgy_Name VARCHAR(100) NOT NULL,
+    Muni_ID INT NOT NULL,
+    Rates DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+
 -- USER ↔ ROLE (junction table for many-to-many)
 CREATE TABLE user_roles (
     user_id INT NOT NULL,
@@ -45,6 +63,25 @@ CREATE TABLE user_roles (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
 );
+
+
+
+CREATE TABLE  user_shipping_details  (
+  user_shipping_id int(11) NOT NULL,
+   user_id  int(11) NOT NULL,
+   fullname  varchar(150) NOT NULL,
+   phonenumber  varchar(150) NOT NULL,
+   address  varchar(250) NOT NULL,
+   postalcode  varchar(10) NOT NULL,
+   created_at  timestamp NOT NULL DEFAULT current_timestamp(),
+    is_default_address  int(11) DEFAULT NULL,
+    Brgy_ID INT NOT NULL,
+    Muni_ID INT NOT NULL,    
+    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
+    FOREIGN KEY (Brgy_ID) REFERENCES Barangay(Brgy_ID)
+
+) ;
+
 
 -- BRANDS
 CREATE TABLE brands (
@@ -106,6 +143,7 @@ CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     status_id INT NOT NULL, 
+    rates DECIMAL(10,2) NOT NULL,
     total DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
@@ -197,20 +235,6 @@ INSERT INTO transaction_types (type_id, name) VALUES
 -- Create Municipality and Barangay Tables
 -- ========================================
 
-CREATE TABLE Muni (
-    Muni_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Muni_Name VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE Barangay (
-    Brgy_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Brgy_Name VARCHAR(100) NOT NULL,
-    Muni_ID INT NOT NULL,
-    Rates DECIMAL(10,2) DEFAULT 0.00,
-    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
 
 -- ========================================
 -- Seed Data for Municipality
