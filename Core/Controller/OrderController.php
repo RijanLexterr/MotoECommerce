@@ -34,6 +34,7 @@ class OrderController
             SELECT o.order_id AS order_id,
                     o.user_id as order_by_id,
                     u.name as order_by_name,
+                    p.name as product_name,
                     os.name as order_status_name,
                     o.created_at as order_created_at,
                     oi.order_item_id AS item_id,
@@ -91,7 +92,8 @@ class OrderController
                 'item_category_name' => $row['item_category_name'],
                 'item_qty' => $row['item_qty'],
                 'item_price' => $row['item_price'],
-                'item_total_amt' => $row['item_total_amt']
+                'item_total_amt' => $row['item_total_amt'],
+                'product_name' => $row['product_name']
             ];
         }
 
