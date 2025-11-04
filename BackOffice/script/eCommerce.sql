@@ -34,6 +34,8 @@ CREATE TABLE users (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    phonenumber varchar(25) ,
+    Address varchar(250),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
