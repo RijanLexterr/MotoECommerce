@@ -47,7 +47,18 @@
             <a class="nav-link text-light" href="#!/orders"><i class="fas fa-pen-square me-1"></i>Orders</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-light" href="#!/paymentType"><i class="fas fa-pen-square me-1"></i>Payment Type</a>
+            <a class="nav-link text-light" href="#!/paymentType"><i class="fas fa-money-check"></i>Payment Type</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-light" href="#" id="ratesDropdown" role="button"
+              data-bs-toggle="dropdown">
+              <i class="fas fa-dolly-flatbed"></i>Rates
+            </a>
+            <ul class="dropdown-menu">
+              <li ng-repeat="type in ['Municipality', 'Barangay']">
+                <a class="dropdown-item" ng-href="#!/rates/{{type}}">{{ type }}</a>
+              </li>
+            </ul>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle text-light" href="#" id="reportsDropdown" role="button"

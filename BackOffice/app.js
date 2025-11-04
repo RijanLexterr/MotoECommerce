@@ -75,6 +75,13 @@ app.config(function ($routeProvider) {
         auth: checkAuth
       }
     })
+    .when("/rates/:view", {
+      templateUrl: "view/rates.html",
+      controller: "RatesController",
+      resolve: {
+        auth: checkAuth
+      }
+    })
     .otherwise({
       redirectTo: "/login"
     });
