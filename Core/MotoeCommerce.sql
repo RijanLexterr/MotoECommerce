@@ -42,12 +42,31 @@ CREATE TABLE users (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+     phonenumber varchar(25) ,
+    Address varchar(250),
     failed_attempts INT DEFAULT 0,
     last_failed_login DATETIME DEFAULT NULL,
     is_locked BOOLEAN DEFAULT FALSE,
     image_loc VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE Muni (
+    Muni_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Muni_Name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Barangay (
+    Brgy_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Brgy_Name VARCHAR(100) NOT NULL,
+    Muni_ID INT NOT NULL,
+    Rates DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
 
 -- USER SHIPPING DETAILS
 CREATE TABLE user_shipping_details (
@@ -60,6 +79,10 @@ CREATE TABLE user_shipping_details (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_default_address INT,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    Brgy_ID INT NOT NULL,
+    Muni_ID INT NOT NULL,    
+    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
+    FOREIGN KEY (Brgy_ID) REFERENCES Barangay(Brgy_ID)
 );
 
 -- USER ↔ ROLE (junction table for many-to-many)
@@ -139,6 +162,7 @@ CREATE TABLE orders (
     user_shipping_id INT NULL,
     payment_type_id INT NULL,
     payment_img VARCHAR(255) NULL, -- Path to payment image
+    
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (status_id) REFERENCES order_status(status_id),
     FOREIGN KEY (user_shipping_id) REFERENCES user_shipping_details(user_shipping_id),

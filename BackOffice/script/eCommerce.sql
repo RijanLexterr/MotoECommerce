@@ -162,7 +162,13 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
-
+CREATE TABLE ForgotPassword (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    code VARCHAR(100) NOT NULL,
+    isValid TINYINT(1) DEFAULT 1, -- 1 = valid, 0 = used or expired
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 -- ======================
 -- SAMPLE DATA
 -- ======================
