@@ -54,6 +54,20 @@
                   ng-class="{'is-invalid': showErrors && !user.email}">
                 <div class="text-danger" ng-show="showErrors && !user.email">Valid email is required.</div>
               </div>
+			  
+			   <!-- Phone Number -->
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" class="form-control" ng-model="user.phonenumber"
+				 ng-class="{'is-invalid': showErrors && !user.phonenumber}">
+              </div>
+			  
+			  <!-- Address -->
+              <div class="form-group">
+                <label>Address</label>
+                <input type="text" class="form-control" ng-model="user.Address"
+				 ng-class="{'is-invalid': showErrors && !user.Address}">
+              </div>
 
               <!-- Password Section -->
               <div class="row" style="margin-bottom:15px;">

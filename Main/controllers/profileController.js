@@ -36,6 +36,8 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
           $scope.user = {
             name: $scope.currentUser.name,
             email: $scope.currentUser.email,
+			phonenumber: $scope.currentUser.phonenumber,
+            Address: $scope.currentUser.Address,
             oldPassword: '',
             newPassword: '',
             confirmPassword: ''
@@ -113,6 +115,8 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     let request = {
       name: $scope.currentUser.name,
       email: $scope.currentUser.email,
+	  phonenumber: $scope.user.phonenumber,
+      Address: $scope.user.Address,
       password: $scope.user.newPassword || $scope.currentUser.password,
     };
 
@@ -135,6 +139,8 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     let request = {
       name: $scope.user.name,
       email: $scope.user.email,
+	  phonenumber: $scope.user.phonenumber,
+      Address: $scope.user.Address,
       password: $scope.currentUser.password,
     };
 

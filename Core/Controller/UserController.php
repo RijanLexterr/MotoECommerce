@@ -49,13 +49,15 @@ class UserController
 
         // First insert into users
         $stmt = $this->db->prepare("
-        INSERT INTO users (name, email, password, created_at)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO users (name, email, phonenumber, Address, password, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
         $stmt->bind_param(
-            "ssss",
+            "ssssss",
             $data['name'],
             $data['email'],
+			$data['phonenumber'],
+            $data['Address'],
             $data['password'],
             $created_at
         );
@@ -105,7 +107,7 @@ class UserController
         $total = $countResult->fetch_assoc()['total'];
 
         // Get paginated data
-        $query = "SELECT a.user_id as user_id, a.name, a.email, a.password, b.role_id, c.name as role_name  
+        $query = "SELECT a.user_id as user_id, a.name, a.email, a.phonenumber, a.Address, a.password, b.role_id, c.name as role_name  
                 FROM users a 
                 JOIN user_roles b ON a.user_id = b.user_id 
                 JOIN roles c ON b.role_id = c.role_id
@@ -165,7 +167,7 @@ class UserController
 
     public function readOne($id)
     {
-        $stmt = $this->db->prepare("SELECT a.user_id as user_id, a.name, a.email, a.password, b.role_id, c.name as role_name  FROM users a 
+        $stmt = $this->db->prepare("SELECT a.user_id as user_id, a.name, a.email, a.phonenumber, a.Address, a.password, b.role_id, c.name as role_name  FROM users a 
         JOIN user_roles b ON a.user_id = b.user_id JOIN roles c ON b.role_id = c.role_id WHERE a.user_id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -239,10 +241,10 @@ class UserController
         // Update user info only
         $stmt = $this->db->prepare("
         UPDATE users
-        SET name = ?, email = ?, password = ?
+        SET name = ?, email = ?, phonenumber = ?, Address = ?, password = ?
         WHERE user_id = ?
     ");
-        $stmt->bind_param("sssi", $data['name'], $data['email'], $data['password'], $id);
+        $stmt->bind_param("sssssi", $data['name'], $data['email'], $data['phonenumber'], $data['Address'], $data['password'], $id);
 
         if ($stmt->execute()) {
             echo json_encode([

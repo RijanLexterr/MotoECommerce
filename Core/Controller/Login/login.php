@@ -50,7 +50,7 @@ if ($conn->connect_error) {
 }
 
 // Fetch user with lockout fields
-$stmt = $conn->prepare("SELECT u.user_id, u.name, u.email, u.password, u.failed_attempts, u.last_failed_login, u.is_locked, r.name as role FROM users u
+$stmt = $conn->prepare("SELECT u.user_id, u.name, u.email, u.phonenumber, u.Address, u.password, u.failed_attempts, u.last_failed_login, u.is_locked, r.name as role FROM users u
 JOIN user_roles ur ON ur.user_id = u.user_id JOIN roles r ON r.role_id = ur.role_id WHERE u.email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -91,6 +91,8 @@ if ($user) {
       'user_id' => $user['user_id'],
       'name' => $user['name'],
       'email' => $user['email'],
+	  'phonenumber' => $user['phonenumber'],
+      'Address' => $user['Address'],
       'role' => $user['role']
     ];
     // Reset failed attempts

@@ -1,20 +1,24 @@
 app.controller("SignUpController", function ($scope, $http, $location, $rootScope) {
 
   class User {
-    constructor(id = 0, name = "", email = "", password = "", role = "") {
+    constructor(id = 0, name = "", email = "", phonenumber = "", Address = "", password = "", role = "") {
       this.id = id;
       this.name = name;
       this.email = email;
+	  this.phonenumber = phonenumber;
+      this.Address = Address;
       this.password = password
       this.role_id = role;;
     }
   }
 
-  $scope.updateUserFields = function (id = null, name = null, email = null, password = null, confirmPassword = null) {
+  $scope.updateUserFields = function (id = null, name = null, email = null, phonenumber = null, Address = null, password = null, confirmPassword = null) {
     clearError();
     $scope.userId = id;
     $scope.name = name;
     $scope.email = email;
+	$scope.phonenumber = phonenumber;
+    $scope.Address = Address;
     $scope.password = password;
     $scope.confirmPassword = confirmPassword;
   }
@@ -69,7 +73,7 @@ app.controller("SignUpController", function ($scope, $http, $location, $rootScop
     let isValid = (!$scope.nameHasError && !$scope.emailHasError && !$scope.passwordHasError && !$scope.confirmPasswordHasError)
 
     if (isValid) {
-      let user = new User(id, $scope.name, $scope.email, $scope.password, $scope.role.role_id)
+      let user = new User(id, $scope.name, $scope.email, $scope.phonenumber, $scope.Address, $scope.password, $scope.role.role_id)
       if (!id) {
         createUser(user)
       } else {
