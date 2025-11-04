@@ -212,7 +212,7 @@ $scope.changePageSize = function() {
           console.error("Error fetching data:", error);
         });
     }
-    
+	
     $scope.deleteUserOnClick = function(id) {
         $scope.userIdForDelete = id;
     }

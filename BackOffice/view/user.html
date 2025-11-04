@@ -58,7 +58,7 @@
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select" id="role" ng-change="validateRole()" ng-model="selectedUserRoleId"
-                        ng-options="role.role_id as role.name for role in roles">
+                        ng-options="role.role_id as role.name for role in roles | filter:{name:'!Customer'}">
                         <option value="">-- Select Role --</option>
                     </select>
                     <span ng-show="selectedUserRoleIdHasError" style="color: red; font-size: 0.9em;">
