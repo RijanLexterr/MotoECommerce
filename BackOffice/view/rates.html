@@ -1,0 +1,263 @@
+<div class="add-btn-container d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <input class="form-control" type="text" placeholder="search" ng-model="searchQuery">
+    </div>
+    <div ng-show="userView === 'Municipality'">
+        <button type="button" class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#MuniCreateModal">
+            <i class="fa fa-plus"></i>
+            Add Municipality
+        </button>
+    </div>
+    <div ng-show="userView === 'Barangay'">
+        <button type="button" class="btn btn-primary btn-round ms-auto" data-bs-toggle="modal" data-bs-target="#BrgyCreateModal">
+            <i class="fa fa-plus"></i>
+            Add Barangay
+        </button>
+    </div>
+</div>
+
+
+<div ng-show="userView === 'Municipality'">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>            
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="muni in munilist | filter:searchQuery">
+                <td>{{($index + 1) + ((pagination.page - 1) * pagination.limit)}}</td>
+                <td>{{muni.Muni_Name}}</td>
+                <td>
+                    <div class="action-btn-container">
+                        <div>
+                            <button type="button" class="btn btn-link btn-primary" ng-click="updateMuniOnClick(muni)" data-bs-toggle="modal" data-bs-target="#MuniCreateModal">
+                                <i class="fa fa-edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Update"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <button class="btn btn-link btn-danger" ng-click="deleteMuniOnClick(muni)" data-bs-toggle="modal" data-bs-target="#deleteMuniConfirmationModal">
+                                <i class="fa fa-times"  data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <!-- Pagination controls -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                <label>Show
+                    <select ng-model="pageSize" ng-change="changePageSize()"
+                        ng-options="s for s in [5,10,25,50]"></select>
+                    entries
+                </label>
+            </div>
+
+            <div>
+                <button class="btn btn-sm btn-outline-primary" ng-disabled="pagination.page === 1"
+                    ng-click="loadTransactions(pagination.page - 1)">
+                    Prev
+                </button>
+
+                Page {{pagination.page}} of {{pagination.totalPages}}
+
+                <button class="btn btn-sm btn-outline-primary" ng-disabled="pagination.page === pagination.totalPages"
+                    ng-click="loadTransactions(pagination.page + 1)">next</button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteMuniConfirmationModal" tabindex="-1" aria-labelledby="deleteMuniConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteMuniConfirmationModalLabel">Delete Municipality</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the Municipality : {{muniNameForDelete}}?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary" ng-click="deleteMuniById()">Yes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Confirmation Modal-->
+    <div class="modal fade" id="MuniCreateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" ng-show="!muni.Muni_ID" id="MuniCreateModalLabel">Add Municipality</h5>
+				<h5 class="modal-title" ng-show="muni.Muni_ID" id="MuniCreateModalLabel">Edit Municipality</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" ng-click="updateMuniFields()" aria-label="Close" ></button>
+            </div>
+                <div class="modal-body">
+                    <div class="mb-3">	
+                        <label for="muni.Muni_Name" class="form-label">Municipality Name</label>
+                        <input type="text" class="form-control" id="muni.Muni_Name" ng-model="muni.Muni_Name" ng-blur="validateName()" placeholder="Enter Municipality Name">
+                        <span ng-show="nameHasError" style="color: red; font-size: 0.9em;">
+                            {{nameError}}
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" ng-click="updateMuniFields()">Cancel</button>
+                    <button ng-show="!muni.Muni_ID" type="button" class="btn btn-primary"  ng-click="submit()">Create</button>
+                    <button ng-show="muni.Muni_ID" type="button" class="btn btn-primary"  ng-click="submit()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div ng-show="userView === 'Barangay'">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Municipality Name</th> 
+                <th scope="col">Barangay Name</th>
+                <th scope="col">Rates</th>                 
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="brgy in bgrylist | filter:searchQuery">
+                <td>{{($index + 1) + ((pagination.page - 1) * pagination.limit)}}</td>
+                <td>{{brgy.Muni_Name}}</td>
+                <td>{{brgy.Brgy_Name}}</td>
+                <td>{{brgy.Rates}}</td>
+                <td>
+                    <div class="action-btn-container">
+                        <div>
+                            <button type="button" class="btn btn-link btn-primary" ng-click="updateBrgyOnClick(brgy)" data-bs-toggle="modal" data-bs-target="#BrgyCreateModal">
+                                <i class="fa fa-edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Update"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <button class="btn btn-link btn-danger" ng-click="deleteBrgyOnClick(brgy)" data-bs-toggle="modal" data-bs-target="#deleteBrgyConfirmationModal">
+                                <i class="fa fa-times"  data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <!-- Pagination controls -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                <label>Show
+                    <select ng-model="pageSize" ng-change="changePageSize()"
+                        ng-options="s for s in [5,10,25,50]"></select>
+                    entries
+                </label>
+            </div>
+
+            <div>
+                <button class="btn btn-sm btn-outline-primary" ng-disabled="pagination.page === 1"
+                    ng-click="loadTransactions(pagination.page - 1)">
+                    Prev
+                </button>
+
+                Page {{pagination.page}} of {{pagination.totalPages}}
+
+                <button class="btn btn-sm btn-outline-primary" ng-disabled="pagination.page === pagination.totalPages"
+                    ng-click="loadTransactions(pagination.page + 1)">next</button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteBrgyConfirmationModal" tabindex="-1" aria-labelledby="deleteBrgyConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteBrgyConfirmationModalLabel">Delete Barangay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the Barangay and its Rates : {{brgyNameForDelete}}?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary" ng-click="deleteBrgyById()">Yes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Brgy Modal -->
+    <div class="modal fade" id="BrgyCreateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"    
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" ng-show="!brgy.Brgy_ID" id="BrgyCreateModalLabel">Add Barangay</h5>
+                    <h5 class="modal-title" ng-show="brgy.Brgy_ID" id="BrgyCreateModalLabel">Edit Barangay</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" ng-click="updateBrgyFields()"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="municipality" class="form-label">Municipality</label>
+                        <select class="form-select" id="municipality" ng-change="validateMunicipality()"
+                            ng-model="brgy.Muni_ID"
+                            ng-options="municipality.Muni_ID as municipality.Muni_Name for municipality in muniAlllist">
+                            <option value="">-- Select Municipality --</option>
+                        </select>
+                        <span ng-show="selectedMuniIdHasError" style="color: red; font-size: 0.9em;">
+                            Municipality is required.
+                        </span>
+                    </div> 
+                    <div class="mb-3">
+                        <label for="brgy.Brgy_Name" class="form-label">Barangay Name</label>
+                        <input type="text" class="form-control" id="brgy.Brgy_Name" ng-model="brgy.Brgy_Name"
+                            ng-blur="validateBrgyName()" placeholder="Enter Barangay Name">
+                        <span ng-show="nameBrgyHasError" style="color: red; font-size: 0.9em;">
+                            {{nameBrgyError}}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Rates" class="form-label">Rates</label>
+                        <input type="text" class="form-control" id="decimalInput" ng-model="brgy.Rates"
+                            ng-blur="validatePrice()" placeholder="Enter Price">
+                        <span ng-show="priceHasError" style="color: red; font-size: 0.9em;">
+                            {{priceError}}
+                        </span>
+                    </div> 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        ng-click="updateBrgyFields()">Cancel</button>
+                    <button ng-show="!brgy.Brgy_ID" type="button" class="btn btn-primary"
+                        ng-click="submitBrgy()">Create</button>
+                    <button ng-show="brgy.Brgy_ID" type="button" class="btn btn-primary"
+                        ng-click="submitBrgy()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    
+</div>

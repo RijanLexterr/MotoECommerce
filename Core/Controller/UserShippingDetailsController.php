@@ -237,6 +237,268 @@ class UserShippingDetailsController {
         }
     }
 
+    // READ ALL Municipalities
+    public function getAllMunicipalities() 
+	{		
+		$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $offset = ($page - 1) * $limit;
+
+        // Get total count
+        $countResult = $this->db->query("SELECT COUNT(*) as total FROM muni");
+        $total = $countResult->fetch_assoc()['total'];
+
+        // Get paginated data
+        $query = "SELECT *   
+                FROM muni 
+                ORDER BY 1 
+                LIMIT $limit OFFSET $offset";
+
+        $result = $this->db->query($query);
+        $data = [];
+
+        while ($row = $result->fetch_assoc()) 
+		{
+            $data[] = $row;
+        }
+
+        echo json_encode([
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total,
+            'data' => $data
+        ]);		
+    }
+
+    public function readAllMunicipalities()
+    {
+        $result = $this->db->query("SELECT * FROM muni ORDER BY Muni_Name ASC");
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        echo json_encode([
+            'data' => $data
+        ]);
+    }
+
+    public function createMunicipality() 
+	{
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        $stmt = $this->db->prepare("
+            INSERT INTO muni (Muni_Name)
+            VALUES (?)");
+
+        $stmt->bind_param(
+            "s",
+            $data['Muni_Name']
+        );
+
+        if ($stmt->execute()) 
+		{
+            echo json_encode([
+				"status" => "success",
+                "message" => "Municipality is created",
+                "id" => $this->db->insert_id
+            ]);
+        } 
+		else 
+		{
+            echo json_encode(["status" => "error", "message" => $stmt->error]);
+        }
+    }
+
+    // UPDATE Brand
+    public function updateMunicipality($id) 
+	{
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        $stmt = $this->db->prepare("
+            UPDATE muni 
+            SET Muni_Name = ? 
+            WHERE Muni_ID = ?
+        ");
+
+        $stmt->bind_param(
+            "si",
+            $data['Muni_Name'],
+            $id
+        );
+
+        if ($stmt->execute()) 
+		{
+            echo json_encode([
+			"status" => "success",
+			"message" => "Municipality is updated"]);
+        } 
+		else 
+		{
+            echo json_encode(["status" => "error", "message" => $stmt->error]);
+        }
+    }
+
+    public function deleteMunicipality($id) 
+	{
+        $stmt = $this->db->prepare("DELETE FROM muni WHERE Muni_ID = ?");
+        $stmt->bind_param("i", $id);
+
+        if ($stmt->execute()) 
+		{
+            echo json_encode([
+			"status" => "success",
+			"message" => "Municipality is deleted"]);
+        } 
+		else 
+		{
+            echo json_encode(["status" => "error", "message" => $stmt->error]);
+        }
+    }
+
+    public function getByMunicipalityName($muni_name,$id) 
+	{		
+		$stmt = $this->db->prepare("SELECT * FROM muni WHERE Muni_Name = ? and Muni_ID <> ?");
+        $stmt->bind_param("si", $muni_name, $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $brandname = $result->fetch_assoc();
+
+        if ($brandname) {
+            echo json_encode(["isExisting" => true]);
+        } else {
+            echo json_encode(["isExisting" => false]);
+        }
+    }
+
+    // READ ALL Barangay
+    public function getAllBrgyWithRates() 
+	{		
+		$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+        $offset = ($page - 1) * $limit;
+
+        // Get total count
+        $countResult = $this->db->query("SELECT COUNT(*) as total FROM barangay");
+        $total = $countResult->fetch_assoc()['total'];
+
+        // Get paginated data
+        $query = "SELECT m.Muni_ID, m.Muni_Name, b.Brgy_ID, b.Brgy_Name, b.Rates   
+                FROM barangay b
+                JOIN muni m on m.Muni_ID = b.Muni_ID 
+                ORDER BY 2, 4
+                LIMIT $limit OFFSET $offset";
+
+        $result = $this->db->query($query);
+        $data = [];
+
+        while ($row = $result->fetch_assoc()) 
+		{
+            $data[] = $row;
+        }
+
+        echo json_encode([
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $total,
+            'data' => $data
+        ]);		
+    }
+
+    public function createBarangay() 
+	{
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        $stmt = $this->db->prepare("
+            INSERT INTO barangay (Muni_ID, Brgy_Name, Rates)
+            VALUES (?, ?, ?)");
+
+         $stmt->bind_param(
+            "isd",
+            $data['Muni_ID'],
+            $data['Brgy_Name'],
+            $data['Rates']
+        );
+
+        if ($stmt->execute()) 
+		{
+            echo json_encode([
+				"status" => "success",
+                "message" => "Barangay is created",
+                "id" => $this->db->insert_id
+            ]);
+        } 
+		else 
+		{
+            echo json_encode(["status" => "error", "message" => $stmt->error]);
+        }
+    }
+
+    public function updateBarangay($id)
+    {
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        $stmt = $this->db->prepare("
+            UPDATE barangay
+            SET Muni_ID = ?, Brgy_Name = ?, Rates = ? 
+            WHERE Brgy_ID = ?
+        ");
+
+        $stmt->bind_param(
+            "isdi",
+            $data['Muni_ID'],
+            $data['Brgy_Name'],
+            $data['Rates'],
+            $id
+        );
+
+        if ($stmt->execute()) 
+		{
+            echo json_encode([
+			"status" => "success",
+			"message" => "Barangay is updated"]);
+        } 
+		else 
+		{
+            echo json_encode(["status" => "error", "message" => $stmt->error]);
+        }
+    }
+
+    public function deleteBarangay($id) 
+	{
+        $stmt = $this->db->prepare("DELETE FROM barangay WHERE Brgy_ID = ?");
+        $stmt->bind_param("i", $id);
+
+        if ($stmt->execute()) 
+		{
+            echo json_encode([
+			"status" => "success",
+			"message" => "Barangay is deleted"]);
+        } 
+		else 
+		{
+            echo json_encode(["status" => "error", "message" => $stmt->error]);
+        }
+    }
+
+    public function getByBarangayName($brgy_name,$id) 
+	{		
+		$stmt = $this->db->prepare("SELECT * FROM barangay WHERE Brgy_Name = ? and Brgy_ID <> ?");
+        $stmt->bind_param("si", $brgy_name, $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $brandname = $result->fetch_assoc();
+
+        if ($brandname) {
+            echo json_encode(["isExisting" => true]);
+        } else {
+            echo json_encode(["isExisting" => false]);
+        }
+    }
+
 }
 
 
@@ -268,6 +530,39 @@ if (isset($_GET['action'])) {
             break;
         case 'getByUserId':
 			$controller->getByUserId($_GET['user_id'] ?? 0);
+            break;
+        case "getAllMunicipalities":
+            $controller->getAllMunicipalities(); //with paging
+            break;
+        case "readAllMunicipalities":
+            $controller->readAllMunicipalities(); //with no paging
+            break;
+        case 'createMunicipality':
+            $controller->createMunicipality();
+            break;
+        case 'updateMunicipality':
+            $controller->updateMunicipality($_GET['id'] ?? 0);
+            break;
+        case 'deleteMunicipality':
+            $controller->deleteMunicipality($_GET['id'] ?? 0);
+            break;
+        case 'getByMunicipalityName':
+			$controller->getByMunicipalityName($_GET['muni_name'] ?? "", $_GET['id'] ?? 0);
+            break;
+        case "getAllBrgyWithRates":
+            $controller->getAllBrgyWithRates();
+            break;
+        case 'createBarangay':
+            $controller->createBarangay();
+            break;
+        case 'updateBarangay':
+            $controller->updateBarangay($_GET['id'] ?? 0);
+            break;      
+        case 'deleteBarangay':
+            $controller->deleteBarangay($_GET['id'] ?? 0); 
+            break;
+         case 'getByBarangayName':
+			$controller->getByBarangayName($_GET['brgy_name'] ?? "", $_GET['id'] ?? 0);
             break;
         // case 'readByFilter':
         //     $controller->readByFilter($_GET['categoryIds'] ?? "0", $_GET['brandIds'] ?? "0");
