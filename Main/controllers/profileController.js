@@ -413,5 +413,39 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
         console.error("Error marking as received:", error);
       });
   };
+  $scope.forcePrefix = function () {
+    let input = $scope.usershippingdetail.phonenumber || '';
+
+    // Always start with +63
+    if (!input.startsWith('+63')) {
+      input = '+63 ' + input.replace(/^\+?63/, '').trim();
+    }
+
+    // Remove non-digit characters except +
+    let numbers = input.replace(/\D/g, '');
+    if (numbers.startsWith('63')) numbers = numbers.slice(2);
+    numbers = numbers.slice(0, 10); // Limit to 10 digits
+
+    // Format like +63 912 345 6789
+    let formatted = '+63';
+    if (numbers.length > 0) formatted += ' ' + numbers.slice(0, 3);
+    if (numbers.length > 3) formatted += ' ' + numbers.slice(3, 6);
+    if (numbers.length > 6) formatted += ' ' + numbers.slice(6, 10);
+
+    $scope.usershippingdetail.phonenumber = formatted;
+  };
+
+  $scope.validatePhoneNumber = function () {
+    const val = $scope.usershippingdetail.phonenumber || '';
+    let digits = val.replace(/\D/g, '');
+    if (digits.startsWith('63')) digits = digits.slice(2);
+    $scope.PhoneNumberHasError = digits.length !== 10;
+    return !$scope.PhoneNumberHasError;
+  };
+
+
+  $scope.usershippingdetail = {
+    phonenumber: '+63'
+  };
 
 });
