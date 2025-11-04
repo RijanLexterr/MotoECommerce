@@ -78,10 +78,10 @@ CREATE TABLE user_shipping_details (
     postalcode VARCHAR(10) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_default_address INT,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     Brgy_ID INT NOT NULL,
     Muni_ID INT NOT NULL,    
-    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
+    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID),
     FOREIGN KEY (Brgy_ID) REFERENCES Barangay(Brgy_ID)
 );
 
