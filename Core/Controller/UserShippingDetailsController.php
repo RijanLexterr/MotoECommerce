@@ -130,9 +130,11 @@ class UserShippingDetailsController {
 	{		
 		$stmt = $this->db->prepare("
             SELECT u.User_id, u.Name, u.Email, us.User_Shipping_id, us.FullName, us.PhoneNumber, us.Address, us.PostalCode, 
-                    CASE WHEN us.Is_Default_Address = 1 THEN 1 ELSE 0 END as IsDefault
+                    CASE WHEN us.Is_Default_Address = 1 THEN 1 ELSE 0 END as IsDefault, us.Muni_ID, m.Muni_Name, us.Brgy_ID, b.Brgy_Name, b.Rates
             FROM users u
                 LEFT JOIN user_shipping_details us on u.user_id = us.user_id
+                LEFT JOIN muni m on m.Muni_ID = us.Muni_ID
+                LEFT JOIN barangay b on b.Brgy_ID = us.Brgy_ID
             WHERE u.user_id = ?
         ");
 
@@ -163,7 +165,12 @@ class UserShippingDetailsController {
                     'PhoneNumber' => $row['PhoneNumber'],
                     'Address' => $row['Address'],
                     'PostalCode' => $row['PostalCode'],
-                    'IsDefault' => $row['IsDefault']
+                    'IsDefault' => $row['IsDefault'],
+                    'Muni_ID' => $row['Muni_ID'],
+                    'Muni_Name' => $row['Muni_Name'],
+                    'Brgy_ID' => $row['Brgy_ID'],
+                    'Brgy_Name' => $row['Brgy_Name'],
+                    'Rates' => $row['Rates'],
                 ];
             }
         }

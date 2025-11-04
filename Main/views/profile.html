@@ -441,7 +441,8 @@
 
                         <hr>
                         <div class="text-right">
-                          <h5>Total: ₱{{ getTotal(order.items) | number:2 }}</h5>
+                          <h5>Shipping Fee: ₱{{ order.shipRates | number:2 }}</h5>
+                          <h5>Total: ₱{{ getTotal(order.items, order.shipRates) | number:2 }}</h5>
                         </div>
                       </div>
                     </div>
@@ -493,7 +494,8 @@
                         <hr>
                         <div class="row">
                           <div class="col-xs-6 text-left">
-                            <h5>Total: ₱{{ getTotal(order.items) | number:2 }}</h5>
+                            <h5>Shipping Fee: ₱{{ order.shipRates | number:2 }}</h5>
+                            <h5>Total: ₱{{ getTotal(order.items, order.shipRates) | number:2 }}</h5>
                           </div>
                           <div class="col-xs-6 text-right">
                             <button class="btn btn-primary btn-sm" ng-click="markAsReceived(order)">Received</button>
@@ -553,7 +555,8 @@
 
                         <hr>
                         <div class="text-right">
-                          <h5>Total: ₱{{ getTotal(order.items) | number:2 }}</h5>
+                          <h5>Shipping Fee: ₱{{ order.shipRates | number:2 }}</h5>
+                          <h5>Total: ₱{{ getTotal(order.items, order.shipRates) | number:2 }}</h5>
                         </div>
 
                       </div>

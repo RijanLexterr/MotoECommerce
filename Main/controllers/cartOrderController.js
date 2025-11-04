@@ -131,12 +131,25 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
 
             if (defaultAddress) {
               $scope.selectedAddressId = defaultAddress.ShippingId;
+              $scope.shipRates = defaultAddress.Rates;
+              console.log('Ship Rates: ', $scope.shipRates);
             }
           }
         }
       })
       .catch((err) => console.error("Error loading user addresses:", err));
   }
+
+  $scope.onAddressChange = function(selectedId) {
+    console.log('New selected address:', selectedId);
+    $scope.selectedAddressId = selectedId;
+
+    let user = $scope.userWithAddresses[parseInt($scope.currentUser.user_id)];
+    let shipDetail = user.Addresses.find(a => a.ShippingId === selectedId);
+
+    $scope.shipRates = shipDetail.Rates;
+    console.log('Ship Rates: ', $scope.shipRates);
+  };
 
   // 📦 Quantity controls
   $scope.increaseQty = function (item) {
@@ -149,7 +162,16 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
 
   // 🧮 Total
   $scope.getTotal = function () {
-    return $scope.addedtoCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    if (!$scope.addedtoCart || !$scope.addedtoCart.length) return 0;
+
+    let totalItems = $scope.addedtoCart.reduce((sum, item) => {
+      const price = parseFloat(item.price) || 0;
+      const quantity = parseFloat(item.quantity) || 0;
+      return sum + (price * quantity);
+    }, 0);
+
+    const shipping = parseFloat($scope.shipRates) || 0;
+    return totalItems + shipping;
   };
 
   $scope.proceedCheckOut = function () {

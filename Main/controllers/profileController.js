@@ -184,10 +184,16 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
       });
   }
 
-  $scope.getTotal = function (items) {
-    return items.reduce(function (sum, item) {
-      return sum + parseFloat(item.item_total_amt);
+  $scope.getTotal = function (items, shippingRate) {
+    if (!items || !items.length) return parseFloat(shippingRate) || 0;
+
+    // Sum all item totals
+    let totalItems = items.reduce(function (sum, item) {
+      return sum + parseFloat(item.item_total_amt || 0);
     }, 0);
+
+    // Add shipping rate once
+    return totalItems + (parseFloat(shippingRate) || 0);
   };
 
   $scope.searchQuery = "";

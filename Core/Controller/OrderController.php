@@ -122,7 +122,8 @@ class OrderController
                     oi.qty as item_qty,
                     oi.price as item_price,
                     ifnull((oi.qty * oi.price), 0) as item_total_amt,
-                    p.image_location as imageLoc
+                    p.image_location as imageLoc,
+                    IFNULL(bb.Rates, 0.00) as Rates
              FROM orders o
                 left join order_items oi ON o.order_id = oi.order_id
                 left join products p on p.product_id = oi.product_id
@@ -130,6 +131,8 @@ class OrderController
                 left join categories c on c.category_id = p.category_id
                 left join order_status os on os.status_id = o.status_id
                 left join users u on u.user_id = o.user_id
+                left join user_shipping_details us on us.user_shipping_id = o.user_shipping_id
+                left join barangay bb on bb.Brgy_ID = us.Brgy_ID
             WHERE o.user_id = ? ORDER BY 1, 5");
 
         $stmt->bind_param("i", $id);
@@ -150,6 +153,7 @@ class OrderController
                     'order_status_name' => $row['order_status_name'],
                     'order_created_at' => $row['order_created_at'],
                     'showChildren' => false,
+                    'shipRates' => $row['Rates'],
                     'items' => [] // Initialize items array
                 ];
             }
