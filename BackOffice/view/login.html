@@ -27,6 +27,11 @@
                 <a class="text-white-50" href="#!">Forgot password?</a>
               </p> -->
 
+          <!-- Error Message -->
+          <div class="error" style="padding: 5px" ng-if="error">
+            {{ error }}
+          </div>
+
 
               <!-- Login button -->
               <div ng-show="!isForgotPW">

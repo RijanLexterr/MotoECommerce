@@ -31,7 +31,7 @@ app.controller('LoginController', function($scope, $http, $location) {
     if (!valid) return;
 
 
-    $http.post('../Core/Controller/Login/login.php', {
+    $http.post('../Core/Controller/Login/bofficelogin.php', {
       email: $scope.username,
       password: $scope.password
     }).then(function(response) {
