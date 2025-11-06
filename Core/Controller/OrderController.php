@@ -78,6 +78,7 @@ class OrderController
                     'showChildren' => false,
                     'paymentType' => $row['paymentType'],
                     'paymentImg' => $row['payment_img'],
+                    'product_name' => $row['product_name'],
                     'items' => [] // Initialize items array
                 ];
             }
@@ -212,35 +213,45 @@ class OrderController
     // UPDATE Order Status
     public function updateOrderStatus($id)
     {
+        // Read JSON payload
         $rawData = file_get_contents("php://input");
         $data = json_decode($rawData, true);
-        $statusId = 3;
+
+        // Get status ID from JSON or fallback to default (3)
+        $statusId = isset($data['status_id']) ? intval($data['status_id']) : 3;
         $created_at = date("Y-m-d H:i:s");
-        $transactionOutId = 2;
-        $remarks = "Shipped Item already";
 
+        // Optional: remarks or other tracking
+        $remarks = $data['remarks'] ?? "Order status updated";
+
+        // Prepare SQL update
         $stmt = $this->db->prepare("
-            UPDATE orders
-            SET status_id = ?,
-                shipped_at = ? 
-            WHERE order_id = ?
-        ");
+        UPDATE orders
+        SET status_id = ?,
+            shipped_at = ? 
+        WHERE order_id = ?
+    ");
 
-        $stmt->bind_param(
-            "isi",
-            $statusId,
-            $created_at,
-            $id
-        );
+        $stmt->bind_param("isi", $statusId, $created_at, $id);
 
         if ($stmt->execute()) {
-
-
-            echo json_encode(["status" => "success", "message" => "Order Status is updated"]);
+            echo json_encode([
+                "status" => "success",
+                "message" => "Order status updated successfully",
+                "data" => [
+                    "order_id" => $id,
+                    "status_id" => $statusId,
+                    "remarks" => $remarks
+                ]
+            ]);
         } else {
-            echo json_encode(["status" => "error", "message" => $stmt->error]);
+            echo json_encode([
+                "status" => "error",
+                "message" => $stmt->error
+            ]);
         }
     }
+
 
     // UPDATE Order Status
     public function tagReceived($id)
@@ -330,7 +341,7 @@ class OrderController
 
                     $stmt3->bind_param(
                         "iiiiss",
-                    $item['id'],
+                        $item['id'],
                         $data['user_id'],
                         $transactionOutId,
                         $item['quantity'],
@@ -419,6 +430,48 @@ class OrderController
 
     }
 
+    public function returnOrder($id)
+    {
+        // Read JSON payload from Angular
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        // Default values
+        $statusId = isset($data['status_id']) ? intval($data['status_id']) : 5; // 5 = Returned
+        $remarks = $data['remarks'] ?? "Order returned";
+        $created_at = date("Y-m-d H:i:s");
+
+        // Prepare SQL update
+        $stmt = $this->db->prepare("
+        UPDATE orders
+        SET status_id = ?, 
+            returnRemarks = ?, 
+            shipped_at = ? 
+        WHERE order_id = ?
+    ");
+
+        $stmt->bind_param("issi", $statusId, $remarks, $created_at, $id);
+
+        // Execute query
+        if ($stmt->execute()) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "Order has been marked as returned.",
+                "data" => [
+                    "order_id" => $id,
+                    "status_id" => $statusId,
+                    "remarks" => $remarks
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => $stmt->error
+            ]);
+        }
+    }
+
+
 }
 
 $controller = new OrderController($conn);
@@ -445,6 +498,9 @@ if (isset($_GET['action'])) {
             break;
         case 'uploadImage':
             $controller->uploadImage();
+            break;
+        case 'returnOrder':
+            $controller->returnOrder($_GET['id'] ?? 0);
             break;
         default:
             echo json_encode(["status" => "error", "message" => "Invalid action"]);

@@ -162,7 +162,7 @@ CREATE TABLE orders (
     user_shipping_id INT NULL,
     payment_type_id INT NULL,
     payment_img VARCHAR(255) NULL, -- Path to payment image
-    
+    returnRemarks varchar(600),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (status_id) REFERENCES order_status(status_id),
     FOREIGN KEY (user_shipping_id) REFERENCES user_shipping_details(user_shipping_id),
@@ -204,7 +204,7 @@ INSERT INTO roles (name) VALUES
 
 -- Order Status
 INSERT INTO order_status (name) VALUES
-('Pending'),('Paid'),('To Ship'),('Delivered'),('Completed');
+('Pending'),('Paid'),('To Ship'),('Delivered'),('Completed'),('Returned'),('Ready for Pick-up');
 
 -- Transaction Types
 INSERT INTO transaction_types (name) VALUES
@@ -213,7 +213,8 @@ INSERT INTO transaction_types (name) VALUES
 -- Payment Types
 INSERT INTO payment_types (name, is_active) VALUES
 ('Cash on Delivery', 1),
-('GCash', 1);
+('GCash/Maya', 1),
+('Store Pick-up', 1);
 
 
 -- Users
@@ -272,9 +273,6 @@ INSERT INTO products (brand_id, category_id, name, description, price, stock, ex
 (1, 1, 'Yamaha Engine Oil 1L', 'Fully synthetic 10W-40 motorcycle oil', 600.00, 200, '2027-06-01'),
 (2, 1, 'Honda Brake Fluid 500ml', 'DOT 4 high-performance brake fluid', 350.00, 150, '2026-12-01'),
 (3, 1, 'Kawasaki Coolant 1L', 'Long-life premixed coolant', 450.00, 100, '2028-01-01');
-
-
-
 
 -- Order Items
 INSERT INTO order_items (order_id, product_id, qty, price) VALUES
