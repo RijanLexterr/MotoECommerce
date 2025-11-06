@@ -36,7 +36,7 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
           $scope.user = {
             name: $scope.currentUser.name,
             email: $scope.currentUser.email,
-			phonenumber: $scope.currentUser.phonenumber,
+            phonenumber: $scope.currentUser.phonenumber,
             Address: $scope.currentUser.Address,
             oldPassword: '',
             newPassword: '',
@@ -115,7 +115,7 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     let request = {
       name: $scope.currentUser.name,
       email: $scope.currentUser.email,
-	  phonenumber: $scope.user.phonenumber,
+      phonenumber: $scope.user.phonenumber,
       Address: $scope.user.Address,
       password: $scope.user.newPassword || $scope.currentUser.password,
     };
@@ -139,7 +139,7 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     let request = {
       name: $scope.user.name,
       email: $scope.user.email,
-	  phonenumber: $scope.user.phonenumber,
+      phonenumber: $scope.user.phonenumber,
       Address: $scope.user.Address,
       password: $scope.currentUser.password,
     };
@@ -233,8 +233,8 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
           });
 
 
-        
-        
+
+
       })
       .catch(function (error) {
         console.error("Error fetching data:", error);
@@ -242,12 +242,12 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
   }
 
   $scope.validateMunicipality = function () {
-		$scope.selectedMuniIdHasError = !$scope.usershippingdetail.Muni_ID;
-	}
+    $scope.selectedMuniIdHasError = !$scope.usershippingdetail.Muni_ID;
+  }
 
-   $scope.validateBarangay = function () {
-		$scope.selectedBrgyIdHasError = !$scope.usershippingdetail.Brgy_ID;
-	}
+  $scope.validateBarangay = function () {
+    $scope.selectedBrgyIdHasError = !$scope.usershippingdetail.Brgy_ID;
+  }
 
   getAllUserShippingDetails();
 
@@ -408,6 +408,7 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     toShip: {},
     toReceive: {},
     completed: {}, // <-- added completed section
+    forchecking: {}, // <-- added completed section
   };
 
   // Check if panel is open
@@ -495,4 +496,101 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
     phonenumber: '+63'
   };
 
+
+  $scope.reUpload = function (orderId) {
+    console.log(orderId);
+    const fileInput = document.getElementById('imageInput');
+    const files = fileInput ? fileInput.files : [];
+    let uploadedFile = null;
+
+    // If payment type is Gcash/Maya (2), make image required
+    if ($scope.paymentType == 2) {
+      if (!files || files.length === 0) {
+        alert('Payment transaction proof is required!');
+        return;
+      }
+    }
+
+    // Validate file type if uploaded
+    if (files && files.length > 0) {
+      uploadedFile = files[0];
+
+      if (!uploadedFile.type.startsWith('image/')) {
+        alert('It is not an image file.');
+        return;
+      }
+    }
+
+    // ✅ Upload payment proof image if provided
+    if (uploadedFile) {
+      const formData = new FormData();
+      formData.append('order_id', orderId);
+      formData.append('image', uploadedFile); // ✅ Include the actual file
+      formData.append('image_location', "");
+
+      $http.post('../Core/Controller/OrderController.php?action=uploadImage', formData, {
+        headers: { 'Content-Type': undefined }
+      }).then(function (res) {
+        $scope.tagaspending(orderId);
+        console.log('Upload success:', res.data);
+      }, function (error) {
+        console.error('Upload failed:', error);
+      });
+    }
+
+  }
+
+  $scope.tagaspending = function (orderid) {
+    const payload = {
+      status_id: 1, // or dynamically set this (e.g., shipped = 3, delivered = 4)
+      remarks: "Pending"
+    };
+
+    $http.post(
+      "../Core/Controller/OrderController.php?action=returnOrder&id=" + orderid,
+      payload
+    )
+      .then(function (response) {
+        if (response.data.status === "success") {
+          // Close modal
+          $('#paymentProofModal').modal('hide');
+          $('.modal-backdrop').remove(); // remove transparent overlay manually
+
+          // Refresh transaction list
+          readAll();
+
+
+        } else {
+          console.error("Error:", response.data.message);
+        }
+      })
+      .catch(function (error) {
+        console.error("Error shipping order:", error);
+      });
+  };
+
+
 });
+
+
+app.directive('fileInput', ['$parse', function ($parse) {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var model = $parse(attrs.fileInput);
+      element.bind('change', function () {
+        scope.$apply(function () {
+          model.assign(scope, element[0].files[0]);
+          // preview
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            scope.$apply(function () {
+              scope.previewImage = e.target.result;
+            });
+          };
+          reader.readAsDataURL(element[0].files[0]);
+        });
+      });
+    }
+  };
+}]);

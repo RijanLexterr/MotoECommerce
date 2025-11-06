@@ -54,19 +54,19 @@
                   ng-class="{'is-invalid': showErrors && !user.email}">
                 <div class="text-danger" ng-show="showErrors && !user.email">Valid email is required.</div>
               </div>
-			  
-			   <!-- Phone Number -->
+
+              <!-- Phone Number -->
               <div class="form-group">
                 <label>Phone Number</label>
                 <input type="text" class="form-control" ng-model="user.phonenumber"
-				 ng-class="{'is-invalid': showErrors && !user.phonenumber}">
+                  ng-class="{'is-invalid': showErrors && !user.phonenumber}">
               </div>
-			  
-			  <!-- Address -->
+
+              <!-- Address -->
               <div class="form-group">
                 <label>Address</label>
                 <input type="text" class="form-control" ng-model="user.Address"
-				 ng-class="{'is-invalid': showErrors && !user.Address}">
+                  ng-class="{'is-invalid': showErrors && !user.Address}">
               </div>
 
               <!-- Password Section -->
@@ -211,25 +211,25 @@
                     <div class="form-group">
                       <label for="municipality">Municipality</label>
                       <select class="input-select" id="municipality" ng-change="validateMunicipality()"
-                            ng-model="usershippingdetail.Muni_ID"
-                            ng-options="municipality.Muni_ID as municipality.Muni_Name for municipality in muniAlllist">
-                            <option value="">-- Select Municipality --</option>
-                        </select>
-                        <span ng-show="selectedMuniIdHasError" style="color: red; font-size: 0.9em;">
-                            Municipality is required.
-                        </span>
+                        ng-model="usershippingdetail.Muni_ID"
+                        ng-options="municipality.Muni_ID as municipality.Muni_Name for municipality in muniAlllist">
+                        <option value="">-- Select Municipality --</option>
+                      </select>
+                      <span ng-show="selectedMuniIdHasError" style="color: red; font-size: 0.9em;">
+                        Municipality is required.
+                      </span>
                     </div>
 
                     <div class="form-group">
                       <label for="barangay">Barangay</label>
                       <select class="input-select" id="barangay" ng-change="validateBarangay()"
-                            ng-model="usershippingdetail.Brgy_ID"
-                            ng-options="barangay.Brgy_ID as barangay.Brgy_Name for barangay in brgyAlllist | filter:{Muni_ID: usershippingdetail.Muni_ID}">
-                            <option value="">-- Select Barangay --</option>
-                        </select>
-                        <span ng-show="selectedBrgyIdHasError" style="color: red; font-size: 0.9em;">
-                            Barangay is required.
-                        </span>
+                        ng-model="usershippingdetail.Brgy_ID"
+                        ng-options="barangay.Brgy_ID as barangay.Brgy_Name for barangay in brgyAlllist | filter:{Muni_ID: usershippingdetail.Muni_ID}">
+                        <option value="">-- Select Barangay --</option>
+                      </select>
+                      <span ng-show="selectedBrgyIdHasError" style="color: red; font-size: 0.9em;">
+                        Barangay is required.
+                      </span>
                     </div>
 
 
@@ -383,6 +383,9 @@
 
               <!-- Tabs -->
               <ul class="nav nav-tabs" style="margin-bottom:20px;">
+                <li ng-class="{active: activeTab === 'forchecking'}">
+                  <a ng-click="activeTab = 'forchecking'" style="cursor:pointer;">For Checking</a>
+                </li>
                 <li ng-class="{active: activeTab === 'toShip'}">
                   <a ng-click="activeTab = 'toShip'" style="cursor:pointer;">To Ship</a>
                 </li>
@@ -398,7 +401,140 @@
               <div ng-init="toShipOrders = (orders | filter:{order_status_name: 'Pending'})"></div>
               <div ng-init="toReceiveOrders = (orders | filter:{order_status_name: 'Shipped'})"></div>
               <div ng-init="completedOrders = (orders | filter:{order_status_name: 'Paid'})"></div>
+              <div ng-init="forChecking = (orders | filter:{order_status_name: 'Returned'})"></div>
 
+
+
+              <!-- for checking -->
+
+              <div ng-show="activeTab === 'forchecking'">
+
+                <div ng-if="forChecking.length === 0" class="text-center text-muted" style="margin-top:20px;">
+                  <p>No orders to ship at the moment.</p>
+                </div>
+
+                <div class="panel-group" id="forcheckingAcco">
+                  <div class="panel panel-default"
+                    ng-repeat="order in orders | filter:{order_status_name: 'Returned'} track by $index">
+                    <div class="panel-heading">
+                      <h4 class="panel-title">
+                        <a href="" ng-click="togglePanel('forchecking', $index, $event)"
+                          ng-class="{'collapsed': !isPanelOpen('forchecking', $index)}"
+                          aria-expanded="{{ isPanelOpen('forchecking', $index) ? 'true' : 'false' }}"
+                          style="cursor:pointer; display:block;">
+                          Order #{{ order.order_id }}
+                          <span class="pull-right"><i class="fa"
+                              ng-class="{'fa-chevron-up': isPanelOpen('forchecking',$index), 'fa-chevron-down': !isPanelOpen('forchecking',$index)}"></i></span>
+                        </a>
+                      </h4>
+                    </div>
+
+                    <div class="panel-collapse collapse" ng-class="{'in': isPanelOpen('forchecking', $index)}">
+                      <div class="panel-body">
+                        <div class="row" ng-repeat="item in order.items" style="margin-bottom:15px;">
+                          <div class="col-sm-3">
+                            <img style="max-width: 100px;max-height: 100px;"
+                              ng-src="{{ (item.item_img_loc ? ('../BackOffice/uploads/' + item.item_img_loc) : 'assets/img/default.jpg') }}"
+                              class="img-responsive img-thumbnail" alt="{{ item.item_brand_name }}">
+                          </div>
+                          <div class="col-sm-6">
+                            <h5>{{ item.item_brand_name }} - {{ item.item_category_name }}</h5>
+                            <p class="text-muted">Qty: {{ item.item_qty }} × ₱{{ item.item_price }}</p>
+                          </div>
+                          <div class="col-sm-3 text-right">
+                            <strong>₱{{ item.item_total_amt | number:2 }}</strong>
+                          </div>
+                        </div>
+
+                        <hr>
+                        <div class="row">
+                          <!-- Left: Image -->
+                          <div class="col-md-9 text-left">
+                            <img
+                              ng-src="{{ (order.img ? ('../BackOffice/uploads/' + order.img) : 'assets/img/default.jpg') }}"
+                              alt="Proof of Payment" class="img-thumbnail"
+                              style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;"
+                              data-toggle="modal" data-target="#paymentProofModal">
+
+                            <p class="text-muted small mt-2">Click image to review payment</p>
+                          </div>
+
+                          <!-- Payment Proof Modal -->
+                          <div class="modal fade" id="paymentProofModal" tabindex="-1" role="dialog"
+                            aria-labelledby="paymentProofModalLabel">
+                            <div class="modal-dialog modal-lg" role="document">
+                              <div class="modal-content">
+
+                                <!-- Modal Header -->
+                                <div class="modal-header bg-primary" style="color: white;">
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                  <h4 class="modal-title" id="paymentProofModalLabel">
+                                    <i class="glyphicon glyphicon-credit-card"></i> Payment Proof Review
+                                  </h4>
+                                </div>
+
+                                <!-- Modal Body -->
+                                <div class="modal-body text-center">
+
+                                  <!-- Current Proof -->
+                                  <h5>Current Payment Proof</h5>
+                                  <img
+                                    ng-src="{{ (order.img ? ('../BackOffice/uploads/' + order.img) : 'assets/img/default.jpg') }}"
+                                    alt="Full Payment Proof" class="img-responsive center-block img-thumbnail"
+                                    style="max-height: 300px;">
+
+                                  <p class="mt-3 text-muted">
+                                    File: <strong>{{ order.img || 'No file uploaded' }}</strong>
+                                  </p>
+
+                                  <hr>
+
+                                  <!-- Re-Upload Section -->
+                                  <h5>Re-upload Payment Proof</h5>
+                                  <input id="imageInput" type="file" accept="image/*" file-input="newPaymentImage"
+                                    class="form-control" />
+                                  <p class="text-muted small mt-2">Select a new image file to replace your proof of
+                                    payment.</p>
+
+                                  <!-- New Preview -->
+                                  <div ng-if="previewImage">
+                                    <h6>Preview:</h6>
+                                    <img ng-src="{{ previewImage }}" class="img-responsive center-block img-thumbnail"
+                                      style="max-height: 200px;">
+                                  </div>
+
+                                </div>
+                                <!-- Modal Footer -->
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-success" ng-click="reUpload(order.order_id)">
+                                    <i class="glyphicon glyphicon-ok-circle" data-dismiss="modal"></i> Re-submit
+                                  </button>
+                                  <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">
+                                    <i class="glyphicon glyphicon-share-alt"></i> Cancel
+                                  </button>
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Right: Shipping & Total -->
+                          <div class="col-md-3 text-right">
+                            <h5>Shipping Fee: ₱{{ order.shipRates | number:2 }}</h5>
+                            <h4 class="text-primary"><strong>Total: ₱{{ getTotal(order.items, order.shipRates) |
+                                number:2 }}</strong></h4>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ENBD -->
               <!-- ===================== TO SHIP ===================== -->
               <div ng-show="activeTab === 'toShip'">
                 <h4>To Ship</h4>
@@ -408,7 +544,8 @@
                 </div>
 
                 <div class="panel-group" id="toShipAccordion">
-                  <div class="panel panel-default" ng-repeat="order in orders | filter:{order_status_name: 'Pending'} track by $index">
+                  <div class="panel panel-default"
+                    ng-repeat="order in orders | filter:{order_status_name: 'Pending'} track by $index">
                     <div class="panel-heading">
                       <h4 class="panel-title">
                         <a href="" ng-click="togglePanel('toShip', $index, $event)"
@@ -449,6 +586,8 @@
                   </div>
                 </div>
               </div>
+
+
 
               <!-- ===================== TO RECEIVE ===================== -->
               <div ng-show="activeTab === 'toReceive'">

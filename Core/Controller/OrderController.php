@@ -114,6 +114,7 @@ class OrderController
         $stmt = $this->db->prepare("SELECT o.order_id AS order_id,o.user_id as order_by_id, u.name as order_by_name,
                     os.name as order_status_name,
                     o.created_at as order_created_at,
+                    o.payment_img as payment_img,
                     oi.order_item_id AS item_id,
                     p.product_id as item_product_id,
                     b.brand_id as item_brand_id,
@@ -155,6 +156,8 @@ class OrderController
                     'order_created_at' => $row['order_created_at'],
                     'showChildren' => false,
                     'shipRates' => $row['Rates'],
+                    'img' => $row['payment_img'],
+
                     'items' => [] // Initialize items array
                 ];
             }

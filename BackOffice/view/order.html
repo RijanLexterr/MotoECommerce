@@ -159,7 +159,7 @@
                         </div>
 
                         <!-- Buttons -->
-                        <div class="d-flex justify-content-center gap-3 mt-4" ng-show="!selectedParent.paymentImg">
+                        <div class="d-flex justify-content-center gap-3 mt-4" ng-show="selectedParent.paymentImg && selectedParent.order_status_name ==='Pending'">
                             <button class="btn btn-success btn-lg px-4 shadow-sm rounded-pill" ng-click="Verify()"
                                 data-bs-dismiss="modal" data-bs-target="#shippedOrderConfirmationModal">
                                 <i class="bi bi-check-circle me-2"></i> Verify

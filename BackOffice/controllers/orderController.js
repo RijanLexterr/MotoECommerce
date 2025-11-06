@@ -7,7 +7,7 @@ app.controller("OrderController", function ($scope, $http) {
     page: 1,
     totalPages: 1
   };
-  $scope.returnRemarks="";
+  $scope.returnRemarks = "";
   getAllTransactions();
 
   function getAllTransactions(page = 1, limit = $scope.pageSize) {
@@ -99,6 +99,8 @@ app.controller("OrderController", function ($scope, $http) {
       .then(function (response) {
         if (response.data.status === "success") {
           $('#returnOrder').modal('hide');
+         
+
           getAllTransactions();
           $scope.returnRemarks = ""; // clear textarea
         } else {
