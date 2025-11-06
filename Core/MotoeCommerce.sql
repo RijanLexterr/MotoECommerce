@@ -52,17 +52,17 @@ CREATE TABLE users (
 );
 
 
-CREATE TABLE Muni (
+CREATE TABLE muni (
     Muni_ID INT AUTO_INCREMENT PRIMARY KEY,
     Muni_Name VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Barangay (
+CREATE TABLE barangay (
     Brgy_ID INT AUTO_INCREMENT PRIMARY KEY,
     Brgy_Name VARCHAR(100) NOT NULL,
     Muni_ID INT NOT NULL,
     Rates DECIMAL(10,2) DEFAULT 0.00,
-    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
+    FOREIGN KEY (Muni_ID) REFERENCES muni(Muni_ID)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
@@ -81,8 +81,8 @@ CREATE TABLE user_shipping_details (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     Brgy_ID INT NOT NULL,
     Muni_ID INT NOT NULL,    
-    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID),
-    FOREIGN KEY (Brgy_ID) REFERENCES Barangay(Brgy_ID)
+    FOREIGN KEY (Muni_ID) REFERENCES muni(Muni_ID),
+    FOREIGN KEY (Brgy_ID) REFERENCES barangay(Brgy_ID)
 );
 
 -- USER ↔ ROLE (junction table for many-to-many)
@@ -163,6 +163,7 @@ CREATE TABLE orders (
     payment_type_id INT NULL,
     payment_img VARCHAR(255) NULL, -- Path to payment image
     returnRemarks varchar(600),
+    rates DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (status_id) REFERENCES order_status(status_id),
     FOREIGN KEY (user_shipping_id) REFERENCES user_shipping_details(user_shipping_id),
@@ -297,19 +298,19 @@ INSERT INTO inventory_transactions (product_id, user_id, type_id, qty, remarks) 
 
 INSERT INTO Muni (Muni_Name) VALUES
 ('San Pedro, Laguna'),
-('Biñan, Laguna'),
+('Binan, Laguna'),
 ('Santa Rosa, Laguna'),
 ('Muntinlupa City');
 
 -- ========================================
--- Seed Data for Barangay
+-- Seed Data for barangay
 -- ========================================
 
 -- San Pedro, Laguna (Muni_ID = 1)
-INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
+INSERT INTO barangay (Brgy_Name, Muni_ID, Rates) VALUES
 ('San Antonio', 1, 10.50),
 ('Landayan', 1, 11.00),
-('Santo Niño', 1, 9.75),
+('Santo Nino', 1, 9.75),
 ('Fatima', 1, 10.25),
 ('Nueva', 1, 9.50),
 ('Cuyab', 1, 10.00),
@@ -319,7 +320,7 @@ INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
 ('Magsaysay', 1, 10.30);
 
 -- Biñan, Laguna (Muni_ID = 2)
-INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
+INSERT INTO barangay (Brgy_Name, Muni_ID, Rates) VALUES
 ('Sto. Domingo', 2, 11.50),
 ('San Antonio', 2, 10.75),
 ('Dela Paz', 2, 9.85),
@@ -332,7 +333,7 @@ INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
 ('Malaban', 2, 10.40);
 
 -- Santa Rosa, Laguna (Muni_ID = 3)
-INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
+INSERT INTO barangay (Brgy_Name, Muni_ID, Rates) VALUES
 ('Balibago', 3, 11.80),
 ('Market Area', 3, 11.25),
 ('Dila', 3, 10.60),
@@ -345,7 +346,7 @@ INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
 ('Ibaba', 3, 9.85);
 
 -- Muntinlupa City (Muni_ID = 4)
-INSERT INTO Barangay (Brgy_Name, Muni_ID, Rates) VALUES
+INSERT INTO barangay (Brgy_Name, Muni_ID, Rates) VALUES
 ('Alabang', 4, 12.50),
 ('Ayala Alabang', 4, 13.00),
 ('Bayanan', 4, 11.20),

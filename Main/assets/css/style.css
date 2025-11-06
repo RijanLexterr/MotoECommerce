@@ -2329,3 +2329,31 @@ textarea.input {
 .btn-clear:hover {
   color: #333;
 }
+
+.address-item {
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: transparent; /* force no background */    
+  }
+
+  .address-item:hover {
+    border-color: #28a745;
+    box-shadow: 0 0 4px rgba(40, 167, 69, 0.3);
+    cursor: pointer;
+    background-color: transparent !important;
+  }
+
+  .address-item.active {
+    border-color: #28a745;
+    box-shadow: 0 0 6px rgba(40, 167, 69, 0.5);
+    background-color: transparent !important;
+  }
+
+  .check-icon {
+    font-size: 18px;
+    color: #28a745;
+    margin-right: 10px;
+  }

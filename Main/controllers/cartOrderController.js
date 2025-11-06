@@ -139,16 +139,51 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       })
       .catch((err) => console.error("Error loading user addresses:", err));
   }
+  
+  $scope.deliveryMethod = 'delivery'; // default
+  $scope.paymentType = null;
+  $scope.shipRates = 0;
+
+  $scope.selectDeliveryMethod = function(method) {
+    $scope.deliveryMethod = method;
+
+    if (method === 'pickup') {
+      $scope.shipRates = 0;
+      $scope.paymentType = null;
+    } else if ($scope.selectedAddressId) {
+      $scope.updateShippingRate();
+    }
+  };
+
+  $scope.selectAddress = function(id) {
+        $scope.selectedAddressId = id;
+        $scope.onAddressChange(id);
+        $scope.updateShippingRate();
+  };
 
   $scope.onAddressChange = function(selectedId) {
-    console.log('New selected address:', selectedId);
-    $scope.selectedAddressId = selectedId;
+    $timeout(function () {
+      let user = $scope.userWithAddresses[parseInt($scope.currentUser.user_id)];
+      let shipDetail = user.Addresses.find(a => a.ShippingId === selectedId);
+
+      if (shipDetail && $scope.deliveryMethod === 'delivery') {
+        $scope.shipRates = shipDetail.Rates;
+        console.log('Ship Rates: ', $scope.shipRates);
+      }
+    });
+  };
+
+  $scope.updateShippingRate = function() {
+    if ($scope.deliveryMethod !== 'delivery') {
+      $scope.shipRates = 0;
+      return;
+    }
 
     let user = $scope.userWithAddresses[parseInt($scope.currentUser.user_id)];
-    let shipDetail = user.Addresses.find(a => a.ShippingId === selectedId);
+    let addr = user.Addresses.find(a => a.ShippingId === $scope.selectedAddressId);
+    let baseRate = parseFloat(addr?.Rates) || 0;
 
-    $scope.shipRates = shipDetail.Rates;
-    console.log('Ship Rates: ', $scope.shipRates);
+    $scope.shipRates = $scope.paymentType === 1 ? baseRate : baseRate;
   };
 
   // 📦 Quantity controls
@@ -280,5 +315,4 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
         alert("Error placing order.");
       });
   };
-
 });
