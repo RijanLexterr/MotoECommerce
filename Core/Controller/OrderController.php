@@ -47,6 +47,7 @@ class OrderController
                     oi.price as item_price,
                     pt.name as paymentType,
                     o.payment_img,
+                     u.email as email,
                     ifnull((oi.qty * oi.price), 0) as item_total_amt
              FROM (
                 	select * from orders order by order_id, created_at LIMIT $limit OFFSET $offset
@@ -78,6 +79,8 @@ class OrderController
                     'showChildren' => false,
                     'paymentType' => $row['paymentType'],
                     'paymentImg' => $row['payment_img'],
+                    'email' => $row['email'],
+
                     'product_name' => $row['product_name'],
                     'items' => [] // Initialize items array
                 ];
@@ -111,7 +114,7 @@ class OrderController
     {
 
         // Fetch all orders with their items
-        $stmt = $this->db->prepare("SELECT o.order_id AS order_id,o.user_id as order_by_id, u.name as order_by_name,
+        $stmt = $this->db->prepare("SELECT o.order_id AS order_id,o.user_id as order_by_id, u.name as order_by_name, u.email as email,
                     os.name as order_status_name,
                     o.created_at as order_created_at,
                     o.payment_img as payment_img,
@@ -156,6 +159,7 @@ class OrderController
                     'order_created_at' => $row['order_created_at'],
                     'showChildren' => false,
                     'shipRates' => $row['Rates'],
+                    'email' => $row['email'],
                     'img' => $row['payment_img'],
 
                     'items' => [] // Initialize items array
