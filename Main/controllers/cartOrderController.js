@@ -4,7 +4,7 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
   // $scope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
   $scope.addedtoCart = [];
   $scope.userWithAddresses = [];
-  $scope.paymentType = 0;
+  $scope.paymentType = 1;
   if (sessionStorage.getItem('isLoggedIn') === 'true') {
     $rootScope.isLoggedIn = true;
     $scope.isLoggedIn = true;
@@ -43,7 +43,8 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
 
 
   // 🛒 Load cart items
-  function loadCart() {
+  function loadCart()   
+  {
     console.log("Loading cart from sessionStorage...");
 
     const productsOnCart = JSON.parse(sessionStorage.getItem('productsOnCart')) || [];
@@ -51,33 +52,7 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
     if (productsOnCart.length === 0) {
       console.warn("No products found in sessionStorage.");
       return;
-    }
-    $scope.isShowImage = false;
-    $scope.showImage = function (value) {
-      console.log(value);
-      if (value == 2) {
-        $scope.isShowImage = true;
-
-        $timeout(function () {
-          const imageInput = document.getElementById('imageInput');
-          const previewImage = document.getElementById('previewImage');
-
-          if (imageInput) {
-            imageInput.addEventListener('change', function (event) {
-              const file = event.target.files[0];
-              if (file) {
-                const imageURL = URL.createObjectURL(file);
-                previewImage.src = imageURL;
-                previewImage.style.display = 'block';
-              } else {
-                previewImage.src = '';
-                previewImage.style.display = 'none';
-              }
-            });
-          }
-        }, 0);
-      }
-    };
+    }    
 
     // Clear first
     $scope.addedtoCart = [];
@@ -112,6 +87,37 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
     });
   }
 
+  $scope.isShowImage = false;
+
+    $scope.showImage = function (value) {
+      console.log(value);
+      if (value == 2) {
+        $scope.isShowImage = true;
+
+        $timeout(function () {
+          const imageInput = document.getElementById('imageInput');
+          const previewImage = document.getElementById('previewImage');
+
+          if (imageInput) {
+            imageInput.addEventListener('change', function (event) {
+              const file = event.target.files[0];
+              if (file) {
+                const imageURL = URL.createObjectURL(file);
+                previewImage.src = imageURL;
+                previewImage.style.display = 'block';
+              } else {
+                previewImage.src = '';
+                previewImage.style.display = 'none';
+              }
+            });
+          }
+        }, 0);
+      } else
+      {
+        $scope.isShowImage = false;
+      }
+  };
+
   // 👤 Load addresses
   function loadUserInfo() {
 
@@ -139,16 +145,55 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       })
       .catch((err) => console.error("Error loading user addresses:", err));
   }
+  
+  $scope.deliveryMethod = 'delivery'; // default
+  $scope.shipRates = 0;
+
+  $scope.selectDeliveryMethod = function(method) {
+    $scope.deliveryMethod = method;
+
+    if (method === 'pickup') {
+      $scope.shipRates = 0;
+      $scope.paymentType = null;
+    } else if ($scope.selectedAddressId) {
+      $scope.updateShippingRate();
+    }
+  };
+
+  $scope.selectPaymentMethod = function(id) {
+    $scope.paymentType = id;
+    $scope.showImage(id);
+  };
+
+  $scope.selectAddress = function(id) {
+        $scope.selectedAddressId = id;
+        $scope.onAddressChange(id);
+        $scope.updateShippingRate();
+  };
 
   $scope.onAddressChange = function(selectedId) {
-    console.log('New selected address:', selectedId);
-    $scope.selectedAddressId = selectedId;
+    $timeout(function () {
+      let user = $scope.userWithAddresses[parseInt($scope.currentUser.user_id)];
+      let shipDetail = user.Addresses.find(a => a.ShippingId === selectedId);
+
+      if (shipDetail && $scope.deliveryMethod === 'delivery') {
+        $scope.shipRates = shipDetail.Rates;
+        console.log('Ship Rates: ', $scope.shipRates);
+      }
+    });
+  };
+
+  $scope.updateShippingRate = function() {
+    if ($scope.deliveryMethod !== 'delivery') {
+      $scope.shipRates = 0;
+      return;
+    }
 
     let user = $scope.userWithAddresses[parseInt($scope.currentUser.user_id)];
-    let shipDetail = user.Addresses.find(a => a.ShippingId === selectedId);
+    let addr = user.Addresses.find(a => a.ShippingId === $scope.selectedAddressId);
+    let baseRate = parseFloat(addr?.Rates) || 0;
 
-    $scope.shipRates = shipDetail.Rates;
-    console.log('Ship Rates: ', $scope.shipRates);
+    $scope.shipRates = $scope.paymentType === 1 ? baseRate : baseRate;
   };
 
   // 📦 Quantity controls
@@ -183,7 +228,7 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
     }
 
     // ✅ Validate payment type
-    if (!$scope.paymentType) {
+    if (!$scope.paymentType && $scope.deliveryMethod === 'delivery') {
       alert("Please select payment type!");
       return;
     }
@@ -217,6 +262,13 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       }
     }
 
+    let selPaymentType = 0;
+    if ($scope.deliveryMethod === 'pickup') {
+        selPaymentType = 3
+    }
+    else{
+      selPaymentType = $scope.paymentType;
+    }
 
     // ✅ Build order data
     const userId = parseInt($scope.currentUser.user_id);
@@ -226,7 +278,8 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
       user_shipping_id: $scope.selectedAddressId || null,
       total: $scope.getTotal(),
       items: $scope.addedtoCart,
-      payment_type_id: $scope.paymentType
+      payment_type_id: selPaymentType,
+      rates: $scope.shipRates
     };
 
     // ✅ Create the order first
@@ -280,5 +333,4 @@ app.controller("CartOrderController", function ($scope, $http, $rootScope, $loca
         alert("Error placing order.");
       });
   };
-
 });

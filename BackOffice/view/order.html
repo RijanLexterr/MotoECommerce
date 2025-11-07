@@ -34,11 +34,19 @@
                             </button>
                         </div>
                         <div>
-                            <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order.order_id)"
+                            <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order)"
                                 data-bs-toggle="modal" data-bs-target="#shippedOrderConfirmationModal"
-                                ng-show="order.order_status_name == 'Pending'">
+                                ng-show="order.order_status_name == 'Pending' && order.paymentType !== 'Store Pick-up'">
                                 <i class="fas fa-shipping-fast" data-bs-toggle="tooltip" data-bs-placement="top"
                                     title="Tag as Ship Order"></i>
+                            </button>
+                        </div>
+                        <div>                            
+                            <button class="btn btn-link btn-danger" ng-click="shippedOrderOnClick(order)"
+                                data-bs-toggle="modal" data-bs-target="#forPickupOrderConfirmationModal"
+                                ng-show="order.order_status_name == 'Pending' && order.paymentType === 'Store Pick-up'">
+                                <i class="fas fa-shopping-bag" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Tag as Ready for Pick-up"></i>
                             </button>
                         </div>
 
@@ -110,7 +118,6 @@
                             <tr>
                                 <th>Child Item ID</th>
                                 <th>Item</th>
-
                                 <th>Brand Name</th>
                                 <th>Category Name</th>
                                 <th>Quantity</th>
@@ -122,7 +129,8 @@
                             <tr ng-repeat="item in selectedParent.items">
                                 <td>{{ item.item_id }}</td>
                                 <td>{{ item.product_name }}</td>
-                                <td>{{ item.item_category_name }}</td>
+                                <td>{{ item.item_brand_name }}</td>
+                                <td>{{ item.item_category_name}}</td>
                                 <td>{{ item.item_qty }}</td>
                                 <td>₱{{ item.item_price | number:2 }}</td>
                                 <td>₱{{ item.item_total_amt | number:2 }}</td>
@@ -145,7 +153,7 @@
                             <div class="d-flex justify-content-center align-items-center flex-column">
                                 <img ng-src="{{ '../BackOffice/uploads/' + selectedParent.paymentImg }}"
                                     alt="Proof of Payment" class="img-fluid rounded shadow border"
-                                    style="min-width: 400px; min-height: 400px;  background-color: #f8f9fa; padding: 10px;">
+                                    style="min-width: 400px; min-height: 400px; background-color: #f8f9fa; padding: 10px;">
                                 <p class="mt-3 text-muted small">
                                     File: <span class="fw-semibold">{{ selectedParent.paymentImg }}</span>
                                 </p>
@@ -157,7 +165,21 @@
                             <i class="bi bi-exclamation-circle me-2"></i>
                             No proof of payment available.
                         </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-center gap-3 mt-4" ng-show="selectedParent.paymentImg && selectedParent.order_status_name ==='Pending'">
+                            <button class="btn btn-success btn-lg px-4 shadow-sm rounded-pill" ng-click="Verify()"
+                                data-bs-dismiss="modal" data-bs-target="#shippedOrderConfirmationModal">
+                                <i class="bi bi-check-circle me-2"></i> Verify
+                            </button>
+                            <button class="btn btn-outline-danger btn-lg px-4 shadow-sm rounded-pill"
+                                data-bs-toggle="modal" data-bs-target="#returnOrder">
+                                <i class="bi bi-arrow-return-left me-2"></i> Return
+                            </button>
+
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -179,6 +201,65 @@
                 <button type="button" class="btn btn-primary" ng-click="shippedOrder()">Yes</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="forPickupOrderConfirmationModal" tabindex="-1"
+    aria-labelledby="forPickupOrderConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forPickupOrderConfirmationModalLabel">Ready for Pick up Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to inform user that order is ready for pickup now?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" ng-click="forPickUpOrder()">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="returnOrder" tabindex="-1" aria-labelledby="returnOrderLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="returnOrderLabel">
+                    <i class="bi bi-arrow-return-left me-2"></i> Return Order
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <p class="fw-semibold mb-3">Please confirm if you want to return this order.</p>
+
+                <div class="form-group">
+                    <label for="returnRemarks" class="form-label fw-semibold">
+                        Remarks <span class="text-muted small">(optional)</span>
+                    </label>
+                    <textarea id="returnRemarks" class="form-control" rows="3" ng-model="returnRemarks"
+                        placeholder="Enter reason or remarks for returning this order..."></textarea>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger px-4" ng-click="returnOrder()">
+                    <i class="bi bi-arrow-return-left me-2"></i> Return
+                </button>
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i> Cancel
+                </button>
+            </div>
+
         </div>
     </div>
 </div>

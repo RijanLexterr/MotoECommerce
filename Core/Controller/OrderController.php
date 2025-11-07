@@ -47,6 +47,7 @@ class OrderController
                     oi.price as item_price,
                     pt.name as paymentType,
                     o.payment_img,
+                     u.email as email,
                     ifnull((oi.qty * oi.price), 0) as item_total_amt
              FROM (
                 	select * from orders order by order_id, created_at LIMIT $limit OFFSET $offset
@@ -78,6 +79,9 @@ class OrderController
                     'showChildren' => false,
                     'paymentType' => $row['paymentType'],
                     'paymentImg' => $row['payment_img'],
+                    'email' => $row['email'],
+
+                    'product_name' => $row['product_name'],
                     'items' => [] // Initialize items array
                 ];
             }
@@ -110,9 +114,10 @@ class OrderController
     {
 
         // Fetch all orders with their items
-        $stmt = $this->db->prepare("SELECT o.order_id AS order_id,o.user_id as order_by_id, u.name as order_by_name,
+        $stmt = $this->db->prepare("SELECT o.order_id AS order_id,o.user_id as order_by_id, u.name as order_by_name, u.email as email,
                     os.name as order_status_name,
                     o.created_at as order_created_at,
+                    o.payment_img as payment_img,
                     oi.order_item_id AS item_id,
                     p.product_id as item_product_id,
                     b.brand_id as item_brand_id,
@@ -123,7 +128,12 @@ class OrderController
                     oi.price as item_price,
                     ifnull((oi.qty * oi.price), 0) as item_total_amt,
                     p.image_location as imageLoc,
-                    IFNULL(bb.Rates, 0.00) as Rates
+                    IFNULL(o.Rates, 0.00) as Rates,
+                    case when o.payment_type_id = 1 then 'COD'
+                         when o.payment_type_id = 2 then 'GCASH/MAYA'
+                         when o.payment_type_id = 3 then 'Store Pick-up'
+                         else ''
+                    end as PaymentTypeMethod
              FROM orders o
                 left join order_items oi ON o.order_id = oi.order_id
                 left join products p on p.product_id = oi.product_id
@@ -154,6 +164,9 @@ class OrderController
                     'order_created_at' => $row['order_created_at'],
                     'showChildren' => false,
                     'shipRates' => $row['Rates'],
+                    'email' => $row['email'],
+                    'img' => $row['payment_img'],
+                    'paymentType' => $row['PaymentTypeMethod'],
                     'items' => [] // Initialize items array
                 ];
             }
@@ -212,35 +225,45 @@ class OrderController
     // UPDATE Order Status
     public function updateOrderStatus($id)
     {
+        // Read JSON payload
         $rawData = file_get_contents("php://input");
         $data = json_decode($rawData, true);
-        $statusId = 3;
+
+        // Get status ID from JSON or fallback to default (3)
+        $statusId = isset($data['status_id']) ? intval($data['status_id']) : 3;
         $created_at = date("Y-m-d H:i:s");
-        $transactionOutId = 2;
-        $remarks = "Shipped Item already";
 
+        // Optional: remarks or other tracking
+        $remarks = $data['remarks'] ?? "Order status updated";
+
+        // Prepare SQL update
         $stmt = $this->db->prepare("
-            UPDATE orders
-            SET status_id = ?,
-                shipped_at = ? 
-            WHERE order_id = ?
-        ");
+        UPDATE orders
+        SET status_id = ?,
+            shipped_at = ? 
+        WHERE order_id = ?
+    ");
 
-        $stmt->bind_param(
-            "isi",
-            $statusId,
-            $created_at,
-            $id
-        );
+        $stmt->bind_param("isi", $statusId, $created_at, $id);
 
         if ($stmt->execute()) {
-
-
-            echo json_encode(["status" => "success", "message" => "Order Status is updated"]);
+            echo json_encode([
+                "status" => "success",
+                "message" => "Order status updated successfully",
+                "data" => [
+                    "order_id" => $id,
+                    "status_id" => $statusId,
+                    "remarks" => $remarks
+                ]
+            ]);
         } else {
-            echo json_encode(["status" => "error", "message" => $stmt->error]);
+            echo json_encode([
+                "status" => "error",
+                "message" => $stmt->error
+            ]);
         }
     }
+
 
     // UPDATE Order Status
     public function tagReceived($id)
@@ -287,18 +310,19 @@ class OrderController
         $remarks = "Placed Item already";
 
         $stmt = $this->db->prepare("
-            INSERT INTO orders (user_id, status_id, total, created_at, user_shipping_id,payment_type_id)
-            VALUES (?, ?, ?, ?, ?,?)
+            INSERT INTO orders (user_id, status_id, total, created_at, user_shipping_id,payment_type_id,rates)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->bind_param(
-            "iidsii",
+            "iidsiid",
             $data['user_id'],
             $statusId,
             $data['total'],
             $created_at,
             $data['user_shipping_id'],
-            $data['payment_type_id']
+            $data['payment_type_id'],
+            $data['rates']
         );
 
         if ($stmt->execute()) {
@@ -330,7 +354,7 @@ class OrderController
 
                     $stmt3->bind_param(
                         "iiiiss",
-                    $item['id'],
+                        $item['id'],
                         $data['user_id'],
                         $transactionOutId,
                         $item['quantity'],
@@ -419,6 +443,89 @@ class OrderController
 
     }
 
+    public function returnOrder($id)
+    {
+        // Read JSON payload from Angular
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        // Default values
+        $statusId = isset($data['status_id']) ? intval($data['status_id']) : 5; // 5 = Returned
+        $remarks = $data['remarks'] ?? "Order returned";
+        $created_at = date("Y-m-d H:i:s");
+
+        // Prepare SQL update
+        $stmt = $this->db->prepare("
+            UPDATE orders
+            SET status_id = ?, 
+                returnRemarks = ?, 
+                shipped_at = ? 
+            WHERE order_id = ?
+        ");
+
+        $stmt->bind_param("issi", $statusId, $remarks, $created_at, $id);
+
+        // Execute query
+        if ($stmt->execute()) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "Order has been marked as returned.",
+                "data" => [
+                    "order_id" => $id,
+                    "status_id" => $statusId,
+                    "remarks" => $remarks
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => $stmt->error
+            ]);
+        }
+    }
+
+    public function readyPickUpOrder($id)
+    {
+        // Read JSON payload from Angular
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        // Default values
+        $statusId = isset($data['status_id']) ? intval($data['status_id']) : 7; // 7 = Ready for Pick-Up
+        $remarks = $data['remarks'] ?? "Order ready for Pick-up";
+        $created_at = date("Y-m-d H:i:s");
+
+        // Prepare SQL update
+        $stmt = $this->db->prepare("
+            UPDATE orders
+            SET status_id = ?, 
+                returnRemarks = ?, 
+                shipped_at = ? 
+            WHERE order_id = ?
+        ");
+
+        $stmt->bind_param("issi", $statusId, $remarks, $created_at, $id);
+
+        // Execute query
+        if ($stmt->execute()) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "Order has been marked as ready for pickup.",
+                "data" => [
+                    "order_id" => $id,
+                    "status_id" => $statusId,
+                    "remarks" => $remarks
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => $stmt->error
+            ]);
+        }
+    }
+
+
 }
 
 $controller = new OrderController($conn);
@@ -445,6 +552,12 @@ if (isset($_GET['action'])) {
             break;
         case 'uploadImage':
             $controller->uploadImage();
+            break;
+        case 'returnOrder':
+            $controller->returnOrder($_GET['id'] ?? 0);
+            break;
+        case 'readyPickUpOrder':
+            $controller->readyPickUpOrder($_GET['id'] ?? 0);
             break;
         default:
             echo json_encode(["status" => "error", "message" => "Invalid action"]);

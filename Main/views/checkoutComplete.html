@@ -1,20 +1,44 @@
 <div ng-controller="CheckOutCompleteController">
 
-    <div class="container text-center" style="margin-top: 100px;">
+    <div class="container text-center" style="margin-top: 100px;margin-bottom: 100px;">
         <!-- Success Message -->
-        <div ng-if="status === 'success'" class="panel panel-success">
+        <div class="panel panel-info">
             <div class="panel-heading">
-                <h2><span class="glyphicon glyphicon-ok-circle"></span> Thank You!</h2>
+                <h2 class="text-center">
+                    <span class="glyphicon glyphicon-ok-circle"></span> Order Submitted Successfully
+                </h2>
             </div>
-            <div class="panel-body">
-                <p class="lead">Your order has been placed successfully.</p>
-                <p>Order Number: <strong>#{{orderNumber}}</strong></p>
-                <p ng-if="cartCleared">Your cart was cleared after checkout.</p>
-                <a href="#/" class="btn btn-success">
+
+            <div class="panel-body text-center">
+                <p class="lead text-success">
+                    Thank you for your order!
+                </p>
+
+                <p class="text-muted">
+                    Your payment proof has been received and is now under review by our team.
+                </p>
+
+                <p>
+                    <strong>Order Number:</strong> <span class="text-primary">#{{orderNumber}}</span>
+                </p>
+
+                <p class="text-warning small">
+                    <i class="glyphicon glyphicon-time"></i> Please note:
+                    We will update your order status once the payment has been verified.
+                </p>
+
+                <p ng-if="cartCleared" class="text-muted">
+                    <i class="glyphicon glyphicon-shopping-cart"></i> Your cart has been cleared after checkout.
+                </p>
+
+                <hr>
+
+                <a href="#/" class="btn btn-success btn-lg">
                     <span class="glyphicon glyphicon-home"></span> Back to Home
                 </a>
             </div>
         </div>
+
 
         <!-- Error Message -->
         <div ng-if="status === 'error'" class="panel panel-danger">

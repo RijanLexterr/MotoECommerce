@@ -52,17 +52,17 @@ CREATE TABLE users (
 );
 
 
-CREATE TABLE Muni (
+CREATE TABLE muni (
     Muni_ID INT AUTO_INCREMENT PRIMARY KEY,
     Muni_Name VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Barangay (
+CREATE TABLE barangay (
     Brgy_ID INT AUTO_INCREMENT PRIMARY KEY,
     Brgy_Name VARCHAR(100) NOT NULL,
     Muni_ID INT NOT NULL,
     Rates DECIMAL(10,2) DEFAULT 0.00,
-    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID)
+    FOREIGN KEY (Muni_ID) REFERENCES muni(Muni_ID)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
@@ -81,8 +81,8 @@ CREATE TABLE user_shipping_details (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     Brgy_ID INT NOT NULL,
     Muni_ID INT NOT NULL,    
-    FOREIGN KEY (Muni_ID) REFERENCES Muni(Muni_ID),
-    FOREIGN KEY (Brgy_ID) REFERENCES Barangay(Brgy_ID)
+    FOREIGN KEY (Muni_ID) REFERENCES muni(Muni_ID),
+    FOREIGN KEY (Brgy_ID) REFERENCES barangay(Brgy_ID)
 );
 
 -- USER ↔ ROLE (junction table for many-to-many)
@@ -162,7 +162,8 @@ CREATE TABLE orders (
     user_shipping_id INT NULL,
     payment_type_id INT NULL,
     payment_img VARCHAR(255) NULL, -- Path to payment image
-    
+    returnRemarks varchar(600),
+    rates DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (status_id) REFERENCES order_status(status_id),
     FOREIGN KEY (user_shipping_id) REFERENCES user_shipping_details(user_shipping_id),
@@ -204,7 +205,7 @@ INSERT INTO roles (name) VALUES
 
 -- Order Status
 INSERT INTO order_status (name) VALUES
-('Pending'),('Paid'),('To Ship'),('Delivered'),('Completed');
+('Pending'),('Paid'),('To Ship'),('Delivered'),('Completed'),('Returned'),('Ready for Pick-up');
 
 -- Transaction Types
 INSERT INTO transaction_types (name) VALUES
@@ -213,7 +214,8 @@ INSERT INTO transaction_types (name) VALUES
 -- Payment Types
 INSERT INTO payment_types (name, is_active) VALUES
 ('Cash on Delivery', 1),
-('GCash', 1);
+('GCash/Maya', 1),
+('Store Pick-up', 1);
 
 
 -- Users
@@ -273,9 +275,6 @@ INSERT INTO products (brand_id, category_id, name, description, price, stock, ex
 (2, 1, 'Honda Brake Fluid 500ml', 'DOT 4 high-performance brake fluid', 350.00, 150, '2026-12-01'),
 (3, 1, 'Kawasaki Coolant 1L', 'Long-life premixed coolant', 450.00, 100, '2028-01-01');
 
-
-
-
 -- Order Items
 INSERT INTO order_items (order_id, product_id, qty, price) VALUES
 (1, 1, 1, 4500.00),
@@ -290,3 +289,70 @@ INSERT INTO inventory_transactions (product_id, user_id, type_id, qty, remarks) 
 (4, 1, 1, 100, 'Initial stock Milk'),
 (5, 1, 1, 15, 'Initial stock Headphones'),
 (6, 1, 1, 200, 'Initial stock Vitamins');
+
+
+
+-- ========================================
+-- Seed Data for Municipality
+-- ========================================
+
+INSERT INTO Muni (Muni_Name) VALUES
+('San Pedro, Laguna'),
+('Binan, Laguna'),
+('Santa Rosa, Laguna'),
+('Muntinlupa City');
+
+-- ========================================
+-- Seed Data for barangay
+-- ========================================
+
+-- San Pedro, Laguna (Muni_ID = 1)
+INSERT INTO barangay (Brgy_Name, Muni_ID, Rates) VALUES
+('San Antonio', 1, 10.50),
+('Landayan', 1, 11.00),
+('Santo Nino', 1, 9.75),
+('Fatima', 1, 10.25),
+('Nueva', 1, 9.50),
+('Cuyab', 1, 10.00),
+('Chrysanthemum', 1, 9.80),
+('San Vicente', 1, 11.25),
+('San Lorenzo Ruiz', 1, 9.90),
+('Magsaysay', 1, 10.30);
+
+-- Biñan, Laguna (Muni_ID = 2)
+INSERT INTO barangay (Brgy_Name, Muni_ID, Rates) VALUES
+('Sto. Domingo', 2, 11.50),
+('San Antonio', 2, 10.75),
+('Dela Paz', 2, 9.85),
+('Canlalay', 2, 10.10),
+('Langkiwa', 2, 10.20),
+('Poblacion', 2, 11.00),
+('Zapote', 2, 10.60),
+('San Francisco', 2, 9.95),
+('Platero', 2, 10.15),
+('Malaban', 2, 10.40);
+
+-- Santa Rosa, Laguna (Muni_ID = 3)
+INSERT INTO barangay (Brgy_Name, Muni_ID, Rates) VALUES
+('Balibago', 3, 11.80),
+('Market Area', 3, 11.25),
+('Dila', 3, 10.60),
+('Malitlit', 3, 10.75),
+('Macabling', 3, 9.95),
+('Tagapo', 3, 11.10),
+('Sinalhan', 3, 10.20),
+('Labas', 3, 10.50),
+('Aplaya', 3, 10.00),
+('Ibaba', 3, 9.85);
+
+-- Muntinlupa City (Muni_ID = 4)
+INSERT INTO barangay (Brgy_Name, Muni_ID, Rates) VALUES
+('Alabang', 4, 12.50),
+('Ayala Alabang', 4, 13.00),
+('Bayanan', 4, 11.20),
+('Buli', 4, 10.80),
+('Cupang', 4, 11.00),
+('Poblacion', 4, 10.90),
+('Putatan', 4, 11.10),
+('Sucat', 4, 11.40),
+('Tunasan', 4, 10.70);
