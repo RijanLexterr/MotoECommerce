@@ -234,7 +234,7 @@ $scope.changePageSize = function() {
 	 {
         // show only matching role
 		$scope.showAddUserButton = true;
-		if($scope.userView == "Customer") 
+		if($scope.userView == "Staff" || $scope.userView == "Customer") 
 		{
 			$scope.showAddUserButton = false;
 		}
