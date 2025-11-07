@@ -177,12 +177,33 @@ app.controller('ProfileController', function ($scope, $http, $location, $rootSco
         $scope.toShipOrders = allOrders.filter(o => o.order_status_name === 'Pending');
         $scope.toReceiveOrders = allOrders.filter(o => o.order_status_name === 'To Ship');
         $scope.completedOrders = allOrders.filter(o => o.order_status_name === 'Paid');
+        $scope.toCheckOrders = allOrders.filter(o => o.order_status_name === 'Returned');
+        $scope.toPickupOrders = allOrders.filter(o => o.order_status_name === 'Ready for Pick-up');
         $scope.orders = allOrders;
       })
       .catch(function (error) {
         console.error("Error fetching data:", error);
       });
   }
+
+  $scope.statusSwitchFilter = function(statusName) {
+  return function(order) {
+    switch (statusName) {
+      case 'Pending':
+        return order.order_status_name === 'Pending' && order.paymentType !== 'Store Pick-up';
+      case 'Shipped':
+        return order.order_status_name === 'Shipped';
+      case 'Paid':
+        return order.order_status_name === 'Paid';
+      case 'Returned':
+        return order.order_status_name === 'Returned';
+      case 'Ready for Pick-up':
+        return order.order_status_name === 'Ready for Pick-up' && order.paymentType === 'Store Pick-up';
+      default:
+        return false;
+    }
+  };
+};
 
   $scope.getTotal = function (items, shippingRate) {
     if (!items || !items.length) return parseFloat(shippingRate) || 0;

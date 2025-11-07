@@ -128,7 +128,12 @@ class OrderController
                     oi.price as item_price,
                     ifnull((oi.qty * oi.price), 0) as item_total_amt,
                     p.image_location as imageLoc,
-                    IFNULL(bb.Rates, 0.00) as Rates
+                    IFNULL(o.Rates, 0.00) as Rates,
+                    case when o.payment_type_id = 1 then 'COD'
+                         when o.payment_type_id = 2 then 'GCASH/MAYA'
+                         when o.payment_type_id = 3 then 'Store Pick-up'
+                         else ''
+                    end as PaymentTypeMethod
              FROM orders o
                 left join order_items oi ON o.order_id = oi.order_id
                 left join products p on p.product_id = oi.product_id
@@ -161,7 +166,7 @@ class OrderController
                     'shipRates' => $row['Rates'],
                     'email' => $row['email'],
                     'img' => $row['payment_img'],
-
+                    'paymentType' => $row['PaymentTypeMethod'],
                     'items' => [] // Initialize items array
                 ];
             }
@@ -305,18 +310,19 @@ class OrderController
         $remarks = "Placed Item already";
 
         $stmt = $this->db->prepare("
-            INSERT INTO orders (user_id, status_id, total, created_at, user_shipping_id,payment_type_id)
-            VALUES (?, ?, ?, ?, ?,?)
+            INSERT INTO orders (user_id, status_id, total, created_at, user_shipping_id,payment_type_id,rates)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->bind_param(
-            "iidsii",
+            "iidsiid",
             $data['user_id'],
             $statusId,
             $data['total'],
             $created_at,
             $data['user_shipping_id'],
-            $data['payment_type_id']
+            $data['payment_type_id'],
+            $data['rates']
         );
 
         if ($stmt->execute()) {
@@ -450,12 +456,12 @@ class OrderController
 
         // Prepare SQL update
         $stmt = $this->db->prepare("
-        UPDATE orders
-        SET status_id = ?, 
-            returnRemarks = ?, 
-            shipped_at = ? 
-        WHERE order_id = ?
-    ");
+            UPDATE orders
+            SET status_id = ?, 
+                returnRemarks = ?, 
+                shipped_at = ? 
+            WHERE order_id = ?
+        ");
 
         $stmt->bind_param("issi", $statusId, $remarks, $created_at, $id);
 
@@ -464,6 +470,47 @@ class OrderController
             echo json_encode([
                 "status" => "success",
                 "message" => "Order has been marked as returned.",
+                "data" => [
+                    "order_id" => $id,
+                    "status_id" => $statusId,
+                    "remarks" => $remarks
+                ]
+            ]);
+        } else {
+            echo json_encode([
+                "status" => "error",
+                "message" => $stmt->error
+            ]);
+        }
+    }
+
+    public function readyPickUpOrder($id)
+    {
+        // Read JSON payload from Angular
+        $rawData = file_get_contents("php://input");
+        $data = json_decode($rawData, true);
+
+        // Default values
+        $statusId = isset($data['status_id']) ? intval($data['status_id']) : 7; // 7 = Ready for Pick-Up
+        $remarks = $data['remarks'] ?? "Order ready for Pick-up";
+        $created_at = date("Y-m-d H:i:s");
+
+        // Prepare SQL update
+        $stmt = $this->db->prepare("
+            UPDATE orders
+            SET status_id = ?, 
+                returnRemarks = ?, 
+                shipped_at = ? 
+            WHERE order_id = ?
+        ");
+
+        $stmt->bind_param("issi", $statusId, $remarks, $created_at, $id);
+
+        // Execute query
+        if ($stmt->execute()) {
+            echo json_encode([
+                "status" => "success",
+                "message" => "Order has been marked as ready for pickup.",
                 "data" => [
                     "order_id" => $id,
                     "status_id" => $statusId,
@@ -508,6 +555,9 @@ if (isset($_GET['action'])) {
             break;
         case 'returnOrder':
             $controller->returnOrder($_GET['id'] ?? 0);
+            break;
+        case 'readyPickUpOrder':
+            $controller->readyPickUpOrder($_GET['id'] ?? 0);
             break;
         default:
             echo json_encode(["status" => "error", "message" => "Invalid action"]);

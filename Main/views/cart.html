@@ -176,13 +176,17 @@
 						<!-- Payment Method (only for delivery) -->
 						<div ng-if="deliveryMethod === 'delivery'" class="mt-4" style="padding-top:10px">
 							<label class="form-label fw-bold">Payment Method</label>
-							<div class="form-check">
-							<input class="form-check-input" type="radio" ng-model="paymentType" ng-value="1" ng-change="showImage(1)">
-							<label class="form-check-label">Cash on Delivery</label>
-							</div>
-							<div class="form-check">
-							<input class="form-check-input" type="radio" ng-model="paymentType" ng-value="2" ng-change="showImage(2)">
-							<label class="form-check-label">Gcash/Maya</label>
+							<div>
+								<div class="address-item"
+									ng-click="selectPaymentMethod(1)"
+									ng-class="{'active': paymentType === 1}">
+									Cash On Delivery
+								</div>
+								<div class="address-item"
+									ng-click="selectPaymentMethod(2)"
+									ng-class="{'active': paymentType === 2}">
+									Gcash/Maya
+								</div>
 							</div>
 							<div ng-if="isShowImage">
 								<form id="uploadForm" enctype="multipart/form-data">
@@ -193,7 +197,7 @@
 										style="width: 100px; height: 100px;">
 									<br>
 								</form>
-							</div>
+							</div>							
 						</div>
 
 
@@ -227,7 +231,16 @@
 									<br>
 								</form>
 							</div>
-						</div> -->
+						</div> 
+							<div class="form-check">
+							<input class="form-check-input" type="radio" ng-model="paymentType" ng-value="1" ng-change="showImage(1)">
+							<label class="form-check-label">Cash on Delivery</label>
+							</div>
+							<div class="form-check">
+							<input class="form-check-input" type="radio" ng-model="paymentType" ng-value="2" ng-change="showImage(2)">
+							<label class="form-check-label">Gcash/Maya</label>
+							</div>
+						-->
 
 
 					</div>
