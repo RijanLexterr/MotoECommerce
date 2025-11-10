@@ -17,19 +17,18 @@ class ProductController
         $data = json_decode($rawData, true);
 
         $stmt = $this->db->prepare("
-            INSERT INTO products (brand_id, category_id, name, description, price, stock,lowstock, expiration_date, created_at, image_location, is_promoted, new_price)
+            INSERT INTO products (brand_id, category_id, name, description, price, lowstock, expiration_date, created_at, image_location, is_promoted, new_price)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $created_at = date("Y-m-d H:i:s");
 
         $stmt->bind_param(
-            "iissdiisssid",
+            "iissdisssid",
             $data['brand_id'],
             $data['category_id'],
             $data['name'],
             $data['description'],
             $data['price'],
-            $data['stock'],
             $data['lowstock'],
             $data['expiration_date'],
             $created_at,
@@ -189,18 +188,17 @@ class ProductController
 
         $stmt = $this->db->prepare("
             UPDATE products
-            SET brand_id = ?, category_id = ?, name = ?, description = ?, price = ?, stock = ?,lowstock = ?, expiration_date = ?, is_promoted = ?, new_price = ? 
+            SET brand_id = ?, category_id = ?, name = ?, description = ?, price = ? ,lowstock = ?, expiration_date = ?, is_promoted = ?, new_price = ? 
             WHERE product_id = ?
         ");
 
         $stmt->bind_param(
-            "iissdiisidi",
+            "iissdisidi",
             $data['brand_id'],
             $data['category_id'],
             $data['name'],
             $data['description'],
             $data['price'],
-            $data['stock'],
             $data['lowstock'],
             $data['expiration_date'],
             $data['is_promoted'],
