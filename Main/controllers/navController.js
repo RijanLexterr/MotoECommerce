@@ -121,7 +121,7 @@ app.controller("NavController", function ($scope, $http, $location, $rootScope, 
       $("#logoutModal").modal("hide");
       $scope.$emit("isLoggedIn", false);
       // $scope.$emit("currentUser", currentUser);
-      // $location.path('/login');
+      $location.path('/login');
     });
   };
 

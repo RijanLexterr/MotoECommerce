@@ -389,6 +389,9 @@
                 <li ng-class="{active: activeTab === 'toShip'}">
                   <a ng-click="activeTab = 'toShip'" style="cursor:pointer;">To Ship</a>
                 </li>
+                <li ng-class="{active: activeTab === 'toPickUp'}">
+                  <a ng-click="activeTab = 'toPickUp'" style="cursor:pointer;">To Pick-Up</a>
+                </li>
                 <li ng-class="{active: activeTab === 'toReceive'}">
                   <a ng-click="activeTab = 'toReceive'" style="cursor:pointer;">To Receive</a>
                 </li>
@@ -398,19 +401,16 @@
               </ul>
 
               <!-- Initialize Filtered Arrays -->
-              <div ng-init="toShipOrders = (orders | filter:{order_status_name: 'Pending'})"></div>
-              <div ng-init="toReceiveOrders = (orders | filter:{order_status_name: 'Shipped'})"></div>
-              <div ng-init="completedOrders = (orders | filter:{order_status_name: 'Paid'})"></div>
-              <div ng-init="forChecking = (orders | filter:{order_status_name: 'Returned'})"></div>
-
-
-
+              <div ng-init="toShipOrders = (orders | filter:statusSwitchFilter('Pending'))"></div> 
+              <div ng-init="toReceiveOrders = (orders | filter:statusSwitchFilter('Shipped'))"></div>
+              <div ng-init="completedOrders = (orders | filter:statusSwitchFilter('Paid'))"></div>
+              <div ng-init="forChecking = (orders | filter:statusSwitchFilter('Returned'))"></div>
+              <div ng-init="forPickUpOrder = (orders | filter:statusSwitchFilter('Ready for Pick-up'))"></div>
+ 
               <!-- for checking -->
-
               <div ng-show="activeTab === 'forchecking'">
-
-                <div ng-if="forChecking.length === 0" class="text-center text-muted" style="margin-top:20px;">
-                  <p>No orders to ship at the moment.</p>
+                <div ng-if="toCheckOrders.length === 0" class="text-center text-muted" style="margin-top:20px;">
+                  <p>No orders to verify at the moment.</p>
                 </div>
 
                 <div class="panel-group" id="forcheckingAcco">
@@ -533,8 +533,8 @@
                   </div>
                 </div>
               </div>
-
               <!-- ENBD -->
+
               <!-- ===================== TO SHIP ===================== -->
               <div ng-show="activeTab === 'toShip'">
                 <h4>To Ship</h4>
@@ -587,7 +587,61 @@
                 </div>
               </div>
 
+              <!-- ===================== TO Pick Up ===================== -->
+              <div ng-show="activeTab === 'toPickUp'">
+                <h4>To Pick-up</h4>
 
+                <div ng-if="toPickupOrders.length === 0" class="text-center text-muted" style="margin-top:20px;">
+                  <p>No orders to pick up at the moment.</p>
+                </div>
+
+                <div class="panel-group" id="toShipAccordion">
+                  <div class="panel panel-default"
+                    ng-repeat="order in toPickupOrders track by $index">
+                    <div class="panel-heading">
+                      <h4 class="panel-title">
+                        <a href="" ng-click="togglePanel('toShip', $index, $event)"
+                          ng-class="{'collapsed': !isPanelOpen('toShip', $index)}"
+                          aria-expanded="{{ isPanelOpen('toShip', $index) ? 'true' : 'false' }}"
+                          style="cursor:pointer; display:block;">
+                          Order #{{ order.order_id }}
+                          <span class="pull-right"><i class="fa"
+                              ng-class="{'fa-chevron-up': isPanelOpen('toShip',$index), 'fa-chevron-down': !isPanelOpen('toShip',$index)}"></i></span>
+                        </a>
+                      </h4>
+                    </div>
+
+                    <div class="panel-collapse collapse" ng-class="{'in': isPanelOpen('toShip', $index)}">
+                      <div class="panel-body">
+                        <div class="row" ng-repeat="item in order.items" style="margin-bottom:15px;">
+                          <div class="col-sm-3">
+                            <img
+                              ng-src="{{ (item.item_img_loc ? ('../BackOffice/uploads/' + item.item_img_loc) : 'assets/img/default.jpg') }}"
+                              class="img-responsive img-thumbnail" alt="{{ item.item_brand_name }}">
+                          </div>
+                          <div class="col-sm-6">
+                            <h5>{{ item.item_brand_name }} - {{ item.item_category_name }}</h5>
+                            <p class="text-muted">Qty: {{ item.item_qty }} × ₱{{ item.item_price }}</p>
+                          </div>
+                          <div class="col-sm-3 text-right">
+                            <strong>₱{{ item.item_total_amt | number:2 }}</strong>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-xs-6 text-left">
+                            <h5>Shipping Fee: ₱{{ order.shipRates | number:2 }}</h5>
+                            <h5>Total: ₱{{ getTotal(order.items, order.shipRates) | number:2 }}</h5>
+                          </div>
+                          <div class="col-xs-6 text-right">
+                            <button class="btn btn-primary btn-sm" ng-click="markAsReceived(order)">Received</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <!-- ===================== TO RECEIVE ===================== -->
               <div ng-show="activeTab === 'toReceive'">
