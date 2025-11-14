@@ -3,7 +3,7 @@
 
     <!-- Add New Payment Type Form -->
     <form ng-submit="addPaymentType(newType)" class="mb-4">
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-md-4">
                 <input type="text" class="form-control" ng-model="newType.payment_type_name" placeholder="Payment Type Name" required>
             </div>
@@ -16,7 +16,7 @@
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">Add Payment Type</button>
             </div>
-        </div>
+        </div> -->
     </form>
 
     <!-- Payment Types Table -->
@@ -26,7 +26,7 @@
                 <th>Payment Type ID</th>
                 <th>Name</th>
                 <th>Active</th>
-                <th>Actions</th>
+                <!-- <th>Actions</th> -->
             </tr>
         </thead>
         <tbody>
@@ -37,10 +37,10 @@
                     <span ng-if="type.is_active == 1" class="badge bg-success">Active</span>
                     <span ng-if="type.is_active == 0" class="badge bg-danger">Inactive</span>
                 </td>
-                <td>
+                <!-- <td>
                     <button class="btn btn-secondary btn-sm" ng-click="showPaymentTypeModal(type)">Edit</button>
                     <button class="btn btn-danger btn-sm" ng-click="deletePaymentType(type.payment_type_id)">Delete</button>
-                </td>
+                </td> -->
             </tr>
         </tbody>
     </table>

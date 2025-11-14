@@ -246,7 +246,7 @@
 					</div>
 
 					<button class="primary-btn order-submit" ng-click="proceedCheckOut()"
-						ng-disabled="!userWithAddresses[currentUser.user_id].Addresses || userWithAddresses[currentUser.user_id].Addresses.length === 0">Place
+						ng-disabled="(!userWithAddresses[currentUser.user_id].Addresses || userWithAddresses[currentUser.user_id].Addresses.length === 0) && isLoggedIn"">Place
 						order</button>
 				</div>
 				<!-- /ORDER DETAILS -->

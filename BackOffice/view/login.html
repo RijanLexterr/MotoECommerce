@@ -17,7 +17,7 @@
               </div>
 
               <!-- Password Field -->
-              <div class="mb-4 text-start">
+              <div class="mb-4 text-start" ng-show="!isForgotPW">
                 <label class="form-label text-white" for="typePasswordX">Password</label>
                 <input type="password" ng-model="password" id="typePasswordX" class="form-control form-control-lg" />
                 <small class="text-danger d-block mt-1" ng-if="passwordError">{{ passwordError }}</small>

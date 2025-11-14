@@ -81,6 +81,12 @@ app.config(function ($routeProvider) {
       resolve: {
         auth: checkAuth
       }
+    }).when('/forgotpasswordSent', {
+      templateUrl: 'view/forgotPasswordSent.html'
+    })
+    .when('/forgotpassword', {
+      templateUrl: 'view/forgotPassword.html',
+      controller: 'ForgotPasswordController'
     })
     .otherwise({
       redirectTo: "/login"

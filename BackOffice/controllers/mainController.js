@@ -9,7 +9,7 @@ app.controller('MainController', function($scope, $location, $rootScope) {
     $rootScope.currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
 
     // Optional: redirect to login if not logged in
-    if (!$scope.isLoggedIn && $location.path() !== '/login') {
+    if (!$scope.isLoggedIn && $location.path() !== '/login' && $location.path() !== '/forgotpassword') {
       $location.path('/login');
     }
   });
