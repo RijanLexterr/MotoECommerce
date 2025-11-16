@@ -19,7 +19,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="userCreateModalLabel" >Add User</h5>
+                <h5 class="modal-title" id="userCreateModalLabel">Add User</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" ng-click="updateUserFields()"
                     aria-label="Close"></button>
             </div>
@@ -58,7 +58,7 @@
                 <div class="mb-3">
                     <label for="role" class="form-label">Role</label>
                     <select class="form-select" id="role" ng-change="validateRole()" ng-model="selectedUserRoleId"
-                        ng-options="role.role_id as role.name for role in roles | filter:{name:'!Customer'}">
+                        ng-options="+role.role_id as role.name for role in roles | filter:{name:'!Customer'}">
                         <option value="">-- Select Role --</option>
                     </select>
                     <span ng-show="selectedUserRoleIdHasError" style="color: red; font-size: 0.9em;">
@@ -83,7 +83,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="userCreateModalLabel" >Customer Details</h5>
+                <h5 class="modal-title" id="userCreateModalLabel">Customer Details</h5>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
@@ -94,11 +94,11 @@
                     <label for="email" class="form-label">Email address</label>
                     <input type="text" class="form-control" id="email" ng-disabled="userId" ng-model="email" disabled>
                 </div>
-				<div class="mb-3">
+                <div class="mb-3">
                     <label for="phonenumber" class="form-label">Phone Number</label>
                     <input type="text" class="form-control" id="phonenumber" ng-model="phonenumber" disabled>
                 </div>
-				<div class="mb-3">
+                <div class="mb-3">
                     <label for="Address" class="form-label">Address</label>
                     <input type="text" class="form-control" id="Address" ng-model="Address" disabled>
                 </div>
@@ -113,10 +113,10 @@
                         <option value="">-- Select Role --</option>
                     </select>
                 </div>
-				<div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    ng-click="updateUserFields()">Close</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        ng-click="updateUserFields()">Close</button>
+                </div>
             </div>
         </div>
     </div>
@@ -151,8 +151,8 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
-				<th scope="col" ng-show="!showAddUserButton">Phone Number</th>
-				<th scope="col" ng-show="!showAddUserButton">Address</th>
+                <th scope="col" ng-show="!showAddUserButton">Phone Number</th>
+                <th scope="col" ng-show="!showAddUserButton">Address</th>
                 <th scope="col">Role</th>
                 <th scope="col">Action</th>
             </tr>
@@ -162,8 +162,8 @@
                 <td>{{($index + 1) + ((pagination.page - 1) * pagination.limit)}}</td>
                 <td>{{user.name}}</td>
                 <td>{{user.email}}</td>
-				<td ng-show="!showAddUserButton">{{user.phonenumber}}</td>
-				<td ng-show="!showAddUserButton">{{user.Address}}</td>
+                <td ng-show="!showAddUserButton">{{user.phonenumber}}</td>
+                <td ng-show="!showAddUserButton">{{user.Address}}</td>
                 <td>{{user.role_name}}</td>
                 <td>
                     <div class="action-btn-container">
@@ -176,11 +176,12 @@
                         </div>
                         <div>
                             <button class="btn btn-link btn-danger" ng-click="deleteUserOnClick(user.user_id)"
-                                data-bs-toggle="modal" data-bs-target="#deleteUserConfirmationModal" ng-show="showAddUserButton">
+                                data-bs-toggle="modal" data-bs-target="#deleteUserConfirmationModal"
+                                ng-show="showAddUserButton">
                                 <i class="fa fa-times"></i>
                             </button>
                         </div>
-						<div>
+                        <div>
                             <button type="button" class="btn btn-link btn-primary"
                                 ng-click="updateUserOnClick(user.user_id)" data-bs-toggle="modal"
                                 data-bs-target="#ViewCustomerModal" ng-show="!showAddUserButton">
