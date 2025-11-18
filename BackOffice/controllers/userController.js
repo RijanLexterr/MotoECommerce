@@ -52,7 +52,7 @@ app.controller("UserController", function ($scope, $http, $routeParams) {
   };
 
   function getAllUser(page = 1, limit = $scope.pageSize) {
-    $http.get(`../Core/Controller/UserController.php?action=readAll&page=${page}&limit=${limit}`)
+    $http.get(`../Core/Controller/UserController.php?action=readAll&page=${page}&limit=${limit}&view=${$scope.userView}`)
       .then(function (response) {
         $scope.users = response.data.data;
         $scope.pagination.page = response.data.page;

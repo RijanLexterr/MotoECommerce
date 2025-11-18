@@ -101,9 +101,13 @@ class UserController
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
         $offset = ($page - 1) * $limit;
+        $view = isset($_GET['view']) ? (string) $_GET['view'] : '';
 
         // Get total count
-        $countResult = $this->db->query("SELECT COUNT(*) as total FROM users");
+        $countResult = $this->db->query("SELECT COUNT(*) as total FROM users a 
+                JOIN user_roles b ON a.user_id = b.user_id 
+                JOIN roles c ON b.role_id = c.role_id WHERE c.name = '$view'");
+
         $total = $countResult->fetch_assoc()['total'];
 
         // Get paginated data
@@ -111,6 +115,7 @@ class UserController
                 FROM users a 
                 JOIN user_roles b ON a.user_id = b.user_id 
                 JOIN roles c ON b.role_id = c.role_id
+                WHERE c.name = '$view'
                 ORDER BY a.created_at ASC 
                 LIMIT $limit OFFSET $offset";
 
